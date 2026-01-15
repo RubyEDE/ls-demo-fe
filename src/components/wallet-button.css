@@ -1,0 +1,51 @@
+.wallet-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.625rem 1rem;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+}
+
+.wallet-btn.connect {
+  background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+  color: #fff;
+}
+
+.wallet-btn.connect:hover {
+  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+  transform: translateY(-1px);
+}
+
+.wallet-btn.connected {
+  background: rgba(26, 26, 46, 0.9);
+  border: 1px solid rgba(124, 58, 237, 0.3);
+  color: #e4e4e7;
+}
+
+.wallet-btn.connected:hover {
+  background: rgba(36, 36, 56, 0.9);
+  border-color: rgba(124, 58, 237, 0.5);
+}
+
+.wallet-balance {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.625rem;
+  background: linear-gradient(135deg, rgba(74, 222, 128, 0.15) 0%, rgba(34, 197, 94, 0.1) 100%);
+  color: #4ade80;
+  border-radius: 6px;
+  font-family: "JetBrains Mono", "Fira Code", monospace;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.wallet-address {
+  font-family: "JetBrains Mono", "Fira Code", monospace;
+  font-size: 0.85rem;
+  color: #a1a1aa;
+}
