@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useTrading } from "../../hooks/use-trading";
 import { useAuth } from "../../context/auth-context";
 import type { Market } from "../../types/clob";
@@ -7,9 +7,10 @@ import "./order-form.css";
 interface OrderFormProps {
   market: Market | null;
   onOrderPlaced?: () => void;
+  selectedPrice?: { price: number; timestamp: number } | null;
 }
 
-export function OrderForm({ market, onOrderPlaced }: OrderFormProps) {
+export function OrderForm({ market, onOrderPlaced, selectedPrice }: OrderFormProps) {
   const { isConnected, isAuthenticated, isAuthLoading, login } = useAuth();
   const { placeOrder, isPlacing, error, clearError } = useTrading();
 
@@ -18,6 +19,15 @@ export function OrderForm({ market, onOrderPlaced }: OrderFormProps) {
   const [price, setPrice] = useState("");
   const [quantity, setQuantity] = useState("");
   const [postOnly, setPostOnly] = useState(false);
+
+  // Update price when a price is selected from the orderbook
+  useEffect(() => {
+    if (selectedPrice) {
+      setPrice(selectedPrice.price.toFixed(2));
+      // Switch to limit order when price is selected
+      setOrderType("limit");
+    }
+  }, [selectedPrice]);
 
   const orderValue = useMemo(() => {
     const p = orderType === "market" ? (market?.oraclePrice || 0) : parseFloat(price) || 0;

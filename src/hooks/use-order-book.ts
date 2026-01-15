@@ -15,6 +15,11 @@ export function useOrderBook(symbol: string) {
   const { socket, isConnected } = useWebSocket();
   const [orderBook, setOrderBook] = useState<OrderBook | null>(null);
 
+  // Clear orderbook when symbol changes
+  useEffect(() => {
+    setOrderBook(null);
+  }, [symbol]);
+
   const calculateSpread = useCallback((bids: OrderBookEntry[], asks: OrderBookEntry[]) => {
     if (bids.length === 0 || asks.length === 0) {
       return { spread: 0, spreadPercent: 0 };

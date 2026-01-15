@@ -1,6 +1,8 @@
 export { ConnectionStatus } from "./connection-status";
 export { PriceTicker } from "./price-ticker";
+export { MarketHeader } from "./market-header";
 export { TradingViewChart } from "./tradingview-chart";
+export { CandlestickChart } from "./candlestick-chart";
 export { OrderBook } from "./order-book";
 export { TradeFeed } from "./trade-feed";
 export { OrderForm } from "./order-form";

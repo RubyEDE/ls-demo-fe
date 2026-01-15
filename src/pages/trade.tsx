@@ -1,7 +1,7 @@
 import { useState, useCallback } from "react";
 import { ConnectionStatus } from "../components/trading/connection-status";
-import { PriceTicker } from "../components/trading/price-ticker";
-import { TradingViewChart } from "../components/trading/tradingview-chart";
+import { MarketHeader } from "../components/trading/market-header";
+import { CandlestickChart } from "../components/trading/candlestick-chart";
 import { OrderBook } from "../components/trading/order-book";
 import { TradeFeed } from "../components/trading/trade-feed";
 import { OrderForm } from "../components/trading/order-form";
@@ -12,16 +12,19 @@ import { useAuth } from "../context/auth-context";
 import type { OrderEvent, BalanceUpdate } from "../types/websocket";
 import "./trade.css";
 
-const SYMBOLS = ["AAPL", "GOOGL", "MSFT", "AMZN", "TSLA"];
-
 export function TradePage() {
   const { isAuthenticated } = useAuth();
-  const { getMarket } = useMarkets();
-  const [selectedSymbol, setSelectedSymbol] = useState(SYMBOLS[0]);
+  const { markets, getMarket } = useMarkets();
+  const [selectedSymbol, setSelectedSymbol] = useState("AAPL");
   const [notifications, setNotifications] = useState<string[]>([]);
   const [ordersKey, setOrdersKey] = useState(0);
+  const [selectedPrice, setSelectedPrice] = useState<{ price: number; timestamp: number } | null>(null);
 
   const selectedMarket = getMarket(`${selectedSymbol}-PERP`) || null;
+
+  const handlePriceClick = useCallback((price: number) => {
+    setSelectedPrice({ price, timestamp: Date.now() });
+  }, []);
 
   const addNotification = useCallback((message: string) => {
     setNotifications((prev) => [message, ...prev].slice(0, 5));
@@ -84,25 +87,35 @@ export function TradePage() {
         )}
       </div>
 
-      {/* Price Ticker */}
-      <PriceTicker
-        symbols={SYMBOLS}
-        selectedSymbol={selectedSymbol}
-        onSelectSymbol={setSelectedSymbol}
+      {/* Market Header */}
+      <MarketHeader
+        markets={markets}
+        selectedMarket={selectedMarket}
+        onSelectMarket={setSelectedSymbol}
       />
 
       {/* Main Trading Layout */}
       <div className="trade-layout">
         {/* Left: Chart + Open Orders */}
         <div className="trade-main">
-          <TradingViewChart symbol={selectedSymbol} height={450} />
+          <CandlestickChart symbol={`${selectedSymbol}-PERP`} height={450} />
           <OpenOrders key={ordersKey} market={`${selectedSymbol}-PERP`} />
         </div>
 
         {/* Right Sidebar */}
         <div className="trade-sidebar">
-          <OrderForm market={selectedMarket} onOrderPlaced={handleOrderPlaced} />
-          <OrderBook symbol={`${selectedSymbol}-PERP`} depth={10} />
+          <div className="order-panel">
+            <OrderForm
+              market={selectedMarket}
+              onOrderPlaced={handleOrderPlaced}
+              selectedPrice={selectedPrice}
+            />
+            <OrderBook
+              symbol={`${selectedSymbol}-PERP`}
+              depth={8}
+              onPriceClick={handlePriceClick}
+            />
+          </div>
           <TradeFeed symbol={`${selectedSymbol}-PERP`} maxTrades={20} />
         </div>
       </div>

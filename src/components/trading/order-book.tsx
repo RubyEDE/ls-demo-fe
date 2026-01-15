@@ -6,6 +6,7 @@ import "./order-book.css";
 interface OrderBookProps {
   symbol: string;
   depth?: number;
+  onPriceClick?: (price: number) => void;
 }
 
 function formatPrice(price: number): string {
@@ -26,15 +27,23 @@ function OrderRow({
   entry,
   side,
   maxTotal,
+  onClick,
 }: {
   entry: OrderBookEntry;
   side: "bid" | "ask";
   maxTotal: number;
+  onClick?: () => void;
 }) {
   const depthPercent = maxTotal > 0 ? (entry.total / maxTotal) * 100 : 0;
 
   return (
-    <div className={`order-row ${side}`}>
+    <div
+      className={`order-row ${side} ${onClick ? "clickable" : ""}`}
+      onClick={onClick}
+      role={onClick ? "button" : undefined}
+      tabIndex={onClick ? 0 : undefined}
+      onKeyDown={onClick ? (e) => e.key === "Enter" && onClick() : undefined}
+    >
       <div
         className="depth-bar"
         style={{ width: `${Math.min(depthPercent, 100)}%` }}
@@ -46,7 +55,7 @@ function OrderRow({
   );
 }
 
-export function OrderBook({ symbol, depth = 10 }: OrderBookProps) {
+export function OrderBook({ symbol, depth = 10, onPriceClick }: OrderBookProps) {
   const { orderBook, isConnected } = useOrderBook(symbol);
 
   const { asks, bids, maxTotal } = useMemo(() => {
@@ -105,7 +114,13 @@ export function OrderBook({ symbol, depth = 10 }: OrderBookProps) {
           <div className="no-orders">No asks</div>
         ) : (
           asks.map((ask, i) => (
-            <OrderRow key={`ask-${i}`} entry={ask} side="ask" maxTotal={maxTotal} />
+            <OrderRow
+              key={`ask-${i}`}
+              entry={ask}
+              side="ask"
+              maxTotal={maxTotal}
+              onClick={onPriceClick ? () => onPriceClick(ask.price) : undefined}
+            />
           ))
         )}
       </div>
@@ -122,7 +137,13 @@ export function OrderBook({ symbol, depth = 10 }: OrderBookProps) {
           <div className="no-orders">No bids</div>
         ) : (
           bids.map((bid, i) => (
-            <OrderRow key={`bid-${i}`} entry={bid} side="bid" maxTotal={maxTotal} />
+            <OrderRow
+              key={`bid-${i}`}
+              entry={bid}
+              side="bid"
+              maxTotal={maxTotal}
+              onClick={onPriceClick ? () => onPriceClick(bid.price) : undefined}
+            />
           ))
         )}
       </div>

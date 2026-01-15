@@ -1,5 +1,6 @@
 import { fetchWithAuth } from "./api";
 import type { Market, Order, PlaceOrderParams, PlaceOrderResult } from "../types/clob";
+import type { CandleInterval, CandleResponse, MarketStatus } from "../types/candles";
 
 const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:3000";
 
@@ -114,4 +115,30 @@ export async function getRecentTrades(
   }
   const data = await res.json();
   return data.trades;
+}
+
+// Candles (Authenticated)
+export async function getCandles(
+  symbol: string,
+  interval: CandleInterval = "1m",
+  limit = 100
+): Promise<CandleResponse> {
+  // Strip -PERP suffix if present for the API call
+  const baseSymbol = symbol.replace("-PERP", "");
+  const res = await fetchWithAuth(`/finnhub/candles/${baseSymbol}?interval=${interval}&limit=${limit}`);
+
+  if (!res.ok) {
+    throw new Error("Failed to fetch candles");
+  }
+
+  return res.json();
+}
+
+// Market Status (Public)
+export async function getMarketStatus(): Promise<MarketStatus> {
+  const res = await fetch(`${API_BASE}/clob/market-status`);
+  if (!res.ok) {
+    throw new Error("Failed to fetch market status");
+  }
+  return res.json();
 }
