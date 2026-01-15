@@ -19,7 +19,7 @@ export function Layout() {
               className={({ isActive }) => (isActive ? "nav-link active" : "nav-link")}
               end
             >
-              Home
+              Trade
             </NavLink>
             {isAuthenticated && (
               <NavLink

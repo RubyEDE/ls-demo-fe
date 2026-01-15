@@ -1,0 +1,106 @@
+.trade-feed-container {
+  background: rgba(26, 26, 46, 0.8);
+  border: 1px solid rgba(124, 58, 237, 0.2);
+  border-radius: 12px;
+  padding: 1rem;
+  font-family: "JetBrains Mono", "Fira Code", monospace;
+  display: flex;
+  flex-direction: column;
+}
+
+.trade-feed-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.trade-feed-header h3 {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #e4e4e7;
+  margin: 0;
+  font-family: inherit;
+}
+
+.symbol-tag {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #a78bfa;
+  background: rgba(124, 58, 237, 0.15);
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  letter-spacing: 0.05em;
+}
+
+.trade-feed-columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 0.5rem;
+  padding: 0.5rem 0;
+  font-size: 0.7rem;
+  color: #71717a;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.trade-feed-loading {
+  text-align: center;
+  padding: 2rem;
+  color: #71717a;
+  font-size: 0.85rem;
+}
+
+.trade-feed-list {
+  flex: 1;
+  overflow-y: auto;
+  max-height: 400px;
+}
+
+.trade-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 0.5rem;
+  padding: 0.375rem 0;
+  font-size: 0.8rem;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.trade-row.buy .trade-price {
+  color: #4ade80;
+}
+
+.trade-row.sell .trade-price {
+  color: #f87171;
+}
+
+.trade-quantity {
+  color: #a1a1aa;
+  text-align: right;
+}
+
+.trade-time {
+  color: #71717a;
+  text-align: right;
+  font-size: 0.75rem;
+}
+
+.no-trades {
+  text-align: center;
+  padding: 2rem;
+  color: #52525b;
+  font-size: 0.85rem;
+}

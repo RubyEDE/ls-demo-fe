@@ -1,7 +1,7 @@
 import { createBrowserRouter } from "react-router-dom";
 import { Layout } from "./components/layout";
 import { ProtectedRoute } from "./components/protected-route";
-import { HomePage } from "./pages/home";
+import { TradePage } from "./pages/trade";
 import { FaucetPage } from "./pages/faucet";
 
 export const router = createBrowserRouter([
@@ -11,7 +11,7 @@ export const router = createBrowserRouter([
     children: [
       {
         index: true,
-        element: <HomePage />,
+        element: <TradePage />,
       },
       {
         path: "faucet",

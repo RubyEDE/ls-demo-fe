@@ -6,6 +6,7 @@ import { RainbowKitProvider, darkTheme } from "@rainbow-me/rainbowkit";
 import { RouterProvider } from "react-router-dom";
 import { config } from "./config/wagmi";
 import { AuthProvider } from "./context/auth-context";
+import { WebSocketProvider } from "./context/websocket-context";
 import { router } from "./router";
 import "@rainbow-me/rainbowkit/styles.css";
 import "./index.css";
@@ -31,7 +32,9 @@ createRoot(document.getElementById("root")!).render(
           })}
         >
           <AuthProvider>
-            <RouterProvider router={router} />
+            <WebSocketProvider>
+              <RouterProvider router={router} />
+            </WebSocketProvider>
           </AuthProvider>
         </RainbowKitProvider>
       </QueryClientProvider>
