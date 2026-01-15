@@ -1,15 +1,24 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { ConnectionStatus } from "../components/trading/connection-status";
 import { MarketHeader } from "../components/trading/market-header";
 import { CandlestickChart } from "../components/trading/candlestick-chart";
 import { OrderBook } from "../components/trading/order-book";
 import { OrderForm } from "../components/trading/order-form";
+import { TradeFeed } from "../components/trading/trade-feed";
 import { TradingTabs } from "../components/trading/trading-tabs";
 import { useMarkets } from "../hooks/use-markets";
+import { usePriceFeed } from "../hooks/use-price-feed";
 import { useUserEvents } from "../hooks/use-user-events";
 import { useAuth } from "../context/auth-context";
 import type { OrderEvent, BalanceUpdate, PositionEvent } from "../types/websocket";
 import "./trade.css";
+
+function formatPrice(price: number): string {
+  return price.toLocaleString("en-US", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+}
 
 export function TradePage() {
   const { isAuthenticated } = useAuth();
@@ -20,6 +29,23 @@ export function TradePage() {
   const [selectedPrice, setSelectedPrice] = useState<{ price: number; timestamp: number } | null>(null);
 
   const selectedMarket = getMarket(`${selectedSymbol}-PERP`) || null;
+  
+  // Get price feed for document title
+  const { getPrice } = usePriceFeed([selectedSymbol]);
+  const currentPrice = getPrice(selectedSymbol);
+
+  // Update document title with current price
+  useEffect(() => {
+    if (currentPrice) {
+      document.title = `$${formatPrice(currentPrice.price)} | ${selectedSymbol} | Longsword`;
+    } else {
+      document.title = `${selectedSymbol} | Longsword`;
+    }
+
+    return () => {
+      document.title = "Longsword";
+    };
+  }, [currentPrice, selectedSymbol]);
 
   const handlePriceClick = useCallback((price: number) => {
     setSelectedPrice({ price, timestamp: Date.now() });
@@ -117,13 +143,16 @@ export function TradePage() {
           <TradingTabs ordersKey={ordersKey} />
         </div>
 
-        {/* Right: Order Form + Order Book */}
+        {/* Right: Order Form + Trade Feed + Order Book */}
         <div className="terminal-sidebar">
-          <OrderForm
-            market={selectedMarket}
-            onOrderPlaced={handleOrderPlaced}
-            selectedPrice={selectedPrice}
-          />
+          <div className="sidebar-left">
+            <OrderForm
+              market={selectedMarket}
+              onOrderPlaced={handleOrderPlaced}
+              selectedPrice={selectedPrice}
+            />
+            <TradeFeed symbol={`${selectedSymbol}-PERP`} maxTrades={20} />
+          </div>
           <OrderBook
             symbol={`${selectedSymbol}-PERP`}
             depth={50}
