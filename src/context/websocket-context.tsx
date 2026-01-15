@@ -28,6 +28,7 @@ interface WebSocketProviderProps {
 export function WebSocketProvider({ children }: WebSocketProviderProps) {
   const { token, isAuthenticated } = useAuth();
   const socketRef = useRef<Socket | null>(null);
+  const [socket, setSocket] = useState<Socket | null>(null);
   const [isConnected, setIsConnected] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const subscribedChannelsRef = useRef<Set<string>>(new Set());
@@ -38,7 +39,7 @@ export function WebSocketProvider({ children }: WebSocketProviderProps) {
       socketRef.current.disconnect();
     }
 
-    const socket = io(WS_URL, {
+    const newSocket = io(WS_URL, {
       auth: token ? { token } : undefined,
       transports: ["websocket"],
       reconnection: true,
@@ -47,44 +48,46 @@ export function WebSocketProvider({ children }: WebSocketProviderProps) {
       reconnectionDelayMax: 5000,
     });
 
-    socket.on("connect", () => {
+    newSocket.on("connect", () => {
+      console.log("[WebSocket] Connected, setting socket state");
       setIsConnected(true);
+      setSocket(newSocket);
       setError(null);
 
       // Re-subscribe to previously subscribed channels
       subscribedChannelsRef.current.forEach((channel) => {
         const [type, symbol] = channel.split(":");
-        socket.emit(`subscribe:${type}`, symbol);
+        newSocket.emit(`subscribe:${type}`, symbol);
       });
     });
 
-    socket.on("disconnect", (reason) => {
+    newSocket.on("disconnect", (reason) => {
       setIsConnected(false);
       if (reason === "io server disconnect") {
         // Server disconnected, try to reconnect
-        socket.connect();
+        newSocket.connect();
       }
     });
 
-    socket.on("connect_error", (err) => {
+    newSocket.on("connect_error", (err) => {
       setError(err.message);
       setIsConnected(false);
     });
 
-    socket.on("error", (err: { code: string; message: string }) => {
+    newSocket.on("error", (err: { code: string; message: string }) => {
       setError(err.message);
     });
 
     // Track subscriptions for reconnection
-    socket.on("subscribed", (data: { channel: string; symbol: string }) => {
+    newSocket.on("subscribed", (data: { channel: string; symbol: string }) => {
       subscribedChannelsRef.current.add(`${data.channel}:${data.symbol}`);
     });
 
-    socket.on("unsubscribed", (data: { channel: string; symbol: string }) => {
+    newSocket.on("unsubscribed", (data: { channel: string; symbol: string }) => {
       subscribedChannelsRef.current.delete(`${data.channel}:${data.symbol}`);
     });
 
-    socketRef.current = socket;
+    socketRef.current = newSocket;
   }, [token]);
 
   const reconnect = useCallback(() => {
@@ -109,6 +112,7 @@ export function WebSocketProvider({ children }: WebSocketProviderProps) {
       if (socketRef.current) {
         socketRef.current.disconnect();
         socketRef.current = null;
+        setSocket(null);
       }
     };
   }, [connect, isAuthenticated]);
@@ -116,7 +120,7 @@ export function WebSocketProvider({ children }: WebSocketProviderProps) {
   return (
     <WebSocketContext.Provider
       value={{
-        socket: socketRef.current,
+        socket,
         isConnected,
         error,
         reconnect,

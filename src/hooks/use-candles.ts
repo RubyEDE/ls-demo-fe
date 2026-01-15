@@ -13,7 +13,7 @@ interface UseCandlesOptions {
 export function useCandles(options: UseCandlesOptions) {
   const {
     symbol,
-    interval = "1m",
+    interval = "5m",
     limit = 200,
     autoRefresh = true,
     refreshInterval = 60000,

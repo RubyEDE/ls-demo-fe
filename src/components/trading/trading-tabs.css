@@ -1,0 +1,129 @@
+.trading-tabs-container {
+  background: rgba(26, 26, 46, 0.8);
+  border: 1px solid rgba(124, 58, 237, 0.2);
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  min-height: 300px;
+}
+
+.trading-tabs-header {
+  display: flex;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  padding: 0 0.5rem;
+}
+
+.trading-tab {
+  position: relative;
+  padding: 0.75rem 1rem;
+  background: transparent;
+  border: none;
+  color: #71717a;
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: color 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.trading-tab:hover {
+  color: #a1a1aa;
+}
+
+.trading-tab.active {
+  color: #e4e4e7;
+}
+
+.trading-tab.active::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0.5rem;
+  right: 0.5rem;
+  height: 2px;
+  background: linear-gradient(135deg, #a78bfa 0%, #7c3aed 100%);
+  border-radius: 2px 2px 0 0;
+}
+
+.trading-tab-badge {
+  background: rgba(124, 58, 237, 0.3);
+  color: #a78bfa;
+  font-size: 0.65rem;
+  font-weight: 600;
+  padding: 0.125rem 0.375rem;
+  border-radius: 10px;
+  min-width: 18px;
+  text-align: center;
+}
+
+.trading-tab-badge.positions {
+  background: rgba(74, 222, 128, 0.2);
+  color: #4ade80;
+}
+
+.trading-tab-badge.orders {
+  background: rgba(59, 130, 246, 0.2);
+  color: #60a5fa;
+}
+
+.trading-tabs-content {
+  flex: 1;
+  overflow: hidden;
+}
+
+/* Override child container styles when inside tabs */
+.trading-tabs-content .positions-container,
+.trading-tabs-content .open-orders-container,
+.trading-tabs-content .trade-feed-container {
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  height: 100%;
+}
+
+.trading-tabs-content .positions-header,
+.trading-tabs-content .open-orders-header,
+.trading-tabs-content .trade-feed-header {
+  padding: 0.75rem 1rem 0.5rem;
+  margin-bottom: 0;
+  border-bottom: none;
+}
+
+.trading-tabs-content .positions-header h3,
+.trading-tabs-content .open-orders-header h3,
+.trading-tabs-content .trade-feed-header h3 {
+  display: none;
+}
+
+.trading-tabs-content .positions-list,
+.trading-tabs-content .orders-list,
+.trading-tabs-content .trade-feed-list {
+  max-height: 280px;
+  padding: 0 0.5rem 0.5rem;
+}
+
+.trading-tabs-content .positions-summary {
+  margin: 0 0.5rem 0.5rem;
+}
+
+.trading-tabs-content .positions-empty,
+.trading-tabs-content .positions-loading,
+.trading-tabs-content .open-orders-empty,
+.trading-tabs-content .open-orders-loading,
+.trading-tabs-content .no-trades,
+.trading-tabs-content .trade-feed-loading {
+  padding: 2rem 1rem;
+}
+
+/* Hide symbol tag in trade feed header since tab already indicates context */
+.trading-tabs-content .symbol-tag {
+  display: none;
+}
+
+/* Trade feed columns header */
+.trading-tabs-content .trade-feed-columns {
+  padding: 0 1rem;
+  margin-bottom: 0.25rem;
+}

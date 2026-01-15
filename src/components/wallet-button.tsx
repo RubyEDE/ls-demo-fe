@@ -1,34 +1,20 @@
 import { ConnectButton } from "@rainbow-me/rainbowkit";
-import { useState, useEffect } from "react";
 import { useAuth } from "../context/auth-context";
-import { getBalance } from "../utils/faucet-api";
+import { useBalance } from "../context/balance-context";
 import "./wallet-button.css";
+
+function formatMoney(amount: number): string {
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(amount);
+}
 
 export function WalletButton() {
   const { isAuthenticated } = useAuth();
-  const [balance, setBalance] = useState<number | null>(null);
-
-  useEffect(() => {
-    if (!isAuthenticated) {
-      setBalance(null);
-      return;
-    }
-
-    const fetchBalance = async () => {
-      try {
-        const data = await getBalance();
-        setBalance(data.total);
-      } catch {
-        setBalance(null);
-      }
-    };
-
-    fetchBalance();
-
-    // Refresh balance every 30 seconds
-    const interval = setInterval(fetchBalance, 30000);
-    return () => clearInterval(interval);
-  }, [isAuthenticated]);
+  const { availableBalance } = useBalance();
 
   return (
     <ConnectButton.Custom>
@@ -69,8 +55,8 @@ export function WalletButton() {
 
               return (
                 <button onClick={openAccountModal} className="wallet-btn connected">
-                  {isAuthenticated && balance !== null && (
-                    <span className="wallet-balance">${balance}</span>
+                  {isAuthenticated && availableBalance !== null && (
+                    <span className="wallet-balance">{formatMoney(availableBalance)}</span>
                   )}
                   <span className="wallet-address">
                     {account.ensName || account.displayName}

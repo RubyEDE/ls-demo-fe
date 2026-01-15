@@ -1,6 +1,7 @@
 import { useOrders } from "../../hooks/use-orders";
 import { useTrading } from "../../hooks/use-trading";
 import { useAuth } from "../../context/auth-context";
+import { useBalance } from "../../context/balance-context";
 import type { Order } from "../../types/clob";
 import "./open-orders.css";
 
@@ -60,15 +61,22 @@ export function OpenOrders({ market }: OpenOrdersProps) {
   const { isAuthenticated } = useAuth();
   const { openOrders, isLoading, refresh } = useOrders({ market });
   const { cancelOrder, cancelAllOrders, isCancelling } = useTrading();
+  const { refreshBalance } = useBalance();
 
   const handleCancel = async (orderId: string) => {
     const success = await cancelOrder(orderId);
-    if (success) refresh();
+    if (success) {
+      refresh();
+      // Refresh balance to reflect unlocked funds
+      refreshBalance();
+    }
   };
 
   const handleCancelAll = async () => {
     await cancelAllOrders(openOrders);
     refresh();
+    // Refresh balance to reflect unlocked funds
+    refreshBalance();
   };
 
   if (!isAuthenticated) {

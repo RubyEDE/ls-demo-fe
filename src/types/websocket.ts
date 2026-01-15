@@ -63,6 +63,23 @@ export interface BalanceUpdate {
   timestamp: number;
 }
 
+// Position Events (Authenticated)
+export interface PositionEvent {
+  positionId: string;
+  marketSymbol: string;
+  side: "long" | "short";
+  size: number;
+  entryPrice: number;
+  markPrice: number;
+  margin: number;
+  leverage: number;
+  unrealizedPnl: number;
+  realizedPnl: number;
+  liquidationPrice: number;
+  status: "open" | "closed" | "liquidated";
+  timestamp: number;
+}
+
 // WebSocket Error
 export interface WSError {
   code: string;

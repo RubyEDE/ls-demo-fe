@@ -10,7 +10,7 @@ interface UseLiveCandlesOptions {
 }
 
 export function useLiveCandles(options: UseLiveCandlesOptions) {
-  const { symbol, interval = "1m", limit = 200 } = options;
+  const { symbol, interval = "5m", limit = 200 } = options;
 
   const {
     candles,

@@ -5,6 +5,8 @@ export { useUserEvents } from "./use-user-events";
 export { useMarkets } from "./use-markets";
 export { useTrading } from "./use-trading";
 export { useOrders, useOrderHistory } from "./use-orders";
+export { usePositions, usePositionHistory } from "./use-positions";
+export { usePositionActions } from "./use-position-actions";
 export { useCandles } from "./use-candles";
 export { useCandleUpdates } from "./use-candle-updates";
 export { useLiveCandles } from "./use-live-candles";

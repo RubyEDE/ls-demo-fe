@@ -7,6 +7,7 @@ import { RouterProvider } from "react-router-dom";
 import { config } from "./config/wagmi";
 import { AuthProvider } from "./context/auth-context";
 import { WebSocketProvider } from "./context/websocket-context";
+import { BalanceProvider } from "./context/balance-context";
 import { router } from "./router";
 import "@rainbow-me/rainbowkit/styles.css";
 import "./index.css";
@@ -33,7 +34,9 @@ createRoot(document.getElementById("root")!).render(
         >
           <AuthProvider>
             <WebSocketProvider>
-              <RouterProvider router={router} />
+              <BalanceProvider>
+                <RouterProvider router={router} />
+              </BalanceProvider>
             </WebSocketProvider>
           </AuthProvider>
         </RainbowKitProvider>

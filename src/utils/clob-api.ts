@@ -1,6 +1,7 @@
 import { fetchWithAuth } from "./api";
 import type { Market, Order, PlaceOrderParams, PlaceOrderResult } from "../types/clob";
 import type { CandleInterval, CandleResponse, MarketStatus } from "../types/candles";
+import type { Position, PositionSummary, ClosePositionResult } from "../types/position";
 
 const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:3000";
 
@@ -120,7 +121,7 @@ export async function getRecentTrades(
 // Candles (Authenticated)
 export async function getCandles(
   symbol: string,
-  interval: CandleInterval = "1m",
+  interval: CandleInterval = "5m",
   limit = 100
 ): Promise<CandleResponse> {
   // Strip -PERP suffix if present for the API call
@@ -140,5 +141,68 @@ export async function getMarketStatus(): Promise<MarketStatus> {
   if (!res.ok) {
     throw new Error("Failed to fetch market status");
   }
+  return res.json();
+}
+
+// Positions (Authenticated)
+export async function getPositions(): Promise<Position[]> {
+  const res = await fetchWithAuth("/clob/positions");
+  if (!res.ok) {
+    throw new Error("Failed to fetch positions");
+  }
+  const data = await res.json();
+  return data.positions;
+}
+
+export async function getPositionSummary(): Promise<PositionSummary> {
+  const res = await fetchWithAuth("/clob/positions/summary");
+  if (!res.ok) {
+    throw new Error("Failed to fetch position summary");
+  }
+  return res.json();
+}
+
+export async function getPosition(marketSymbol: string): Promise<Position | null> {
+  const res = await fetchWithAuth(`/clob/positions/${marketSymbol}`);
+  if (!res.ok) {
+    throw new Error("Failed to fetch position");
+  }
+  const data = await res.json();
+  return data.position;
+}
+
+export async function closePosition(
+  marketSymbol: string,
+  quantity?: number
+): Promise<ClosePositionResult> {
+  const res = await fetchWithAuth(`/clob/positions/${marketSymbol}/close`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(quantity ? { quantity } : {}),
+  });
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    return { success: false, closedQuantity: 0, order: null, position: null, error: data.message || "Failed to close position" };
+  }
+
+  return data;
+}
+
+export async function getPositionHistory(
+  options: { market?: string; limit?: number; offset?: number } = {}
+): Promise<{ positions: Position[]; pagination: { hasMore: boolean } }> {
+  const params = new URLSearchParams();
+  if (options.market) params.set("market", options.market);
+  if (options.limit) params.set("limit", String(options.limit));
+  if (options.offset) params.set("offset", String(options.offset));
+
+  const res = await fetchWithAuth(`/clob/positions/history?${params}`);
+
+  if (!res.ok) {
+    throw new Error("Failed to fetch position history");
+  }
+
   return res.json();
 }

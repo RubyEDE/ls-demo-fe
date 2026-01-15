@@ -3,13 +3,12 @@ import { ConnectionStatus } from "../components/trading/connection-status";
 import { MarketHeader } from "../components/trading/market-header";
 import { CandlestickChart } from "../components/trading/candlestick-chart";
 import { OrderBook } from "../components/trading/order-book";
-import { TradeFeed } from "../components/trading/trade-feed";
 import { OrderForm } from "../components/trading/order-form";
-import { OpenOrders } from "../components/trading/open-orders";
+import { TradingTabs } from "../components/trading/trading-tabs";
 import { useMarkets } from "../hooks/use-markets";
 import { useUserEvents } from "../hooks/use-user-events";
 import { useAuth } from "../context/auth-context";
-import type { OrderEvent, BalanceUpdate } from "../types/websocket";
+import type { OrderEvent, BalanceUpdate, PositionEvent } from "../types/websocket";
 import "./trade.css";
 
 export function TradePage() {
@@ -66,6 +65,25 @@ export function TradePage() {
       },
       [addNotification]
     ),
+    onPositionOpened: useCallback(
+      (position: PositionEvent) => {
+        addNotification(`Position opened: ${position.side.toUpperCase()} ${position.size} ${position.marketSymbol}`);
+      },
+      [addNotification]
+    ),
+    onPositionClosed: useCallback(
+      (position: PositionEvent) => {
+        const pnlStr = position.realizedPnl >= 0 ? `+$${position.realizedPnl.toFixed(2)}` : `-$${Math.abs(position.realizedPnl).toFixed(2)}`;
+        addNotification(`Position closed: ${position.marketSymbol} (${pnlStr})`);
+      },
+      [addNotification]
+    ),
+    onPositionLiquidated: useCallback(
+      (position: PositionEvent) => {
+        addNotification(`⚠️ Position liquidated: ${position.marketSymbol}`);
+      },
+      [addNotification]
+    ),
   });
 
   return (
@@ -96,10 +114,10 @@ export function TradePage() {
 
       {/* Main Trading Layout */}
       <div className="trade-layout">
-        {/* Left: Chart + Open Orders */}
+        {/* Left: Chart + Tabbed Panel */}
         <div className="trade-main">
           <CandlestickChart symbol={`${selectedSymbol}-PERP`} height={450} />
-          <OpenOrders key={ordersKey} market={`${selectedSymbol}-PERP`} />
+          <TradingTabs market={`${selectedSymbol}-PERP`} ordersKey={ordersKey} />
         </div>
 
         {/* Right Sidebar */}
@@ -116,7 +134,6 @@ export function TradePage() {
               onPriceClick={handlePriceClick}
             />
           </div>
-          <TradeFeed symbol={`${selectedSymbol}-PERP`} maxTrades={20} />
         </div>
       </div>
     </div>

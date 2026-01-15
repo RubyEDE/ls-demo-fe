@@ -19,7 +19,12 @@ export function useCandleUpdates(options: UseCandleUpdatesOptions) {
   }, [onUpdate]);
 
   useEffect(() => {
-    if (!socket || !isConnected || !symbol) return;
+    console.log("[Candles] Effect triggered:", { hasSocket: !!socket, isConnected, symbol, interval });
+    
+    if (!socket || !isConnected || !symbol) {
+      console.log("[Candles] Skipping subscription - not ready");
+      return;
+    }
 
     const upperSymbol = symbol.toUpperCase();
 
@@ -75,15 +80,19 @@ export function useCandleUpdates(options: UseCandleUpdatesOptions) {
 
     socket.on("candle:update", handleUpdate);
 
-    // Also listen for subscription confirmation
-    socket.on("subscribed", (data: { channel: string; symbol: string }) => {
-      console.log("[Candles] Subscription confirmed:", data);
-    });
+    // Also listen for subscription confirmation (only log candle subscriptions)
+    const handleSubscribed = (data: { channel: string; symbol: string; interval?: string }) => {
+      if (data.channel === "candles") {
+        console.log("[Candles] Subscription confirmed:", data);
+      }
+    };
+    socket.on("subscribed", handleSubscribed);
 
     return () => {
       console.log("[Candles] Unsubscribing from:", { symbol: upperSymbol, interval });
       socket.emit("unsubscribe:candles", { symbol: upperSymbol, interval });
       socket.off("candle:update", handleUpdate);
+      socket.off("subscribed", handleSubscribed);
       socket.offAny(debugHandler);
     };
   }, [socket, isConnected, symbol, interval]);

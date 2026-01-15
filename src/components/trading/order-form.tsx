@@ -1,6 +1,7 @@
 import { useState, useMemo, useEffect } from "react";
 import { useTrading } from "../../hooks/use-trading";
 import { useAuth } from "../../context/auth-context";
+import { useBalance } from "../../context/balance-context";
 import type { Market } from "../../types/clob";
 import "./order-form.css";
 
@@ -13,12 +14,33 @@ interface OrderFormProps {
 export function OrderForm({ market, onOrderPlaced, selectedPrice }: OrderFormProps) {
   const { isConnected, isAuthenticated, isAuthLoading, login } = useAuth();
   const { placeOrder, isPlacing, error, clearError } = useTrading();
+  const { refreshBalance } = useBalance();
 
   const [side, setSide] = useState<"buy" | "sell">("buy");
   const [orderType, setOrderType] = useState<"limit" | "market">("limit");
   const [price, setPrice] = useState("");
   const [quantity, setQuantity] = useState("");
   const [postOnly, setPostOnly] = useState(false);
+  const [leverage, setLeverage] = useState(1);
+  const [showLeveragePopup, setShowLeveragePopup] = useState(false);
+  const [tempLeverage, setTempLeverage] = useState(1);
+
+  const maxLeverage = market?.maxLeverage || 20;
+
+  const handleOpenLeveragePopup = () => {
+    setTempLeverage(leverage);
+    setShowLeveragePopup(true);
+  };
+
+  const handleConfirmLeverage = () => {
+    setLeverage(tempLeverage);
+    setShowLeveragePopup(false);
+  };
+
+  const handleCancelLeverage = () => {
+    setTempLeverage(leverage);
+    setShowLeveragePopup(false);
+  };
 
   // Update price when a price is selected from the orderbook
   useEffect(() => {
@@ -36,8 +58,8 @@ export function OrderForm({ market, onOrderPlaced, selectedPrice }: OrderFormPro
   }, [orderType, price, quantity, market?.oraclePrice]);
 
   const requiredMargin = useMemo(() => {
-    return orderValue * (market?.initialMarginRate || 0.05);
-  }, [orderValue, market?.initialMarginRate]);
+    return orderValue / leverage;
+  }, [orderValue, leverage]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -64,6 +86,8 @@ export function OrderForm({ market, onOrderPlaced, selectedPrice }: OrderFormPro
       setPrice("");
       setQuantity("");
       onOrderPlaced?.();
+      // Refresh balance to reflect locked funds
+      refreshBalance();
     }
   };
 
@@ -149,6 +173,62 @@ export function OrderForm({ market, onOrderPlaced, selectedPrice }: OrderFormPro
           </button>
         </div>
 
+        {/* Leverage Button */}
+        <div className="input-group">
+          <label>Leverage</label>
+          <button
+            type="button"
+            className="leverage-btn"
+            onClick={handleOpenLeveragePopup}
+          >
+            <span className="leverage-value">{leverage}x</span>
+            <span className="leverage-icon">⚙</span>
+          </button>
+        </div>
+
+        {/* Leverage Popup */}
+        {showLeveragePopup && (
+          <div className="leverage-popup-overlay" onClick={handleCancelLeverage}>
+            <div className="leverage-popup" onClick={(e) => e.stopPropagation()}>
+              <div className="leverage-popup-header">
+                <h4>Adjust Leverage</h4>
+                <span className="leverage-popup-value">{tempLeverage}x</span>
+              </div>
+              <div className="leverage-slider-container">
+                <input
+                  type="range"
+                  min={1}
+                  max={maxLeverage}
+                  step={1}
+                  value={tempLeverage}
+                  onChange={(e) => setTempLeverage(Number(e.target.value))}
+                  className="leverage-slider"
+                />
+                <div className="leverage-slider-labels">
+                  <span>1x</span>
+                  <span>{maxLeverage}x</span>
+                </div>
+              </div>
+              <div className="leverage-popup-actions">
+                <button
+                  type="button"
+                  className="leverage-cancel-btn"
+                  onClick={handleCancelLeverage}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  className="leverage-confirm-btn"
+                  onClick={handleConfirmLeverage}
+                >
+                  Confirm
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Price Input (Limit only) */}
         {orderType === "limit" && (
           <div className="input-group">
@@ -209,12 +289,12 @@ export function OrderForm({ market, onOrderPlaced, selectedPrice }: OrderFormPro
             <span className="summary-value">${orderValue.toFixed(2)}</span>
           </div>
           <div className="summary-row">
-            <span>Est. Margin ({((market.initialMarginRate || 0.05) * 100).toFixed(0)}%)</span>
+            <span>Est. Margin ({leverage}x)</span>
             <span className="summary-value">${requiredMargin.toFixed(2)}</span>
           </div>
           <div className="summary-row">
-            <span>Max Leverage</span>
-            <span className="summary-value">{market.maxLeverage}x</span>
+            <span>Leverage</span>
+            <span className="summary-value">{leverage}x</span>
           </div>
         </div>
 
