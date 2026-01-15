@@ -4,6 +4,9 @@ import { PriceTicker } from "../components/trading/price-ticker";
 import { TradingViewChart } from "../components/trading/tradingview-chart";
 import { OrderBook } from "../components/trading/order-book";
 import { TradeFeed } from "../components/trading/trade-feed";
+import { OrderForm } from "../components/trading/order-form";
+import { OpenOrders } from "../components/trading/open-orders";
+import { useMarkets } from "../hooks/use-markets";
 import { useUserEvents } from "../hooks/use-user-events";
 import { useAuth } from "../context/auth-context";
 import type { OrderEvent, BalanceUpdate } from "../types/websocket";
@@ -13,8 +16,12 @@ const SYMBOLS = ["AAPL", "GOOGL", "MSFT", "AMZN", "TSLA"];
 
 export function TradePage() {
   const { isAuthenticated } = useAuth();
+  const { getMarket } = useMarkets();
   const [selectedSymbol, setSelectedSymbol] = useState(SYMBOLS[0]);
   const [notifications, setNotifications] = useState<string[]>([]);
+  const [ordersKey, setOrdersKey] = useState(0);
+
+  const selectedMarket = getMarket(`${selectedSymbol}-PERP`) || null;
 
   const addNotification = useCallback((message: string) => {
     setNotifications((prev) => [message, ...prev].slice(0, 5));
@@ -23,22 +30,30 @@ export function TradePage() {
     }, 5000);
   }, []);
 
+  const handleOrderPlaced = useCallback(() => {
+    setOrdersKey((k) => k + 1);
+    addNotification("Order placed successfully");
+  }, [addNotification]);
+
   useUserEvents({
     onOrderCreated: useCallback(
       (order: OrderEvent) => {
         addNotification(`Order created: ${order.side.toUpperCase()} ${order.quantity} ${order.symbol}`);
+        setOrdersKey((k) => k + 1);
       },
       [addNotification]
     ),
     onOrderFilled: useCallback(
       (order: OrderEvent) => {
         addNotification(`Order filled: ${order.side.toUpperCase()} ${order.filledQuantity} ${order.symbol} @ $${order.price}`);
+        setOrdersKey((k) => k + 1);
       },
       [addNotification]
     ),
     onOrderCancelled: useCallback(
       (order: OrderEvent) => {
         addNotification(`Order cancelled: ${order.orderId.slice(0, 8)}...`);
+        setOrdersKey((k) => k + 1);
       },
       [addNotification]
     ),
@@ -78,15 +93,17 @@ export function TradePage() {
 
       {/* Main Trading Layout */}
       <div className="trade-layout">
-        {/* Chart - Main Area */}
-        <div className="chart-section">
-          <TradingViewChart symbol={selectedSymbol} height={500} />
+        {/* Left: Chart + Open Orders */}
+        <div className="trade-main">
+          <TradingViewChart symbol={selectedSymbol} height={450} />
+          <OpenOrders key={ordersKey} market={`${selectedSymbol}-PERP`} />
         </div>
 
-        {/* Sidebar */}
+        {/* Right Sidebar */}
         <div className="trade-sidebar">
-          <OrderBook symbol={selectedSymbol} depth={10} />
-          <TradeFeed symbol={selectedSymbol} maxTrades={30} />
+          <OrderForm market={selectedMarket} onOrderPlaced={handleOrderPlaced} />
+          <OrderBook symbol={`${selectedSymbol}-PERP`} depth={10} />
+          <TradeFeed symbol={`${selectedSymbol}-PERP`} maxTrades={20} />
         </div>
       </div>
     </div>
