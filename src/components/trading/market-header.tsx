@@ -2,12 +2,14 @@ import { useState, useRef, useEffect } from "react";
 import { usePriceFeed } from "../../hooks/use-price-feed";
 import type { Market } from "../../types/clob";
 import type { PriceUpdate } from "../../types/websocket";
+import type { LastTradePrice } from "../../hooks/use-last-trade-prices";
 import "./market-header.css";
 
 interface MarketHeaderProps {
   markets: Market[];
   selectedMarket: Market | null;
   onSelectMarket: (symbol: string) => void;
+  lastTradePrices?: Map<string, LastTradePrice>;
 }
 
 function formatPrice(price: number): string {
@@ -38,10 +40,11 @@ interface MarketDropdownProps {
   markets: Market[];
   selectedMarket: Market | null;
   prices: Map<string, PriceUpdate>;
+  lastTradePrices?: Map<string, LastTradePrice>;
   onSelect: (symbol: string) => void;
 }
 
-function MarketDropdown({ markets, selectedMarket, prices, onSelect }: MarketDropdownProps) {
+function MarketDropdown({ markets, selectedMarket, prices, lastTradePrices, onSelect }: MarketDropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -55,17 +58,27 @@ function MarketDropdown({ markets, selectedMarket, prices, onSelect }: MarketDro
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const selectedPrice = selectedMarket
-    ? prices.get(selectedMarket.baseAsset.toUpperCase())
-    : null;
+  // Prefer last trade price, fall back to price feed
+  const getDisplayPrice = (baseAsset: string) => {
+    const lastTrade = lastTradePrices?.get(baseAsset.toUpperCase());
+    if (lastTrade) return lastTrade.price;
+    const priceFeed = prices.get(baseAsset.toUpperCase());
+    if (priceFeed) return priceFeed.price;
+    return null;
+  };
+
+  const selectedDisplayPrice = selectedMarket ? getDisplayPrice(selectedMarket.baseAsset) : null;
+  const selectedLastTrade = selectedMarket ? lastTradePrices?.get(selectedMarket.baseAsset.toUpperCase()) : null;
 
   return (
     <div className="market-dropdown" ref={dropdownRef}>
       <button className="market-dropdown-trigger" onClick={() => setIsOpen(!isOpen)}>
         <div className="market-dropdown-selected">
           <span className="market-symbol">{selectedMarket?.baseAsset || "Select"}-PERP</span>
-          {selectedPrice && (
-            <span className="market-price">${formatPrice(selectedPrice.price)}</span>
+          {selectedDisplayPrice !== null && (
+            <span className={`market-price ${selectedLastTrade?.side === "buy" ? "price-up" : selectedLastTrade?.side === "sell" ? "price-down" : ""}`}>
+              ${formatPrice(selectedDisplayPrice)}
+            </span>
           )}
         </div>
         <svg
@@ -82,9 +95,11 @@ function MarketDropdown({ markets, selectedMarket, prices, onSelect }: MarketDro
       {isOpen && (
         <div className="market-dropdown-menu">
           {markets.map((market) => {
-            const price = prices.get(market.baseAsset.toUpperCase());
+            const priceFeed = prices.get(market.baseAsset.toUpperCase());
+            const lastTrade = lastTradePrices?.get(market.baseAsset.toUpperCase());
+            const displayPrice = lastTrade?.price ?? priceFeed?.price ?? null;
             const isSelected = selectedMarket?.symbol === market.symbol;
-            const isPositive = price ? price.change >= 0 : true;
+            const isPositive = priceFeed ? priceFeed.change >= 0 : true;
 
             return (
               <button
@@ -96,11 +111,11 @@ function MarketDropdown({ markets, selectedMarket, prices, onSelect }: MarketDro
                 }}
               >
                 <span className="item-symbol">{market.baseAsset}-PERP</span>
-                <span className="item-price">
-                  {price ? `$${formatPrice(price.price)}` : "--"}
+                <span className={`item-price ${lastTrade?.side === "buy" ? "price-up" : lastTrade?.side === "sell" ? "price-down" : ""}`}>
+                  {displayPrice !== null ? `$${formatPrice(displayPrice)}` : "--"}
                 </span>
                 <span className={`item-change ${isPositive ? "positive" : "negative"}`}>
-                  {price ? `${isPositive ? "+" : ""}${price.changePercent.toFixed(2)}%` : "--"}
+                  {priceFeed ? `${isPositive ? "+" : ""}${priceFeed.changePercent.toFixed(2)}%` : "--"}
                 </span>
               </button>
             );
@@ -133,7 +148,7 @@ function StatItem({ label, value, subValue, isPositive, isNegative }: StatItemPr
   );
 }
 
-export function MarketHeader({ markets, selectedMarket, onSelectMarket }: MarketHeaderProps) {
+export function MarketHeader({ markets, selectedMarket, onSelectMarket, lastTradePrices }: MarketHeaderProps) {
   const symbols = markets.map((m) => m.baseAsset);
   const { prices } = usePriceFeed(symbols);
 
@@ -157,6 +172,7 @@ export function MarketHeader({ markets, selectedMarket, onSelectMarket }: Market
         markets={markets}
         selectedMarket={selectedMarket}
         prices={prices}
+        lastTradePrices={lastTradePrices}
         onSelect={onSelectMarket}
       />
 

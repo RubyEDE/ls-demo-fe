@@ -1,6 +1,7 @@
 export { usePriceFeed } from "./use-price-feed";
 export { useOrderBook } from "./use-order-book";
 export { useTradeFeed } from "./use-trade-feed";
+export { useLastTradePrices } from "./use-last-trade-prices";
 export { useTradeHistory } from "./use-trade-history";
 export { useUserEvents } from "./use-user-events";
 export { useMarkets } from "./use-markets";

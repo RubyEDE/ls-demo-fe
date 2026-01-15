@@ -52,6 +52,15 @@
   font-weight: 600;
   color: var(--accent-cyan);
   font-family: 'JetBrains Mono', monospace;
+  transition: color 0.2s ease;
+}
+
+.market-price.price-up {
+  color: var(--color-success);
+}
+
+.market-price.price-down {
+  color: var(--color-danger);
 }
 
 .dropdown-arrow {
@@ -110,6 +119,15 @@
   font-size: 0.7rem;
   color: var(--text-secondary);
   font-family: 'JetBrains Mono', monospace;
+  transition: color 0.2s ease;
+}
+
+.item-price.price-up {
+  color: var(--color-success);
+}
+
+.item-price.price-down {
+  color: var(--color-danger);
 }
 
 .item-change {

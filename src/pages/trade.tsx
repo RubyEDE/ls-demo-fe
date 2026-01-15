@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useMemo } from "react";
 import { ConnectionStatus } from "../components/trading/connection-status";
 import { MarketHeader } from "../components/trading/market-header";
 import { CandlestickChart } from "../components/trading/candlestick-chart";
@@ -7,7 +7,7 @@ import { OrderForm } from "../components/trading/order-form";
 import { TradeFeed } from "../components/trading/trade-feed";
 import { TradingTabs } from "../components/trading/trading-tabs";
 import { useMarkets } from "../hooks/use-markets";
-import { usePriceFeed } from "../hooks/use-price-feed";
+import { useLastTradePrices } from "../hooks/use-last-trade-prices";
 import { useUserEvents } from "../hooks/use-user-events";
 import { useAuth } from "../context/auth-context";
 import type { OrderEvent, BalanceUpdate, PositionEvent } from "../types/websocket";
@@ -30,14 +30,17 @@ export function TradePage() {
 
   const selectedMarket = getMarket(`${selectedSymbol}-PERP`) || null;
   
-  // Get price feed for document title
-  const { getPrice } = usePriceFeed([selectedSymbol]);
-  const currentPrice = getPrice(selectedSymbol);
+  // Get all market symbols for last trade prices
+  const marketSymbols = useMemo(() => markets.map((m) => m.baseAsset), [markets]);
+  
+  // Get last trade prices for all markets
+  const { prices: lastTradePrices, getLastTradePrice } = useLastTradePrices(marketSymbols);
+  const currentLastTrade = getLastTradePrice(selectedSymbol);
 
-  // Update document title with current price
+  // Update document title with last trade price
   useEffect(() => {
-    if (currentPrice) {
-      document.title = `$${formatPrice(currentPrice.price)} | ${selectedSymbol} | Longsword`;
+    if (currentLastTrade) {
+      document.title = `$${formatPrice(currentLastTrade.price)} | ${selectedSymbol} | Longsword`;
     } else {
       document.title = `${selectedSymbol} | Longsword`;
     }
@@ -45,7 +48,7 @@ export function TradePage() {
     return () => {
       document.title = "Longsword";
     };
-  }, [currentPrice, selectedSymbol]);
+  }, [currentLastTrade, selectedSymbol]);
 
   const handlePriceClick = useCallback((price: number) => {
     setSelectedPrice({ price, timestamp: Date.now() });
@@ -131,6 +134,7 @@ export function TradePage() {
           markets={markets}
           selectedMarket={selectedMarket}
           onSelectMarket={setSelectedSymbol}
+          lastTradePrices={lastTradePrices}
         />
         <ConnectionStatus />
       </div>
