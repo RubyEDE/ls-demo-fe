@@ -117,7 +117,7 @@ export function TradePage() {
         {/* Left: Chart + Tabbed Panel */}
         <div className="trade-main">
           <CandlestickChart symbol={`${selectedSymbol}-PERP`} height={450} />
-          <TradingTabs market={`${selectedSymbol}-PERP`} ordersKey={ordersKey} />
+          <TradingTabs ordersKey={ordersKey} />
         </div>
 
         {/* Right Sidebar */}

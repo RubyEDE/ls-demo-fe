@@ -1,5 +1,5 @@
 import { fetchWithAuth } from "./api";
-import type { Market, Order, PlaceOrderParams, PlaceOrderResult } from "../types/clob";
+import type { Market, Order, PlaceOrderParams, PlaceOrderResult, UserTrade } from "../types/clob";
 import type { CandleInterval, CandleResponse, MarketStatus } from "../types/candles";
 import type { Position, PositionSummary, ClosePositionResult } from "../types/position";
 
@@ -116,6 +116,24 @@ export async function getRecentTrades(
   }
   const data = await res.json();
   return data.trades;
+}
+
+// User Trade History (Authenticated)
+export async function getUserTradeHistory(
+  options: { market?: string; limit?: number; offset?: number } = {}
+): Promise<{ trades: UserTrade[]; pagination: { limit: number; offset: number; hasMore: boolean } }> {
+  const params = new URLSearchParams();
+  if (options.market) params.set("market", options.market);
+  if (options.limit) params.set("limit", String(options.limit));
+  if (options.offset) params.set("offset", String(options.offset));
+
+  const res = await fetchWithAuth(`/clob/trades/history?${params}`);
+
+  if (!res.ok) {
+    throw new Error("Failed to fetch trade history");
+  }
+
+  return res.json();
 }
 
 // Candles (Authenticated)

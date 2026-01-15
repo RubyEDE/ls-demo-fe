@@ -9,9 +9,9 @@
   justify-content: space-between;
   align-items: center;
   padding: 1rem 2.5rem;
-  background: rgba(15, 15, 26, 0.7);
-  backdrop-filter: blur(12px);
-  border-bottom: 1px solid rgba(124, 58, 237, 0.2);
+  background: rgba(10, 11, 13, 0.75);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
 }
 
 .header-left {
@@ -21,9 +21,9 @@
 }
 
 .title {
-  font-size: 1.5rem;
+  font-size: 1.4rem;
   font-weight: 700;
-  background: linear-gradient(135deg, #a78bfa 0%, #7c3aed 100%);
+  background: linear-gradient(135deg, var(--text-primary), var(--accent-cyan));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -38,23 +38,24 @@
 }
 
 .nav-link {
-  color: #71717a;
+  color: var(--text-secondary);
   text-decoration: none;
   padding: 0.5rem 1rem;
   border-radius: 6px;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   font-weight: 500;
-  transition: all 0.2s ease;
+  letter-spacing: 0.02em;
+  transition: all 0.25s ease;
 }
 
 .nav-link:hover {
-  color: #a1a1aa;
+  color: var(--text-primary);
   background: rgba(255, 255, 255, 0.05);
 }
 
 .nav-link.active {
-  color: #e4e4e7;
-  background: rgba(124, 58, 237, 0.2);
+  color: var(--accent-cyan);
+  background: var(--accent-cyan-dim);
 }
 
 .main-content {
@@ -72,7 +73,7 @@
   justify-content: center;
   gap: 1rem;
   padding: 3rem;
-  color: #a1a1aa;
+  color: var(--text-secondary);
 }
 
 /* RainbowKit button overrides */

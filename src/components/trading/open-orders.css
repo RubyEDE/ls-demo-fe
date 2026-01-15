@@ -1,8 +1,13 @@
 .open-orders-container {
-  background: rgba(26, 26, 46, 0.8);
-  border: 1px solid rgba(124, 58, 237, 0.2);
+  background: linear-gradient(135deg, var(--bg-secondary), var(--bg-tertiary));
+  border: 1px solid var(--border-color);
   border-radius: 12px;
   padding: 1rem;
+  transition: all 0.3s ease;
+}
+
+.open-orders-container:hover {
+  border-color: var(--accent-cyan);
 }
 
 .open-orders-header {
@@ -11,13 +16,13 @@
   align-items: center;
   margin-bottom: 1rem;
   padding-bottom: 0.75rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid var(--border-color);
 }
 
 .open-orders-header h3 {
   font-size: 0.9rem;
   font-weight: 600;
-  color: #e4e4e7;
+  color: var(--text-primary);
   margin: 0;
 }
 
@@ -26,14 +31,14 @@
   background: transparent;
   border: 1px solid rgba(248, 113, 113, 0.3);
   border-radius: 6px;
-  color: #f87171;
+  color: var(--color-danger);
   font-size: 0.75rem;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.25s ease;
 }
 
 .cancel-all-btn:hover:not(:disabled) {
-  background: rgba(248, 113, 113, 0.1);
+  background: var(--color-danger-dim);
 }
 
 .cancel-all-btn:disabled {
@@ -45,7 +50,7 @@
 .open-orders-loading {
   text-align: center;
   padding: 2rem 1rem;
-  color: #71717a;
+  color: var(--text-muted);
   font-size: 0.85rem;
 }
 
@@ -64,7 +69,7 @@
   padding: 0.75rem;
   background: rgba(255, 255, 255, 0.02);
   border-radius: 8px;
-  transition: background 0.2s;
+  transition: background 0.25s ease;
 }
 
 .order-row:hover {
@@ -91,24 +96,24 @@
 }
 
 .order-side.buy {
-  background: rgba(74, 222, 128, 0.15);
-  color: #4ade80;
+  background: var(--color-success-dim);
+  color: var(--color-success);
 }
 
 .order-side.sell {
-  background: rgba(248, 113, 113, 0.15);
-  color: #f87171;
+  background: var(--color-danger-dim);
+  color: var(--color-danger);
 }
 
 .order-symbol {
   font-size: 0.8rem;
   font-weight: 600;
-  color: #e4e4e7;
+  color: var(--text-primary);
 }
 
 .order-type {
   font-size: 0.7rem;
-  color: #71717a;
+  color: var(--text-muted);
   text-transform: uppercase;
 }
 
@@ -116,19 +121,19 @@
   display: flex;
   gap: 0.75rem;
   font-size: 0.75rem;
-  font-family: "JetBrains Mono", "Fira Code", monospace;
+  font-family: 'JetBrains Mono', monospace;
 }
 
 .order-price {
-  color: #a1a1aa;
+  color: var(--text-secondary);
 }
 
 .order-qty {
-  color: #71717a;
+  color: var(--text-muted);
 }
 
 .order-time {
-  color: #52525b;
+  color: var(--text-muted);
 }
 
 .order-status-section {
@@ -142,14 +147,14 @@
 .fill-bar {
   width: 60px;
   height: 4px;
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--border-color);
   border-radius: 2px;
   overflow: hidden;
 }
 
 .fill-progress {
   height: 100%;
-  background: #7c3aed;
+  background: var(--accent-cyan);
   transition: width 0.3s ease;
 }
 
@@ -163,18 +168,18 @@
 }
 
 .order-status.open {
-  background: rgba(59, 130, 246, 0.15);
-  color: #60a5fa;
+  background: rgba(96, 165, 250, 0.15);
+  color: var(--color-info);
 }
 
 .order-status.partial {
-  background: rgba(251, 191, 36, 0.15);
-  color: #fbbf24;
+  background: var(--accent-gold-dim);
+  color: var(--accent-gold);
 }
 
 .order-status.pending {
   background: rgba(161, 161, 170, 0.15);
-  color: #a1a1aa;
+  color: var(--text-secondary);
 }
 
 .cancel-order-btn {
@@ -184,17 +189,17 @@
   align-items: center;
   justify-content: center;
   background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--border-color);
   border-radius: 4px;
-  color: #71717a;
+  color: var(--text-muted);
   font-size: 1rem;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.25s ease;
 }
 
 .cancel-order-btn:hover:not(:disabled) {
   border-color: rgba(248, 113, 113, 0.5);
-  color: #f87171;
+  color: var(--color-danger);
 }
 
 .cancel-order-btn:disabled {

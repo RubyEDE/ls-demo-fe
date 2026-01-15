@@ -1,8 +1,13 @@
 .candlestick-chart-container {
-  background: rgba(26, 26, 46, 0.8);
-  border: 1px solid rgba(124, 58, 237, 0.2);
+  background: linear-gradient(135deg, var(--bg-secondary), var(--bg-tertiary));
+  border: 1px solid var(--border-color);
   border-radius: 12px;
   overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.candlestick-chart-container:hover {
+  border-color: var(--accent-cyan);
 }
 
 .chart-toolbar {
@@ -10,8 +15,8 @@
   justify-content: space-between;
   align-items: center;
   padding: 0.5rem 0.75rem;
-  border-bottom: 1px solid rgba(124, 58, 237, 0.1);
-  background: rgba(26, 26, 46, 0.6);
+  border-bottom: 1px solid var(--border-color);
+  background: var(--bg-secondary);
 }
 
 .interval-selector {
@@ -27,21 +32,21 @@
   background: transparent;
   border: none;
   border-radius: 4px;
-  color: #71717a;
+  color: var(--text-muted);
   font-size: 0.7rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.15s;
+  transition: all 0.15s ease;
 }
 
 .interval-btn:hover {
-  color: #a1a1aa;
+  color: var(--text-secondary);
   background: rgba(255, 255, 255, 0.05);
 }
 
 .interval-btn.active {
-  background: rgba(124, 58, 237, 0.3);
-  color: #e4e4e7;
+  background: var(--accent-cyan-dim);
+  color: var(--text-primary);
 }
 
 .chart-info {
@@ -61,13 +66,13 @@
 }
 
 .market-status.open {
-  color: #4ade80;
-  background: rgba(74, 222, 128, 0.1);
+  color: var(--color-success);
+  background: var(--color-success-dim);
 }
 
 .market-status.closed {
-  color: #f87171;
-  background: rgba(248, 113, 113, 0.1);
+  color: var(--color-danger);
+  background: var(--color-danger-dim);
 }
 
 .status-dot {
@@ -77,18 +82,18 @@
 }
 
 .market-status.open .status-dot {
-  background: #4ade80;
-  box-shadow: 0 0 6px #4ade80;
+  background: var(--color-success);
+  box-shadow: 0 0 6px var(--color-success);
 }
 
 .market-status.closed .status-dot {
-  background: #f87171;
+  background: var(--color-danger);
 }
 
 .et-time {
   font-size: 0.65rem;
-  color: #52525b;
-  font-family: "JetBrains Mono", "Fira Code", monospace;
+  color: var(--text-muted);
+  font-family: 'JetBrains Mono', monospace;
 }
 
 .chart-canvas {
@@ -101,16 +106,16 @@
   align-items: center;
   justify-content: center;
   gap: 0.75rem;
-  color: #71717a;
+  color: var(--text-muted);
   font-size: 0.8rem;
-  background: rgba(26, 26, 46, 0.95);
+  background: var(--bg-secondary);
 }
 
 .loading-spinner {
   width: 24px;
   height: 24px;
-  border: 2px solid rgba(124, 58, 237, 0.2);
-  border-top-color: #7c3aed;
+  border: 2px solid var(--accent-cyan-dim);
+  border-top-color: var(--accent-cyan);
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
@@ -127,7 +132,7 @@
   align-items: center;
   justify-content: center;
   padding: 2rem;
-  color: #f87171;
+  color: var(--color-danger);
   font-size: 0.85rem;
   text-align: center;
 }
@@ -135,5 +140,5 @@
 .chart-error .error-detail {
   margin-top: 0.5rem;
   font-size: 0.75rem;
-  color: #71717a;
+  color: var(--text-muted);
 }

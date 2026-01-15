@@ -1,8 +1,13 @@
 .order-form-container {
-  background: rgba(26, 26, 46, 0.8);
-  border: 1px solid rgba(124, 58, 237, 0.2);
+  background: linear-gradient(135deg, var(--bg-secondary), var(--bg-tertiary));
+  border: 1px solid var(--border-color);
   border-radius: 12px;
   padding: 0.75rem;
+  transition: all 0.3s ease;
+}
+
+.order-form-container:hover {
+  border-color: var(--accent-cyan);
 }
 
 .order-form-header {
@@ -11,21 +16,21 @@
   align-items: center;
   margin-bottom: 0.75rem;
   padding-bottom: 0.5rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid var(--border-color);
 }
 
 .order-form-header h3 {
   font-size: 0.8rem;
   font-weight: 600;
-  color: #e4e4e7;
+  color: var(--text-primary);
   margin: 0;
 }
 
 .market-tag {
   font-size: 0.7rem;
   font-weight: 600;
-  color: #a78bfa;
-  background: rgba(124, 58, 237, 0.15);
+  color: var(--accent-cyan);
+  background: var(--accent-cyan-dim);
   padding: 0.25rem 0.5rem;
   border-radius: 4px;
   letter-spacing: 0.05em;
@@ -35,7 +40,7 @@
 .order-form-auth-required {
   text-align: center;
   padding: 1.5rem 0.75rem;
-  color: #71717a;
+  color: var(--text-muted);
   font-size: 0.8rem;
 }
 
@@ -59,12 +64,12 @@
   font-weight: 600;
   font-size: 0.75rem;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.25s ease;
 }
 
 .side-btn.buy {
-  background: rgba(74, 222, 128, 0.15);
-  color: #4ade80;
+  background: var(--color-success-dim);
+  color: var(--color-success);
 }
 
 .side-btn.buy.active {
@@ -73,8 +78,8 @@
 }
 
 .side-btn.sell {
-  background: rgba(248, 113, 113, 0.15);
-  color: #f87171;
+  background: var(--color-danger-dim);
+  color: var(--color-danger);
 }
 
 .side-btn.sell.active {
@@ -92,18 +97,18 @@
   flex: 1;
   padding: 0.375rem;
   background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--border-color);
   border-radius: 5px;
-  color: #71717a;
+  color: var(--text-muted);
   font-size: 0.7rem;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.25s ease;
 }
 
 .type-selector button.active {
-  border-color: rgba(124, 58, 237, 0.5);
-  color: #e4e4e7;
-  background: rgba(124, 58, 237, 0.15);
+  border-color: var(--accent-cyan);
+  color: var(--text-primary);
+  background: var(--accent-cyan-dim);
 }
 
 /* Leverage Button */
@@ -114,28 +119,28 @@
   width: 100%;
   padding: 0.5rem 0.75rem;
   background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--border-color);
   border-radius: 6px;
-  color: #e4e4e7;
+  color: var(--text-primary);
   font-size: 0.85rem;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.25s ease;
 }
 
 .leverage-btn:hover {
-  border-color: rgba(124, 58, 237, 0.5);
-  background: rgba(124, 58, 237, 0.1);
+  border-color: var(--accent-cyan);
+  background: var(--accent-cyan-dim);
 }
 
 .leverage-value {
   font-weight: 600;
-  font-family: "JetBrains Mono", "Fira Code", monospace;
-  color: #a78bfa;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--accent-cyan);
 }
 
 .leverage-icon {
   font-size: 0.9rem;
-  color: #71717a;
+  color: var(--text-muted);
 }
 
 /* Leverage Popup */
@@ -154,12 +159,12 @@
 }
 
 .leverage-popup {
-  background: rgba(26, 26, 46, 0.98);
-  border: 1px solid rgba(124, 58, 237, 0.3);
+  background: var(--bg-secondary);
+  border: 1px solid var(--accent-cyan);
   border-radius: 12px;
   padding: 1.25rem;
   width: 280px;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 30px rgba(0, 212, 170, 0.1);
 }
 
 .leverage-popup-header {
@@ -173,14 +178,14 @@
   margin: 0;
   font-size: 0.9rem;
   font-weight: 600;
-  color: #e4e4e7;
+  color: var(--text-primary);
 }
 
 .leverage-popup-value {
   font-size: 1.25rem;
   font-weight: 700;
-  font-family: "JetBrains Mono", "Fira Code", monospace;
-  color: #a78bfa;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--accent-cyan);
 }
 
 .leverage-slider-container {
@@ -192,7 +197,7 @@
   height: 6px;
   -webkit-appearance: none;
   appearance: none;
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--border-color);
   border-radius: 3px;
   outline: none;
   cursor: pointer;
@@ -203,11 +208,11 @@
   appearance: none;
   width: 18px;
   height: 18px;
-  background: linear-gradient(135deg, #a78bfa 0%, #7c3aed 100%);
+  background: var(--accent-cyan);
   border-radius: 50%;
   cursor: pointer;
-  border: 2px solid #1a1a2e;
-  box-shadow: 0 2px 8px rgba(124, 58, 237, 0.4);
+  border: 2px solid var(--bg-secondary);
+  box-shadow: 0 2px 8px rgba(0, 212, 170, 0.4);
   transition: transform 0.15s;
 }
 
@@ -218,11 +223,11 @@
 .leverage-slider::-moz-range-thumb {
   width: 18px;
   height: 18px;
-  background: linear-gradient(135deg, #a78bfa 0%, #7c3aed 100%);
+  background: var(--accent-cyan);
   border-radius: 50%;
   cursor: pointer;
-  border: 2px solid #1a1a2e;
-  box-shadow: 0 2px 8px rgba(124, 58, 237, 0.4);
+  border: 2px solid var(--bg-secondary);
+  box-shadow: 0 2px 8px rgba(0, 212, 170, 0.4);
 }
 
 .leverage-slider-labels {
@@ -230,7 +235,7 @@
   justify-content: space-between;
   margin-top: 0.5rem;
   font-size: 0.7rem;
-  color: #71717a;
+  color: var(--text-muted);
 }
 
 .leverage-popup-actions {
@@ -246,28 +251,30 @@
   font-size: 0.8rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.25s ease;
 }
 
 .leverage-cancel-btn {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: #a1a1aa;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
 }
 
 .leverage-cancel-btn:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: #e4e4e7;
+  background: var(--bg-secondary);
+  border-color: var(--accent-cyan);
+  color: var(--text-primary);
 }
 
 .leverage-confirm-btn {
-  background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+  background: var(--accent-cyan);
   border: none;
-  color: #fff;
+  color: var(--bg-primary);
 }
 
 .leverage-confirm-btn:hover {
-  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(0, 212, 170, 0.3);
 }
 
 /* Input Groups */
@@ -279,7 +286,7 @@
 
 .input-group label {
   font-size: 0.65rem;
-  color: #71717a;
+  color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
@@ -288,25 +295,26 @@
   width: 100%;
   padding: 0.5rem;
   background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--border-color);
   border-radius: 6px;
-  color: #f4f4f5;
+  color: var(--text-primary);
   font-size: 0.85rem;
-  font-family: "JetBrains Mono", "Fira Code", monospace;
+  font-family: 'JetBrains Mono', monospace;
+  transition: border-color 0.25s ease;
 }
 
 .input-group input:focus {
   outline: none;
-  border-color: rgba(124, 58, 237, 0.5);
+  border-color: var(--accent-cyan);
 }
 
 .input-group input::placeholder {
-  color: #52525b;
+  color: var(--text-muted);
 }
 
 .input-hint {
   font-size: 0.7rem;
-  color: #52525b;
+  color: var(--text-muted);
 }
 
 .price-input-row {
@@ -326,17 +334,17 @@
 .quick-btns button {
   padding: 0.375rem 0.5rem;
   background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--border-color);
   border-radius: 5px;
-  color: #71717a;
+  color: var(--text-muted);
   font-size: 0.65rem;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.25s ease;
 }
 
 .quick-btns button:hover {
-  border-color: rgba(124, 58, 237, 0.3);
-  color: #a1a1aa;
+  border-color: var(--accent-cyan);
+  color: var(--text-secondary);
 }
 
 /* Checkbox */
@@ -345,14 +353,14 @@
   align-items: center;
   gap: 0.375rem;
   font-size: 0.7rem;
-  color: #a1a1aa;
+  color: var(--text-secondary);
   cursor: pointer;
 }
 
 .checkbox-label input {
   width: 14px;
   height: 14px;
-  accent-color: #7c3aed;
+  accent-color: var(--accent-cyan);
 }
 
 /* Order Summary */
@@ -367,12 +375,12 @@
   justify-content: space-between;
   padding: 0.25rem 0;
   font-size: 0.7rem;
-  color: #71717a;
+  color: var(--text-muted);
 }
 
 .summary-value {
-  color: #e4e4e7;
-  font-family: "JetBrains Mono", "Fira Code", monospace;
+  color: var(--text-primary);
+  font-family: 'JetBrains Mono', monospace;
 }
 
 /* Error */
@@ -381,13 +389,13 @@
   align-items: center;
   justify-content: space-between;
   padding: 0.375rem 0.5rem;
-  background: rgba(239, 68, 68, 0.1);
-  border: 1px solid rgba(239, 68, 68, 0.3);
+  background: var(--color-danger-dim);
+  border: 1px solid rgba(248, 113, 113, 0.3);
   border-radius: 5px;
 }
 
 .order-error p {
-  color: #f87171;
+  color: var(--color-danger);
   margin: 0;
   font-size: 0.7rem;
   flex: 1;
@@ -396,7 +404,7 @@
 .order-error button {
   background: transparent;
   border: none;
-  color: #f87171;
+  color: var(--color-danger);
   font-size: 1rem;
   cursor: pointer;
   padding: 0 0.25rem;
@@ -411,7 +419,7 @@
   font-size: 0.8rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.25s ease;
 }
 
 .submit-btn.buy {
@@ -421,6 +429,7 @@
 
 .submit-btn.buy:hover:not(:disabled) {
   background: #16a34a;
+  transform: translateY(-2px);
 }
 
 .submit-btn.sell {
@@ -430,6 +439,7 @@
 
 .submit-btn.sell:hover:not(:disabled) {
   background: #dc2626;
+  transform: translateY(-2px);
 }
 
 .submit-btn:disabled {
@@ -438,16 +448,18 @@
 }
 
 .submit-btn.sign-in {
-  background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+  background: var(--accent-cyan);
+  color: var(--bg-primary);
 }
 
 .submit-btn.sign-in:hover:not(:disabled) {
-  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(0, 212, 170, 0.3);
 }
 
 .sign-hint {
   text-align: center;
   font-size: 0.75rem;
-  color: #71717a;
+  color: var(--text-muted);
   margin: 0;
 }

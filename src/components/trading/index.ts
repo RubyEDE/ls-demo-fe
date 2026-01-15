@@ -5,6 +5,7 @@ export { TradingViewChart } from "./tradingview-chart";
 export { CandlestickChart } from "./candlestick-chart";
 export { OrderBook } from "./order-book";
 export { TradeFeed } from "./trade-feed";
+export { TradeHistory } from "./trade-history";
 export { OrderForm } from "./order-form";
 export { OpenOrders } from "./open-orders";
 export { PositionsList, MarketPositionWidget } from "./positions-list";

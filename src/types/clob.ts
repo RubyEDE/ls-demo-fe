@@ -57,3 +57,15 @@ export interface PlaceOrderResult {
   }[];
   error?: string;
 }
+
+export interface UserTrade {
+  tradeId: string;
+  marketSymbol: string;
+  side: "buy" | "sell";
+  price: number;
+  quantity: number;
+  quoteQuantity: number;
+  fee: number;
+  isMaker: boolean;
+  timestamp: string;
+}

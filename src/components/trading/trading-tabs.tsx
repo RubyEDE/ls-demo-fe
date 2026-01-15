@@ -1,20 +1,19 @@
 import { useState, useCallback } from "react";
 import { PositionsList } from "./positions-list";
 import { OpenOrders } from "./open-orders";
-import { TradeFeed } from "./trade-feed";
+import { TradeHistory } from "./trade-history";
 import { usePositions } from "../../hooks/use-positions";
 import { useOrders } from "../../hooks/use-orders";
 import { useAuth } from "../../context/auth-context";
 import "./trading-tabs.css";
 
-type TabId = "positions" | "orders" | "trades";
+type TabId = "positions" | "orders" | "history";
 
 interface TradingTabsProps {
-  market: string;
   ordersKey?: number;
 }
 
-export function TradingTabs({ market, ordersKey }: TradingTabsProps) {
+export function TradingTabs({ ordersKey }: TradingTabsProps) {
   const [activeTab, setActiveTab] = useState<TabId>("positions");
   const { isAuthenticated } = useAuth();
   // Positions and orders show all markets
@@ -50,18 +49,17 @@ export function TradingTabs({ market, ordersKey }: TradingTabsProps) {
           )}
         </button>
         <button
-          className={`trading-tab ${activeTab === "trades" ? "active" : ""}`}
-          onClick={() => handleTabClick("trades")}
+          className={`trading-tab ${activeTab === "history" ? "active" : ""}`}
+          onClick={() => handleTabClick("history")}
         >
-          Recent Trades
+          Trade History
         </button>
       </div>
 
       <div className="trading-tabs-content">
-        {/* Positions and orders show all markets */}
         {activeTab === "positions" && <PositionsList />}
         {activeTab === "orders" && <OpenOrders key={ordersKey} />}
-        {activeTab === "trades" && <TradeFeed symbol={market} maxTrades={20} />}
+        {activeTab === "history" && <TradeHistory />}
       </div>
     </div>
   );

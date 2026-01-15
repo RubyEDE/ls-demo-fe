@@ -1,8 +1,13 @@
 .positions-container {
-  background: rgba(26, 26, 46, 0.8);
-  border: 1px solid rgba(124, 58, 237, 0.2);
+  background: linear-gradient(135deg, var(--bg-secondary), var(--bg-tertiary));
+  border: 1px solid var(--border-color);
   border-radius: 12px;
   padding: 1rem;
+  transition: all 0.3s ease;
+}
+
+.positions-container:hover {
+  border-color: var(--accent-cyan);
 }
 
 .positions-header {
@@ -11,13 +16,13 @@
   align-items: center;
   margin-bottom: 1rem;
   padding-bottom: 0.75rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid var(--border-color);
 }
 
 .positions-header h3 {
   font-size: 0.9rem;
   font-weight: 600;
-  color: #e4e4e7;
+  color: var(--text-primary);
   margin: 0;
 }
 
@@ -26,14 +31,14 @@
   background: transparent;
   border: 1px solid rgba(248, 113, 113, 0.3);
   border-radius: 6px;
-  color: #f87171;
+  color: var(--color-danger);
   font-size: 0.75rem;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.25s ease;
 }
 
 .close-all-positions-btn:hover:not(:disabled) {
-  background: rgba(248, 113, 113, 0.1);
+  background: var(--color-danger-dim);
 }
 
 .close-all-positions-btn:disabled {
@@ -45,7 +50,7 @@
 .positions-loading {
   text-align: center;
   padding: 2rem 1rem;
-  color: #71717a;
+  color: var(--text-muted);
   font-size: 0.85rem;
 }
 
@@ -67,7 +72,7 @@
 
 .summary-item .label {
   font-size: 0.65rem;
-  color: #71717a;
+  color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
@@ -75,16 +80,16 @@
 .summary-item .value {
   font-size: 0.85rem;
   font-weight: 600;
-  color: #e4e4e7;
-  font-family: "JetBrains Mono", "Fira Code", monospace;
+  color: var(--text-primary);
+  font-family: 'JetBrains Mono', monospace;
 }
 
 .summary-item .value.profit {
-  color: #4ade80;
+  color: var(--color-success);
 }
 
 .summary-item .value.loss {
-  color: #f87171;
+  color: var(--color-danger);
 }
 
 /* Positions List */
@@ -104,7 +109,7 @@
   background: rgba(255, 255, 255, 0.02);
   border-radius: 8px;
   border-left: 3px solid transparent;
-  transition: background 0.2s;
+  transition: background 0.25s ease;
 }
 
 .position-row:hover {
@@ -112,11 +117,11 @@
 }
 
 .position-row.long {
-  border-left-color: #4ade80;
+  border-left-color: var(--color-success);
 }
 
 .position-row.short {
-  border-left-color: #f87171;
+  border-left-color: var(--color-danger);
 }
 
 .position-info {
@@ -139,24 +144,24 @@
 }
 
 .position-side.long {
-  background: rgba(74, 222, 128, 0.15);
-  color: #4ade80;
+  background: var(--color-success-dim);
+  color: var(--color-success);
 }
 
 .position-side.short {
-  background: rgba(248, 113, 113, 0.15);
-  color: #f87171;
+  background: var(--color-danger-dim);
+  color: var(--color-danger);
 }
 
 .position-symbol {
   font-size: 0.8rem;
   font-weight: 600;
-  color: #e4e4e7;
+  color: var(--text-primary);
 }
 
 .position-leverage {
   font-size: 0.65rem;
-  color: #a1a1aa;
+  color: var(--text-secondary);
   padding: 0.125rem 0.375rem;
   background: rgba(255, 255, 255, 0.05);
   border-radius: 4px;
@@ -166,19 +171,19 @@
   display: flex;
   gap: 0.75rem;
   font-size: 0.75rem;
-  font-family: "JetBrains Mono", "Fira Code", monospace;
+  font-family: 'JetBrains Mono', monospace;
 }
 
 .position-size {
-  color: #a1a1aa;
+  color: var(--text-secondary);
 }
 
 .position-entry {
-  color: #71717a;
+  color: var(--text-muted);
 }
 
 .position-mark {
-  color: #52525b;
+  color: var(--text-muted);
 }
 
 /* PnL Section */
@@ -193,20 +198,20 @@
 .position-pnl {
   font-size: 0.85rem;
   font-weight: 600;
-  font-family: "JetBrains Mono", "Fira Code", monospace;
+  font-family: 'JetBrains Mono', monospace;
 }
 
 .position-pnl.profit {
-  color: #4ade80;
+  color: var(--color-success);
 }
 
 .position-pnl.loss {
-  color: #f87171;
+  color: var(--color-danger);
 }
 
 .position-roe {
   font-size: 0.65rem;
-  color: #71717a;
+  color: var(--text-muted);
 }
 
 .position-roe.profit {
@@ -220,14 +225,14 @@
 /* Liquidation warning */
 .position-liq {
   font-size: 0.65rem;
-  color: #fb923c;
+  color: var(--accent-gold);
   display: flex;
   align-items: center;
   gap: 0.25rem;
 }
 
 .position-liq.danger {
-  color: #f87171;
+  color: var(--color-danger);
 }
 
 /* Close button */
@@ -238,17 +243,17 @@
   align-items: center;
   justify-content: center;
   background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--border-color);
   border-radius: 4px;
-  color: #71717a;
+  color: var(--text-muted);
   font-size: 1rem;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.25s ease;
 }
 
 .close-position-btn:hover:not(:disabled) {
   border-color: rgba(248, 113, 113, 0.5);
-  color: #f87171;
+  color: var(--color-danger);
 }
 
 .close-position-btn:disabled {
@@ -258,19 +263,19 @@
 
 /* Market Position Widget (compact inline) */
 .market-position-widget {
-  background: rgba(26, 26, 46, 0.6);
-  border: 1px solid rgba(124, 58, 237, 0.2);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
   border-radius: 8px;
   padding: 0.75rem;
   border-left: 3px solid transparent;
 }
 
 .market-position-widget.long {
-  border-left-color: #4ade80;
+  border-left-color: var(--color-success);
 }
 
 .market-position-widget.short {
-  border-left-color: #f87171;
+  border-left-color: var(--color-danger);
 }
 
 .widget-header {
@@ -288,40 +293,40 @@
 }
 
 .widget-side.long {
-  background: rgba(74, 222, 128, 0.15);
-  color: #4ade80;
+  background: var(--color-success-dim);
+  color: var(--color-success);
 }
 
 .widget-side.short {
-  background: rgba(248, 113, 113, 0.15);
-  color: #f87171;
+  background: var(--color-danger-dim);
+  color: var(--color-danger);
 }
 
 .widget-close-btn {
   padding: 0.25rem 0.5rem;
   background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--border-color);
   border-radius: 4px;
-  color: #71717a;
+  color: var(--text-muted);
   font-size: 0.7rem;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.25s ease;
 }
 
 .widget-close-btn:hover:not(:disabled) {
   border-color: rgba(248, 113, 113, 0.5);
-  color: #f87171;
+  color: var(--color-danger);
 }
 
 .widget-details {
   display: flex;
   justify-content: space-between;
   font-size: 0.75rem;
-  font-family: "JetBrains Mono", "Fira Code", monospace;
+  font-family: 'JetBrains Mono', monospace;
 }
 
 .widget-size-entry {
-  color: #a1a1aa;
+  color: var(--text-secondary);
 }
 
 .widget-pnl {
@@ -329,9 +334,9 @@
 }
 
 .widget-pnl.profit {
-  color: #4ade80;
+  color: var(--color-success);
 }
 
 .widget-pnl.loss {
-  color: #f87171;
+  color: var(--color-danger);
 }

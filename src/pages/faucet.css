@@ -5,7 +5,7 @@
   justify-content: center;
   gap: 1rem;
   padding: 3rem;
-  color: #a1a1aa;
+  color: var(--text-secondary);
   min-height: 400px;
 }
 
@@ -19,13 +19,16 @@
 }
 
 .faucet-card {
-  background: rgba(26, 26, 46, 0.8);
-  border: 1px solid rgba(124, 58, 237, 0.25);
+  background: linear-gradient(135deg, var(--bg-secondary), var(--bg-tertiary));
+  border: 1px solid var(--border-color);
   border-radius: 16px;
   padding: 2rem;
-  box-shadow:
-    0 4px 24px rgba(0, 0, 0, 0.2),
-    0 0 32px rgba(124, 58, 237, 0.05);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+}
+
+.faucet-card:hover {
+  border-color: var(--accent-cyan);
 }
 
 /* Claim Card */
@@ -40,16 +43,16 @@
 .claim-header h1 {
   font-size: 1.5rem;
   font-weight: 700;
-  color: #f4f4f5;
+  color: var(--text-primary);
   margin: 0 0 0.5rem 0;
-  background: linear-gradient(135deg, #a78bfa 0%, #7c3aed 100%);
+  background: linear-gradient(135deg, var(--text-primary), var(--accent-cyan));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
 .claim-header p {
-  color: #71717a;
+  color: var(--text-muted);
   margin: 0;
   font-size: 0.9rem;
 }
@@ -59,7 +62,7 @@
   flex-direction: column;
   align-items: center;
   padding: 1.5rem;
-  background: linear-gradient(135deg, rgba(74, 222, 128, 0.1) 0%, rgba(34, 197, 94, 0.05) 100%);
+  background: var(--color-success-dim);
   border-radius: 12px;
   margin-bottom: 1.5rem;
 }
@@ -67,8 +70,8 @@
 .claim-value {
   font-size: 3rem;
   font-weight: 700;
-  color: #4ade80;
-  font-family: "JetBrains Mono", "Fira Code", monospace;
+  color: var(--color-success);
+  font-family: 'JetBrains Mono', monospace;
 }
 
 .claim-label {
@@ -83,28 +86,28 @@
   justify-content: center;
   gap: 0.5rem;
   width: 100%;
-  background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
-  color: #fff;
+  background: var(--accent-cyan);
+  color: var(--bg-primary);
   border: none;
   padding: 1rem 1.5rem;
   border-radius: 10px;
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.25s ease;
   margin-bottom: 1.5rem;
 }
 
 .claim-btn:hover:not(:disabled) {
-  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 20px rgba(124, 58, 237, 0.4);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(0, 212, 170, 0.3);
 }
 
 .claim-btn:disabled {
   opacity: 0.7;
   cursor: not-allowed;
-  background: linear-gradient(135deg, #52525b 0%, #3f3f46 100%);
+  background: var(--bg-tertiary);
+  color: var(--text-muted);
 }
 
 .btn-spinner {
@@ -127,7 +130,7 @@
   grid-template-columns: 1fr 1fr;
   gap: 1rem;
   padding-top: 1rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  border-top: 1px solid var(--border-color);
 }
 
 .claim-stat {
@@ -138,13 +141,13 @@
   display: block;
   font-size: 1.25rem;
   font-weight: 600;
-  color: #e4e4e7;
-  font-family: "JetBrains Mono", "Fira Code", monospace;
+  color: var(--text-primary);
+  font-family: 'JetBrains Mono', monospace;
 }
 
 .claim-stat-label {
   font-size: 0.75rem;
-  color: #71717a;
+  color: var(--text-muted);
 }
 
 .faucet-error,
@@ -159,12 +162,12 @@
 }
 
 .faucet-error {
-  background: rgba(239, 68, 68, 0.1);
-  border: 1px solid rgba(239, 68, 68, 0.3);
+  background: var(--color-danger-dim);
+  border: 1px solid rgba(248, 113, 113, 0.3);
 }
 
 .faucet-error p {
-  color: #f87171;
+  color: var(--color-danger);
   margin: 0;
   font-size: 0.85rem;
   text-align: left;
@@ -172,12 +175,12 @@
 }
 
 .faucet-success {
-  background: rgba(34, 197, 94, 0.1);
-  border: 1px solid rgba(34, 197, 94, 0.3);
+  background: var(--color-success-dim);
+  border: 1px solid rgba(74, 222, 128, 0.3);
 }
 
 .faucet-success p {
-  color: #4ade80;
+  color: var(--color-success);
   margin: 0;
   font-size: 0.85rem;
   text-align: left;
@@ -191,16 +194,16 @@
   font-size: 1.25rem;
   cursor: pointer;
   opacity: 0.7;
-  transition: opacity 0.2s;
+  transition: opacity 0.25s ease;
   line-height: 1;
 }
 
 .error-dismiss {
-  color: #f87171;
+  color: var(--color-danger);
 }
 
 .success-dismiss {
-  color: #4ade80;
+  color: var(--color-success);
 }
 
 .error-dismiss:hover,
@@ -216,7 +219,7 @@
 .card-header h3 {
   font-size: 0.9rem;
   font-weight: 600;
-  color: #a1a1aa;
+  color: var(--text-secondary);
   margin: 0;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -249,8 +252,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(74, 222, 128, 0.15);
-  color: #4ade80;
+  background: var(--color-success-dim);
+  color: var(--color-success);
   border-radius: 6px;
   font-weight: 600;
   font-size: 0.875rem;
@@ -259,20 +262,20 @@
 .history-amount {
   font-size: 0.9rem;
   font-weight: 600;
-  color: #4ade80;
-  font-family: "JetBrains Mono", "Fira Code", monospace;
+  color: var(--color-success);
+  font-family: 'JetBrains Mono', monospace;
 }
 
 .history-date {
   font-size: 0.75rem;
-  color: #71717a;
+  color: var(--text-muted);
 }
 
 .spinner {
   width: 40px;
   height: 40px;
-  border: 3px solid rgba(124, 58, 237, 0.2);
-  border-top-color: #7c3aed;
+  border: 3px solid var(--accent-cyan-dim);
+  border-top-color: var(--accent-cyan);
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }

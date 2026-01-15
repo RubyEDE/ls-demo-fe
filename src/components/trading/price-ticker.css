@@ -2,9 +2,9 @@
   display: flex;
   gap: 0.5rem;
   padding: 0.75rem;
-  background: rgba(26, 26, 46, 0.6);
+  background: var(--bg-secondary);
   border-radius: 10px;
-  border: 1px solid rgba(124, 58, 237, 0.15);
+  border: 1px solid var(--border-color);
   overflow-x: auto;
 }
 
@@ -14,7 +14,7 @@
 }
 
 .ticker-loading {
-  color: #71717a;
+  color: var(--text-muted);
   font-size: 0.85rem;
 }
 
@@ -28,17 +28,18 @@
   border: 1px solid transparent;
   border-radius: 8px;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.25s ease;
   min-width: 140px;
 }
 
 .ticker-item:hover {
   background: rgba(255, 255, 255, 0.05);
+  border-color: var(--border-color);
 }
 
 .ticker-item.selected {
-  background: rgba(124, 58, 237, 0.15);
-  border-color: rgba(124, 58, 237, 0.3);
+  background: var(--accent-cyan-dim);
+  border-color: rgba(0, 212, 170, 0.3);
 }
 
 .ticker-item.loading {
@@ -48,30 +49,30 @@
 .ticker-symbol {
   font-size: 0.8rem;
   font-weight: 600;
-  color: #a1a1aa;
+  color: var(--text-secondary);
   letter-spacing: 0.05em;
 }
 
 .ticker-price {
   font-size: 1.125rem;
   font-weight: 700;
-  color: #f4f4f5;
-  font-family: "JetBrains Mono", "Fira Code", monospace;
+  color: var(--text-primary);
+  font-family: 'JetBrains Mono', monospace;
 }
 
 .ticker-price.loading {
-  color: #52525b;
+  color: var(--text-muted);
 }
 
 .ticker-change {
   font-size: 0.75rem;
-  font-family: "JetBrains Mono", "Fira Code", monospace;
+  font-family: 'JetBrains Mono', monospace;
 }
 
 .ticker-change.positive {
-  color: #4ade80;
+  color: var(--color-success);
 }
 
 .ticker-change.negative {
-  color: #f87171;
+  color: var(--color-danger);
 }
