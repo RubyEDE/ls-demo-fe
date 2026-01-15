@@ -17,46 +17,6 @@ function formatTime(timestamp: string): string {
   });
 }
 
-function OrderRow({
-  order,
-  onCancel,
-  isCancelling,
-}: {
-  order: Order;
-  onCancel: () => void;
-  isCancelling: boolean;
-}) {
-  const fillPercent = (order.filledQuantity / order.quantity) * 100;
-
-  return (
-    <div className="order-row">
-      <div className="order-info">
-        <div className="order-main">
-          <span className={`order-side ${order.side}`}>{order.side.toUpperCase()}</span>
-          <span className="order-symbol">{order.marketSymbol}</span>
-          <span className="order-type">{order.type}</span>
-        </div>
-        <div className="order-details">
-          <span className="order-price">${order.price.toFixed(2)}</span>
-          <span className="order-qty">
-            {order.filledQuantity.toFixed(2)} / {order.quantity.toFixed(2)}
-          </span>
-          <span className="order-time">{formatTime(order.createdAt)}</span>
-        </div>
-      </div>
-      <div className="order-status-section">
-        <div className="fill-bar">
-          <div className="fill-progress" style={{ width: `${fillPercent}%` }} />
-        </div>
-        <span className={`order-status ${order.status}`}>{order.status}</span>
-      </div>
-      <button className="cancel-order-btn" onClick={onCancel} disabled={isCancelling}>
-        ×
-      </button>
-    </div>
-  );
-}
-
 export function OpenOrders({ market }: OpenOrdersProps) {
   const { isAuthenticated } = useAuth();
   const { openOrders, isLoading, refresh } = useOrders({ market });
@@ -67,7 +27,6 @@ export function OpenOrders({ market }: OpenOrdersProps) {
     const success = await cancelOrder(orderId);
     if (success) {
       refresh();
-      // Refresh balance to reflect unlocked funds
       refreshBalance();
     }
   };
@@ -75,7 +34,6 @@ export function OpenOrders({ market }: OpenOrdersProps) {
   const handleCancelAll = async () => {
     await cancelAllOrders(openOrders);
     refresh();
-    // Refresh balance to reflect unlocked funds
     refreshBalance();
   };
 
@@ -105,25 +63,62 @@ export function OpenOrders({ market }: OpenOrdersProps) {
     <div className="open-orders-container">
       <div className="open-orders-header">
         <h3>Open Orders ({openOrders.length})</h3>
-        {openOrders.length > 0 && (
-          <button className="cancel-all-btn" onClick={handleCancelAll} disabled={isCancelling}>
-            Cancel All
-          </button>
-        )}
       </div>
 
       {openOrders.length === 0 ? (
         <div className="open-orders-empty">No open orders</div>
       ) : (
-        <div className="orders-list">
-          {openOrders.map((order) => (
-            <OrderRow
-              key={order.orderId}
-              order={order}
-              onCancel={() => handleCancel(order.orderId)}
-              isCancelling={isCancelling}
-            />
-          ))}
+        <div className="orders-table-wrapper">
+          <table className="orders-table">
+            <thead>
+              <tr>
+                <th>Symbol</th>
+                <th>Side</th>
+                <th>Type</th>
+                <th>Price</th>
+                <th>Qty</th>
+                <th>Filled</th>
+                <th>Time</th>
+                <th className="col-action-header">
+                  <button className="cancel-all-btn" onClick={handleCancelAll} disabled={isCancelling}>
+                    Cancel All
+                  </button>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {openOrders.map((order: Order) => {
+                const fillPercent = (order.filledQuantity / order.quantity) * 100;
+                return (
+                  <tr key={order.orderId}>
+                    <td className="col-symbol">{order.marketSymbol}</td>
+                    <td className={`col-side ${order.side}`}>{order.side.toUpperCase()}</td>
+                    <td className="col-type">{order.type}</td>
+                    <td className="col-price">${order.price.toFixed(2)}</td>
+                    <td className="col-qty">{order.quantity.toFixed(2)}</td>
+                    <td className="col-filled">
+                      <div className="fill-cell">
+                        <span>{fillPercent.toFixed(0)}%</span>
+                        <div className="fill-bar">
+                          <div className="fill-progress" style={{ width: `${fillPercent}%` }} />
+                        </div>
+                      </div>
+                    </td>
+                    <td className="col-time">{formatTime(order.createdAt)}</td>
+                    <td className="col-action">
+                      <button
+                        className="cancel-order-btn"
+                        onClick={() => handleCancel(order.orderId)}
+                        disabled={isCancelling}
+                      >
+                        Cancel
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
         </div>
       )}
     </div>

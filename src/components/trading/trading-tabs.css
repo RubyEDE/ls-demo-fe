@@ -70,7 +70,8 @@
 
 .trading-tabs-content {
   flex: 1;
-  overflow: hidden;
+  overflow-y: auto;
+  min-height: 0;
 }
 
 /* Override child container styles when inside tabs */
@@ -104,7 +105,7 @@
 .trading-tabs-content .orders-list,
 .trading-tabs-content .trade-feed-list,
 .trading-tabs-content .trade-history-list {
-  max-height: 280px;
+  max-height: none;
   padding: 0 0.5rem 0.5rem;
 }
 

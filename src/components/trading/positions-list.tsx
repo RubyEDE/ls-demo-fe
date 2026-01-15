@@ -29,75 +29,6 @@ function formatSize(size: number): string {
   return size.toFixed(4);
 }
 
-function PositionRow({
-  position,
-  onClose,
-  isClosing,
-}: {
-  position: Position;
-  onClose: () => void;
-  isClosing: boolean;
-}) {
-  const isProfitable = position.unrealizedPnl >= 0;
-  const roe = position.margin > 0 ? (position.unrealizedPnl / position.margin) * 100 : 0;
-
-  // Calculate liquidation risk
-  const getLiqRisk = (): "safe" | "warning" | "danger" => {
-    if (!position.markPrice) return "safe";
-    const distanceToLiq =
-      position.side === "long"
-        ? position.markPrice - position.liquidationPrice
-        : position.liquidationPrice - position.markPrice;
-    const percentToLiq = (distanceToLiq / position.markPrice) * 100;
-    if (percentToLiq < 2) return "danger";
-    if (percentToLiq < 5) return "warning";
-    return "safe";
-  };
-
-  const liqRisk = getLiqRisk();
-
-  return (
-    <div className={`position-row ${position.side}`}>
-      <div className="position-info">
-        <div className="position-main">
-          <span className={`position-side ${position.side}`}>
-            {position.side.toUpperCase()}
-          </span>
-          <span className="position-symbol">{position.marketSymbol}</span>
-          <span className="position-leverage">{position.leverage.toFixed(1)}x</span>
-        </div>
-        <div className="position-details">
-          <span className="position-size">{formatSize(position.size)}</span>
-          <span className="position-entry">@ ${formatPrice(position.entryPrice)}</span>
-          {position.markPrice && (
-            <span className="position-mark">→ ${formatPrice(position.markPrice)}</span>
-          )}
-        </div>
-      </div>
-
-      <div className="position-pnl-section">
-        <span className={`position-pnl ${isProfitable ? "profit" : "loss"}`}>
-          {isProfitable ? "+" : ""}
-          {formatMoney(position.unrealizedPnl)}
-        </span>
-        <span className={`position-roe ${isProfitable ? "profit" : "loss"}`}>
-          {isProfitable ? "+" : ""}
-          {roe.toFixed(2)}%
-        </span>
-        {liqRisk !== "safe" && (
-          <span className={`position-liq ${liqRisk}`}>
-            Liq: ${formatPrice(position.liquidationPrice)}
-          </span>
-        )}
-      </div>
-
-      <button className="close-position-btn" onClick={onClose} disabled={isClosing} title="Close position">
-        ×
-      </button>
-    </div>
-  );
-}
-
 export function PositionsList({ market }: PositionsListProps) {
   const { isAuthenticated } = useAuth();
   const { positions, summary, isLoading, refresh } = usePositions({ market });
@@ -175,15 +106,6 @@ export function PositionsList({ market }: PositionsListProps) {
     <div className="positions-container">
       <div className="positions-header">
         <h3>Positions ({positions.length})</h3>
-        {positions.length > 1 && (
-          <button
-            className="close-all-positions-btn"
-            onClick={handleCloseAll}
-            disabled={isClosing}
-          >
-            Close All
-          </button>
-        )}
       </div>
 
       {summary && positions.length > 0 && (
@@ -203,21 +125,70 @@ export function PositionsList({ market }: PositionsListProps) {
             <span className="label">Equity</span>
             <span className="value">{formatMoney(summary.totalEquity)}</span>
           </div>
+          {positions.length > 1 && (
+            <button
+              className="close-all-positions-btn"
+              onClick={handleCloseAll}
+              disabled={isClosing}
+            >
+              Close All
+            </button>
+          )}
         </div>
       )}
 
       {positions.length === 0 ? (
         <div className="positions-empty">No open positions</div>
       ) : (
-        <div className="positions-list">
-          {positions.map((position) => (
-            <PositionRow
-              key={position.positionId}
-              position={position}
-              onClose={() => handleClose(position.marketSymbol)}
-              isClosing={isClosing}
-            />
-          ))}
+        <div className="positions-table-wrapper">
+          <table className="positions-table">
+            <thead>
+              <tr>
+                <th>Symbol</th>
+                <th>Side</th>
+                <th>Size</th>
+                <th>Entry</th>
+                <th>Mark</th>
+                <th>Liq</th>
+                <th>PnL</th>
+                <th>ROE</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              {positions.map((position) => {
+                const isProfitable = position.unrealizedPnl >= 0;
+                const roe = position.margin > 0 ? (position.unrealizedPnl / position.margin) * 100 : 0;
+                return (
+                  <tr key={position.positionId}>
+                    <td className="col-symbol">{position.marketSymbol}</td>
+                    <td className={`col-side ${position.side}`}>
+                      {position.side.toUpperCase()} {position.leverage.toFixed(0)}x
+                    </td>
+                    <td className="col-size">{formatSize(position.size)}</td>
+                    <td className="col-entry">${formatPrice(position.entryPrice)}</td>
+                    <td className="col-mark">{position.markPrice ? `$${formatPrice(position.markPrice)}` : "-"}</td>
+                    <td className="col-liq">${formatPrice(position.liquidationPrice)}</td>
+                    <td className={`col-pnl ${isProfitable ? "profit" : "loss"}`}>
+                      {isProfitable ? "+" : ""}{formatMoney(position.unrealizedPnl)}
+                    </td>
+                    <td className={`col-roe ${isProfitable ? "profit" : "loss"}`}>
+                      {isProfitable ? "+" : ""}{roe.toFixed(2)}%
+                    </td>
+                    <td className="col-action">
+                      <button
+                        className="close-position-btn"
+                        onClick={() => handleClose(position.marketSymbol)}
+                        disabled={isClosing}
+                      >
+                        Close
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
         </div>
       )}
     </div>

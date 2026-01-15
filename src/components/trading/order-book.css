@@ -73,9 +73,9 @@
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
   gap: 0.15rem;
-  padding: 0.1rem 0.15rem;
+  padding: 0.25rem 0.15rem;
   position: relative;
-  font-size: 0.65rem;
+  font-size: 0.7rem;
   margin: 0 -0.15rem;
   border-radius: 2px;
   flex-shrink: 0;
@@ -163,6 +163,7 @@
   flex: 1;
   min-height: 0;
   overflow-y: auto;
+  overflow-x: hidden;
   display: flex;
   flex-direction: column;
 }
