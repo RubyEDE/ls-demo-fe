@@ -18,8 +18,9 @@ const INTERVALS: { value: CandleInterval; label: string }[] = [
   { value: "1d", label: "1D" },
 ];
 
-export function CandlestickChart({ symbol, height = 400 }: CandlestickChartProps) {
+export function CandlestickChart({ symbol, height }: CandlestickChartProps) {
   const chartContainerRef = useRef<HTMLDivElement>(null);
+  const chartWrapperRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<IChartApi | null>(null);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const seriesRef = useRef<ISeriesApi<any> | null>(null);
@@ -38,27 +39,28 @@ export function CandlestickChart({ symbol, height = 400 }: CandlestickChartProps
     console.log("[Chart] Init effect, container:", !!chartContainerRef.current);
     if (!chartContainerRef.current) return;
 
+    const containerHeight = height || chartWrapperRef.current?.clientHeight || 400;
     console.log("[Chart] Creating chart with width:", chartContainerRef.current.clientWidth);
     const chart = createChart(chartContainerRef.current, {
       width: chartContainerRef.current.clientWidth,
-      height,
+      height: containerHeight,
       layout: {
-        background: { color: "rgba(26, 26, 46, 1)" },
-        textColor: "#71717a",
+        background: { color: "#131722" },
+        textColor: "#8b8f9a",
       },
       grid: {
-        vertLines: { color: "rgba(124, 58, 237, 0.06)" },
-        horzLines: { color: "rgba(124, 58, 237, 0.06)" },
+        vertLines: { color: "rgba(255, 255, 255, 0.06)" },
+        horzLines: { color: "rgba(255, 255, 255, 0.06)" },
       },
       crosshair: {
         mode: 1,
         vertLine: {
-          color: "rgba(124, 58, 237, 0.4)",
+          color: "rgba(0, 212, 170, 0.4)",
           width: 1,
           style: 2,
         },
         horzLine: {
-          color: "rgba(124, 58, 237, 0.4)",
+          color: "rgba(0, 212, 170, 0.4)",
           width: 1,
           style: 2,
         },
@@ -66,10 +68,10 @@ export function CandlestickChart({ symbol, height = 400 }: CandlestickChartProps
       timeScale: {
         timeVisible: true,
         secondsVisible: false,
-        borderColor: "rgba(124, 58, 237, 0.15)",
+        borderColor: "rgba(255, 255, 255, 0.08)",
       },
       rightPriceScale: {
-        borderColor: "rgba(124, 58, 237, 0.15)",
+        borderColor: "rgba(255, 255, 255, 0.08)",
       },
     });
 
@@ -86,19 +88,23 @@ export function CandlestickChart({ symbol, height = 400 }: CandlestickChartProps
     seriesRef.current = candlestickSeries;
     console.log("[Chart] Chart and series created successfully");
 
-    // Handle resize
-    const handleResize = () => {
-      if (chartContainerRef.current && chartRef.current) {
+    // Handle resize with ResizeObserver
+    const resizeObserver = new ResizeObserver(() => {
+      if (chartContainerRef.current && chartRef.current && chartWrapperRef.current) {
+        const newHeight = height || chartWrapperRef.current.clientHeight;
         chartRef.current.applyOptions({
           width: chartContainerRef.current.clientWidth,
+          height: newHeight,
         });
       }
-    };
+    });
 
-    window.addEventListener("resize", handleResize);
+    if (chartWrapperRef.current) {
+      resizeObserver.observe(chartWrapperRef.current);
+    }
 
     return () => {
-      window.removeEventListener("resize", handleResize);
+      resizeObserver.disconnect();
       chart.remove();
       chartRef.current = null;
       seriesRef.current = null;
@@ -226,19 +232,15 @@ export function CandlestickChart({ symbol, height = 400 }: CandlestickChartProps
         </div>
       )}
 
-      <div style={{ position: "relative" }}>
+      <div ref={chartWrapperRef} className="chart-wrapper" style={height ? { height } : undefined}>
         {isLoading && candles.length === 0 && (
-          <div className="chart-loading" style={{ height, position: "absolute", top: 0, left: 0, right: 0, zIndex: 10 }}>
+          <div className="chart-loading">
             <div className="loading-spinner" />
             <span>Loading chart...</span>
           </div>
         )}
 
-        <div
-          ref={chartContainerRef}
-          className="chart-canvas"
-          style={{ height }}
-        />
+        <div ref={chartContainerRef} className="chart-canvas" />
       </div>
     </div>
   );

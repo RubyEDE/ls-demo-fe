@@ -1,17 +1,19 @@
-import { Outlet, NavLink } from "react-router-dom";
+import { Outlet, NavLink, useLocation } from "react-router-dom";
 import { useAuth } from "../context/auth-context";
 import { WalletButton } from "./wallet-button";
 import "./layout.css";
 
 export function Layout() {
   const { isAuthenticated } = useAuth();
+  const location = useLocation();
+  const isFullWidth = location.pathname === "/";
 
   return (
     <div className="app-container">
       <header className="header">
         <div className="header-left">
           <NavLink to="/" className="title">
-            Demo App
+            Longsword
           </NavLink>
           <nav className="nav">
             <NavLink
@@ -34,7 +36,7 @@ export function Layout() {
         <WalletButton />
       </header>
 
-      <main className="main-content">
+      <main className={`main-content ${isFullWidth ? "full-width" : ""}`}>
         <Outlet />
       </main>
     </div>

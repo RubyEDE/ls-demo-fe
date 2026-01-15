@@ -1,125 +1,181 @@
-.trade-container {
+.trade-terminal {
   width: 100%;
-  max-width: 1600px;
-  padding: 0.75rem;
+  height: calc(100vh - 56px);
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  overflow: hidden;
 }
 
-.trade-header {
+/* Floating notifications */
+.notifications-toast {
+  position: fixed;
+  top: 70px;
+  right: 12px;
+  z-index: 1000;
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.trade-title {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.trade-title h1 {
-  font-size: 1.125rem;
-  font-weight: 700;
-  color: var(--text-primary);
-  margin: 0;
-  background: linear-gradient(135deg, var(--text-primary), var(--accent-cyan));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.notifications {
-  display: flex;
+  flex-direction: column;
   gap: 0.5rem;
-  flex-wrap: wrap;
-  justify-content: flex-end;
 }
 
 .notification {
-  padding: 0.375rem 0.625rem;
-  background: var(--accent-cyan-dim);
-  border: 1px solid rgba(0, 212, 170, 0.3);
-  border-radius: 5px;
-  font-size: 0.7rem;
+  padding: 0.5rem 0.75rem;
+  background: var(--bg-secondary);
+  border: 1px solid var(--accent-cyan);
+  border-radius: 6px;
+  font-size: 0.75rem;
   color: var(--accent-cyan);
   animation: slideIn 0.3s ease;
   white-space: nowrap;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
 }
 
 @keyframes slideIn {
   from {
     opacity: 0;
-    transform: translateY(-10px);
+    transform: translateX(20px);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateX(0);
   }
 }
 
-.trade-layout {
+/* Top Bar */
+.terminal-top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.5rem;
+  background: #131722;
+  border-bottom: 2px solid #1e222d;
+  flex-shrink: 0;
+}
+
+.terminal-top-bar .market-header {
+  flex: 1;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+}
+
+/* Main Layout */
+.terminal-layout {
+  flex: 1;
   display: grid;
   grid-template-columns: 1fr 560px;
-  gap: 1rem;
+  min-height: 0;
+  overflow: hidden;
 }
 
-.trade-main {
+/* Main Area (Chart + Tabs) */
+.terminal-main {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
   min-width: 0;
+  min-height: 0;
+  border-right: 2px solid #1e222d;
 }
 
-.trade-sidebar {
+.terminal-main .candlestick-chart-container {
+  flex: 1;
+  border: none;
+  border-radius: 0;
+  min-height: 0;
+}
+
+.terminal-main .candlestick-chart-container:hover {
+  border-color: transparent;
+}
+
+.terminal-main .trading-tabs-container {
+  height: 280px;
+  flex-shrink: 0;
+  border: none;
+  border-radius: 0;
+  border-top: 2px solid #1e222d;
+}
+
+/* Sidebar */
+.terminal-sidebar {
   display: flex;
-  flex-direction: column;
-  gap: 1rem;
+  flex-direction: row;
+  min-height: 0;
+  overflow: hidden;
 }
 
-.order-panel {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0.75rem;
+.terminal-sidebar .order-form-container {
+  width: 280px;
+  flex-shrink: 0;
+  border: none;
+  border-radius: 0;
+  border-right: 2px solid #1e222d;
+  overflow-y: auto;
+}
+
+.terminal-sidebar .order-book-container {
+  flex: 1;
+  border: none;
+  border-radius: 0;
+  min-height: 0;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.terminal-sidebar .order-book-container:hover {
+  border-color: transparent;
 }
 
 /* Responsive */
 @media (max-width: 1400px) {
-  .trade-layout {
+  .terminal-layout {
     grid-template-columns: 1fr 500px;
+  }
+  
+  .terminal-sidebar .order-form-container {
+    width: 250px;
   }
 }
 
 @media (max-width: 1200px) {
-  .trade-layout {
+  .terminal-layout {
     grid-template-columns: 1fr 440px;
+  }
+  
+  .terminal-sidebar .order-form-container {
+    width: 220px;
   }
 }
 
 @media (max-width: 1000px) {
-  .trade-layout {
+  .terminal-layout {
     grid-template-columns: 1fr;
+    grid-template-rows: 1fr auto;
   }
 
-  .order-panel {
-    grid-template-columns: 1fr 1fr;
+  .terminal-main {
+    border-right: none;
+    border-bottom: 2px solid #1e222d;
+  }
+
+  .terminal-sidebar {
+    height: 320px;
+  }
+
+  .terminal-sidebar .order-form-container {
+    width: 50%;
   }
 }
 
-@media (max-width: 768px) {
-  .trade-header {
+@media (max-width: 600px) {
+  .terminal-sidebar {
     flex-direction: column;
-    align-items: flex-start;
+    height: auto;
   }
 
-  .notifications {
+  .terminal-sidebar .order-form-container {
     width: 100%;
-    justify-content: flex-start;
-  }
-
-  .order-panel {
-    grid-template-columns: 1fr;
+    border-right: none;
+    border-bottom: 2px solid #1e222d;
   }
 }

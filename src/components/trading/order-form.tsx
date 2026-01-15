@@ -241,14 +241,6 @@ export function OrderForm({ market, onOrderPlaced, selectedPrice }: OrderFormPro
                 onChange={(e) => setPrice(e.target.value)}
                 placeholder="0.00"
               />
-              <div className="quick-btns">
-                <button type="button" onClick={() => setQuickPrice("bid")}>
-                  Bid
-                </button>
-                <button type="button" onClick={() => setQuickPrice("ask")}>
-                  Ask
-                </button>
-              </div>
             </div>
           </div>
         )}
@@ -270,17 +262,6 @@ export function OrderForm({ market, onOrderPlaced, selectedPrice }: OrderFormPro
           </span>
         </div>
 
-        {/* Post Only (Limit only) */}
-        {orderType === "limit" && (
-          <label className="checkbox-label">
-            <input
-              type="checkbox"
-              checked={postOnly}
-              onChange={(e) => setPostOnly(e.target.checked)}
-            />
-            <span>Post Only (maker only)</span>
-          </label>
-        )}
 
         {/* Order Summary */}
         <div className="order-summary">

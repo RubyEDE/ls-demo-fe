@@ -1,15 +1,10 @@
 .trading-tabs-container {
-  background: linear-gradient(135deg, var(--bg-secondary), var(--bg-tertiary));
+  background: #131722;
   border: 1px solid var(--border-color);
   border-radius: 12px;
   display: flex;
   flex-direction: column;
   min-height: 300px;
-  transition: all 0.3s ease;
-}
-
-.trading-tabs-container:hover {
-  border-color: var(--accent-cyan);
 }
 
 .trading-tabs-header {

@@ -87,53 +87,48 @@ export function TradePage() {
   });
 
   return (
-    <div className="trade-container">
-      {/* Header */}
-      <div className="trade-header">
-        <div className="trade-title">
-          <h1>Trade</h1>
-          <ConnectionStatus />
+    <div className="trade-terminal">
+      {/* Notifications Toast */}
+      {isAuthenticated && notifications.length > 0 && (
+        <div className="notifications-toast">
+          {notifications.map((note, i) => (
+            <div key={i} className="notification">
+              {note}
+            </div>
+          ))}
         </div>
-        {isAuthenticated && notifications.length > 0 && (
-          <div className="notifications">
-            {notifications.map((note, i) => (
-              <div key={i} className="notification">
-                {note}
-              </div>
-            ))}
-          </div>
-        )}
+      )}
+
+      {/* Top Bar: Market Header + Connection Status */}
+      <div className="terminal-top-bar">
+        <MarketHeader
+          markets={markets}
+          selectedMarket={selectedMarket}
+          onSelectMarket={setSelectedSymbol}
+        />
+        <ConnectionStatus />
       </div>
 
-      {/* Market Header */}
-      <MarketHeader
-        markets={markets}
-        selectedMarket={selectedMarket}
-        onSelectMarket={setSelectedSymbol}
-      />
-
       {/* Main Trading Layout */}
-      <div className="trade-layout">
-        {/* Left: Chart + Tabbed Panel */}
-        <div className="trade-main">
-          <CandlestickChart symbol={`${selectedSymbol}-PERP`} height={450} />
+      <div className="terminal-layout">
+        {/* Left: Chart + Tabs */}
+        <div className="terminal-main">
+          <CandlestickChart symbol={`${selectedSymbol}-PERP`} />
           <TradingTabs ordersKey={ordersKey} />
         </div>
 
-        {/* Right Sidebar */}
-        <div className="trade-sidebar">
-          <div className="order-panel">
-            <OrderForm
-              market={selectedMarket}
-              onOrderPlaced={handleOrderPlaced}
-              selectedPrice={selectedPrice}
-            />
-            <OrderBook
-              symbol={`${selectedSymbol}-PERP`}
-              depth={8}
-              onPriceClick={handlePriceClick}
-            />
-          </div>
+        {/* Right: Order Form + Order Book */}
+        <div className="terminal-sidebar">
+          <OrderForm
+            market={selectedMarket}
+            onOrderPlaced={handleOrderPlaced}
+            selectedPrice={selectedPrice}
+          />
+          <OrderBook
+            symbol={`${selectedSymbol}-PERP`}
+            depth={50}
+            onPriceClick={handlePriceClick}
+          />
         </div>
       </div>
     </div>
