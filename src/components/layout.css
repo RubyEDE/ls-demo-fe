@@ -9,14 +9,18 @@
   justify-content: space-between;
   align-items: center;
   padding: 0 1.25rem;
-  background: linear-gradient(180deg, var(--bg-primary) 0%, rgba(13, 17, 23, 0.98) 100%);
+  background: var(--bg-primary);
   border-bottom: 1px solid var(--border-color);
   height: 60px;
   flex-shrink: 0;
-  backdrop-filter: blur(12px);
   position: sticky;
   top: 0;
   z-index: 100;
+}
+
+.header.header-terminal {
+  background: #131722;
+  border-bottom: 2px solid #1e222d;
 }
 
 .header-left {

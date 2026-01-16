@@ -1,6 +1,6 @@
 import { fetchWithAuth } from "./api";
 import type { Market, Order, PlaceOrderParams, PlaceOrderResult, UserTrade } from "../types/clob";
-import type { CandleInterval, CandleResponse, MarketStatus } from "../types/candles";
+import type { CandleInterval, CandleResponse, CandleResponseRaw, MarketStatus, Candle, CandleRaw } from "../types/candles";
 import type { Position, PositionSummary, ClosePositionResult } from "../types/position";
 
 const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:3000";
@@ -136,21 +136,50 @@ export async function getUserTradeHistory(
   return res.json();
 }
 
-// Candles (Authenticated)
+// Helper to transform raw candle to internal format
+function transformCandle(raw: CandleRaw): Candle {
+  return {
+    time: raw.timestamp,
+    open: raw.open,
+    high: raw.high,
+    low: raw.low,
+    close: raw.close,
+    volume: raw.volume,
+    trades: raw.trades,
+    isClosed: raw.isClosed,
+    isMarketOpen: raw.isMarketOpen ?? true,
+  };
+}
+
+// Candles (Public)
 export async function getCandles(
   symbol: string,
-  interval: CandleInterval = "5m",
-  limit = 100
+  interval: CandleInterval = "1m",
+  limit = 1000
 ): Promise<CandleResponse> {
-  // Strip -PERP suffix if present for the API call
-  const baseSymbol = symbol.replace("-PERP", "");
-  const res = await fetchWithAuth(`/finnhub/candles/${baseSymbol}?interval=${interval}&limit=${limit}`);
+  // Ensure symbol has -PERP suffix for the API call
+  const fullSymbol = symbol.includes("-PERP") ? symbol : `${symbol}-PERP`;
+  const res = await fetch(`${API_BASE}/clob/candles/${fullSymbol}?interval=${interval}&limit=${limit}`);
 
   if (!res.ok) {
-    throw new Error("Failed to fetch candles");
+    const error = await res.json().catch(() => ({ message: "Failed to fetch candles" }));
+    throw new Error(error.message || "Failed to fetch candles");
   }
 
-  return res.json();
+  const raw: CandleResponseRaw = await res.json();
+
+  // Transform to internal format
+  return {
+    symbol: raw.symbol,
+    interval: raw.interval,
+    marketStatus: raw.marketStatus,
+    candles: raw.candles.map(transformCandle),
+    current: raw.currentCandle ? transformCandle(raw.currentCandle) : null,
+    meta: {
+      count: raw.meta.count,
+      hasEnoughData: raw.meta.hasEnoughData,
+    },
+  };
 }
 
 // Market Status (Public)

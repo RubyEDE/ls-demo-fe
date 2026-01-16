@@ -8,9 +8,11 @@ export function Layout() {
   const location = useLocation();
   const isFullWidth = location.pathname === "/";
 
+  const isTradePage = location.pathname === "/";
+
   return (
     <div className="app-container">
-      <header className="header">
+      <header className={`header ${isTradePage ? "header-terminal" : ""}`}>
         <div className="header-left">
           <NavLink to="/" className="title">
             Longsword
