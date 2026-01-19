@@ -1,5 +1,6 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { useWebSocket } from "../context/websocket-context";
+import { getOrderBook } from "../utils/clob-api";
 import type { OrderBookSnapshot, OrderBookUpdate, OrderBookEntry } from "../types/websocket";
 
 export interface OrderBook {
@@ -11,13 +12,15 @@ export interface OrderBook {
   spreadPercent: number;
 }
 
-export function useOrderBook(symbol: string) {
+export function useOrderBook(symbol: string, depth: number = 50) {
   const { socket, isConnected } = useWebSocket();
   const [orderBook, setOrderBook] = useState<OrderBook | null>(null);
+  const hasReceivedSnapshot = useRef(false);
 
   // Clear orderbook when symbol changes
   useEffect(() => {
     setOrderBook(null);
+    hasReceivedSnapshot.current = false;
   }, [symbol]);
 
   const calculateSpread = useCallback((bids: OrderBookEntry[], asks: OrderBookEntry[]) => {
@@ -31,18 +34,63 @@ export function useOrderBook(symbol: string) {
     return { spread, spreadPercent };
   }, []);
 
+  // Fetch initial orderbook via HTTP for faster load
   useEffect(() => {
-    if (!socket || !isConnected || !symbol) return;
+    if (!symbol) return;
+
+    const upperSymbol = symbol.toUpperCase();
+    let cancelled = false;
+
+    console.log("[OrderBook] Fetching initial state via HTTP:", upperSymbol);
+    
+    getOrderBook(upperSymbol, depth)
+      .then((data) => {
+        if (cancelled) return;
+        
+        // Only use HTTP data if we haven't received a WS snapshot yet
+        if (!hasReceivedSnapshot.current) {
+          console.log("[OrderBook] ✅ HTTP response:", data.symbol, "bids:", data.bids?.length, "asks:", data.asks?.length);
+          const { spread, spreadPercent } = calculateSpread(data.bids, data.asks);
+          setOrderBook({
+            symbol: data.symbol,
+            bids: data.bids,
+            asks: data.asks,
+            timestamp: data.timestamp,
+            spread,
+            spreadPercent,
+          });
+        }
+      })
+      .catch((err) => {
+        if (!cancelled) {
+          console.error("[OrderBook] HTTP fetch failed:", err);
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [symbol, depth, calculateSpread]);
+
+  // WebSocket subscription for real-time updates
+  useEffect(() => {
+    if (!socket || !isConnected || !symbol) {
+      console.log("[OrderBook] Not subscribing:", { hasSocket: !!socket, isConnected, symbol });
+      return;
+    }
 
     const upperSymbol = symbol.toUpperCase();
 
     // Subscribe to order book
+    console.log("[OrderBook] Subscribing to:", upperSymbol);
     socket.emit("subscribe:orderbook", upperSymbol);
 
-    // Handle full snapshot
+    // Handle full snapshot from WebSocket
     const handleSnapshot = (data: OrderBookSnapshot) => {
+      console.log("[OrderBook] 📡 WS snapshot:", data.symbol, "bids:", data.bids?.length, "asks:", data.asks?.length);
       if (data.symbol !== upperSymbol) return;
 
+      hasReceivedSnapshot.current = true;
       const { spread, spreadPercent } = calculateSpread(data.bids, data.asks);
       setOrderBook({
         ...data,
@@ -106,10 +154,20 @@ export function useOrderBook(symbol: string) {
     socket.on("orderbook:snapshot", handleSnapshot);
     socket.on("orderbook:update", handleUpdate);
 
+    // Also listen for subscription confirmation
+    const handleSubscribed = (data: { channel: string; symbol: string }) => {
+      if (data.channel === "orderbook" && data.symbol === upperSymbol) {
+        console.log("[OrderBook] ✅ Subscription confirmed:", data);
+      }
+    };
+    socket.on("subscribed", handleSubscribed);
+
     return () => {
+      console.log("[OrderBook] Unsubscribing from:", upperSymbol);
       socket.emit("unsubscribe:orderbook", upperSymbol);
       socket.off("orderbook:snapshot", handleSnapshot);
       socket.off("orderbook:update", handleUpdate);
+      socket.off("subscribed", handleSubscribed);
     };
   }, [socket, isConnected, symbol, calculateSpread]);
 

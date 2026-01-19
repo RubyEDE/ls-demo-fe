@@ -252,13 +252,12 @@ export function OrderForm({ market, onOrderPlaced, selectedPrice }: OrderFormPro
             type="number"
             step={market.lotSize}
             min={market.minOrderSize}
-            max={market.maxOrderSize}
             value={quantity}
             onChange={(e) => setQuantity(e.target.value)}
             placeholder="0.00"
           />
           <span className="input-hint">
-            Min: {market.minOrderSize} | Max: {market.maxOrderSize}
+            Min: {market.minOrderSize}
           </span>
         </div>
 

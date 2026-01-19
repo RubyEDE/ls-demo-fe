@@ -28,6 +28,7 @@ export function CandlestickChart({ symbol, height }: CandlestickChartProps) {
   const prevCandleCountRef = useRef<number>(0);
   const initialLoadDoneRef = useRef<boolean>(false);
   const renderedIntervalRef = useRef<CandleInterval | null>(null);
+  const defaultVisibleBarsRef = useRef<number>(100);
 
   // Set the symbol in the candle context to subscribe to all intervals
   const { setSymbol } = useCandles();
@@ -75,6 +76,7 @@ export function CandlestickChart({ symbol, height }: CandlestickChartProps) {
         timeVisible: true,
         secondsVisible: false,
         borderColor: "rgba(255, 255, 255, 0.08)",
+        minBarSpacing: 2,
         tickMarkFormatter: (time: number) => {
           const date = new Date(time * 1000);
           const hours = date.getHours().toString().padStart(2, "0");
@@ -111,6 +113,22 @@ export function CandlestickChart({ symbol, height }: CandlestickChartProps) {
     chartRef.current = chart;
     seriesRef.current = candlestickSeries;
     console.log("[Chart] Chart and series created successfully");
+
+    // Prevent zooming out beyond default visible bars
+    const timeScale = chart.timeScale();
+    timeScale.subscribeVisibleLogicalRangeChange((logicalRange) => {
+      if (!logicalRange) return;
+      const visibleBars = logicalRange.to - logicalRange.from;
+      const maxBars = defaultVisibleBarsRef.current;
+      
+      // If trying to zoom out beyond default, reset to max allowed
+      if (visibleBars > maxBars) {
+        timeScale.setVisibleLogicalRange({
+          from: logicalRange.to - maxBars,
+          to: logicalRange.to,
+        });
+      }
+    });
 
     // Handle resize with ResizeObserver
     const resizeObserver = new ResizeObserver(() => {

@@ -33,6 +33,12 @@ export function Layout() {
                 Faucet
               </NavLink>
             )}
+            <NavLink
+              to="/achievements"
+              className={({ isActive }) => (isActive ? "nav-link active" : "nav-link")}
+            >
+              Achievements
+            </NavLink>
           </nav>
         </div>
         <WalletButton />

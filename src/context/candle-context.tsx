@@ -25,6 +25,7 @@ interface CandleContextValue {
   symbol: string | null;
   setSymbol: (symbol: string) => void;
   getIntervalData: (interval: CandleInterval) => IntervalData;
+  refetchInterval: (interval: CandleInterval) => Promise<void>;
   marketStatus: MarketStatus | null;
   isConnected: boolean;
 }
@@ -119,14 +120,20 @@ export function CandleProvider({ children }: CandleProviderProps) {
     if (!socket || !isConnected) return;
 
     const handleUpdate = (data: CandleUpdateRaw) => {
+      console.log("[Candles] Socket update received:", { symbol: data.symbol, interval: data.interval, timestamp: data.timestamp });
+      
       // Only process if this is for our current symbol
       const currentSymbol = symbolRef.current;
       if (!currentSymbol || data.symbol?.toUpperCase() !== currentSymbol.toUpperCase()) {
+        console.log("[Candles] Skipping - symbol mismatch:", { received: data.symbol, current: currentSymbol });
         return;
       }
 
       const interval = data.interval as CandleInterval;
-      if (!ALL_INTERVALS.includes(interval)) return;
+      if (!ALL_INTERVALS.includes(interval)) {
+        console.log("[Candles] Skipping - unknown interval:", data.interval);
+        return;
+      }
 
       const candle: Candle = {
         time: data.timestamp,
@@ -198,6 +205,7 @@ export function CandleProvider({ children }: CandleProviderProps) {
     ALL_INTERVALS.forEach((interval) => {
       const key = `${upperSymbol}:${interval}`;
       if (!subscribedRef.current.has(key)) {
+        console.log("[Candles] Subscribing to:", { symbol: upperSymbol, interval });
         socket.emit("subscribe:candles", { symbol: upperSymbol, interval });
         subscribedRef.current.add(key);
       }
@@ -222,15 +230,65 @@ export function CandleProvider({ children }: CandleProviderProps) {
     [intervalDataMap]
   );
 
+  // Refetch a specific interval via API
+  const refetchInterval = useCallback(
+    async (interval: CandleInterval) => {
+      const currentSymbol = symbolRef.current;
+      if (!currentSymbol) return;
+
+      console.log("[Candles] Refetching interval:", interval, "for", currentSymbol);
+
+      // Set loading state for this interval
+      setIntervalDataMap((prev) => {
+        const newMap = new Map(prev);
+        const existing = newMap.get(interval) || defaultIntervalData;
+        newMap.set(interval, { ...existing, isLoading: true, error: null });
+        return newMap;
+      });
+
+      try {
+        const data = await getCandles(currentSymbol, interval, limit);
+        
+        setIntervalDataMap((prev) => {
+          const newMap = new Map(prev);
+          newMap.set(interval, {
+            candles: data.candles || [],
+            currentCandle: data.current,
+            isLoading: false,
+            error: null,
+          });
+          return newMap;
+        });
+
+        if (data.marketStatus) {
+          setMarketStatus(data.marketStatus);
+        }
+      } catch (err) {
+        setIntervalDataMap((prev) => {
+          const newMap = new Map(prev);
+          newMap.set(interval, {
+            candles: [],
+            currentCandle: null,
+            isLoading: false,
+            error: err instanceof Error ? err.message : "Failed to load candles",
+          });
+          return newMap;
+        });
+      }
+    },
+    []
+  );
+
   const value = useMemo(
     () => ({
       symbol,
       setSymbol,
       getIntervalData,
+      refetchInterval,
       marketStatus,
       isConnected,
     }),
-    [symbol, setSymbol, getIntervalData, marketStatus, isConnected]
+    [symbol, setSymbol, getIntervalData, refetchInterval, marketStatus, isConnected]
   );
 
   return (
@@ -250,8 +308,22 @@ export function useCandles(): CandleContextValue {
 
 // Hook for getting candles for a specific interval
 export function useCandleData(interval: CandleInterval) {
-  const { getIntervalData, marketStatus, isConnected } = useCandles();
+  const { getIntervalData, refetchInterval, marketStatus, isConnected, symbol } = useCandles();
   const data = getIntervalData(interval);
+  const isFirstRender = useRef(true);
+
+  // Refetch when interval changes (not on initial mount)
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+    
+    if (symbol) {
+      console.log("[Candles] Interval changed to", interval, "- refetching via API");
+      refetchInterval(interval);
+    }
+  }, [interval, refetchInterval, symbol]);
 
   // Combine historical and current candle
   const allCandles = useMemo(() => {
@@ -261,6 +333,11 @@ export function useCandleData(interval: CandleInterval) {
     return data.candles;
   }, [data.candles, data.currentCandle]);
 
+  // Manual refetch function
+  const refetch = useCallback(() => {
+    refetchInterval(interval);
+  }, [refetchInterval, interval]);
+
   return {
     candles: allCandles,
     currentCandle: data.currentCandle,
@@ -268,5 +345,6 @@ export function useCandleData(interval: CandleInterval) {
     error: data.error,
     marketStatus,
     isConnected,
+    refetch,
   };
 }
