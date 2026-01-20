@@ -10,3 +10,4 @@ export { OrderForm } from "./order-form";
 export { OpenOrders } from "./open-orders";
 export { PositionsList, MarketPositionWidget } from "./positions-list";
 export { TradingTabs } from "./trading-tabs";
+export { FundingRateDisplay } from "./funding-rate-display";

@@ -1,5 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { usePriceFeed } from "../../hooks/use-price-feed";
+import { useFundingInfo } from "../../hooks/use-funding";
+import { useFundingUpdates } from "../../hooks/use-funding-updates";
 import type { Market } from "../../types/clob";
 import type { PriceUpdate } from "../../types/websocket";
 import type { LastTradePrice } from "../../hooks/use-last-trade-prices";
@@ -148,9 +150,33 @@ function StatItem({ label, value, subValue, isPositive, isNegative }: StatItemPr
   );
 }
 
+function getTimeUntilFunding(isoString: string | undefined): string {
+  if (!isoString) return "--";
+  const target = new Date(isoString);
+  const now = new Date();
+  const diff = target.getTime() - now.getTime();
+
+  if (diff <= 0) return "Now";
+
+  const hours = Math.floor(diff / (1000 * 60 * 60));
+  const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+
+  return `${hours}h ${minutes}m`;
+}
+
 export function MarketHeader({ markets, selectedMarket, onSelectMarket, lastTradePrices }: MarketHeaderProps) {
   const symbols = markets.map((m) => m.baseAsset);
   const { prices } = usePriceFeed(symbols);
+
+  // Funding rate data
+  const { data: fundingData } = useFundingInfo(selectedMarket?.symbol || "");
+  const { fundingData: liveFundingData } = useFundingUpdates(selectedMarket?.symbol || "");
+
+  // Use real-time funding data if available, otherwise fall back to REST data
+  const fundingRate = liveFundingData?.fundingRate ?? fundingData?.fundingRate ?? selectedMarket?.fundingRate;
+  const nextFundingTime = liveFundingData?.nextFundingTime
+    ? new Date(liveFundingData.nextFundingTime).toISOString()
+    : fundingData?.nextFundingTime;
 
   const selectedPrice = selectedMarket
     ? prices.get(selectedMarket.baseAsset.toUpperCase())
@@ -165,6 +191,7 @@ export function MarketHeader({ markets, selectedMarket, onSelectMarket, lastTrad
   const change24h = selectedPrice?.change || 0;
   const changePercent = selectedPrice?.changePercent || 0;
   const isPositiveChange = change24h >= 0;
+  const isFundingPositive = (fundingRate ?? 0) >= 0;
 
   return (
     <div className="market-header">
@@ -202,7 +229,10 @@ export function MarketHeader({ markets, selectedMarket, onSelectMarket, lastTrad
         />
         <StatItem
           label="Funding"
-          value={selectedMarket ? formatPercent(selectedMarket.fundingRate) : "--"}
+          value={fundingRate !== undefined ? formatPercent(fundingRate) : "--"}
+          subValue={nextFundingTime ? ` (${getTimeUntilFunding(nextFundingTime)})` : undefined}
+          isPositive={isFundingPositive && fundingRate !== undefined}
+          isNegative={!isFundingPositive && fundingRate !== undefined}
         />
       </div>
     </div>

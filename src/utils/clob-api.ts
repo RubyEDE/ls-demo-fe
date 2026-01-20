@@ -2,6 +2,7 @@ import { fetchWithAuth } from "./api";
 import type { Market, Order, PlaceOrderParams, PlaceOrderResult, UserTrade } from "../types/clob";
 import type { CandleInterval, CandleResponse, CandleResponseRaw, MarketStatus, Candle, CandleRaw } from "../types/candles";
 import type { Position, PositionSummary, ClosePositionResult } from "../types/position";
+import type { FundingInfo, FundingHistoryResponse, FundingEstimate, FundingStats } from "../types/funding";
 
 const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:3000";
 
@@ -251,5 +252,47 @@ export async function getPositionHistory(
     throw new Error("Failed to fetch position history");
   }
 
+  return res.json();
+}
+
+// Funding Rate (Public)
+export async function getFundingInfo(symbol: string): Promise<FundingInfo> {
+  const res = await fetch(`${API_BASE}/clob/funding/${symbol}`);
+  if (!res.ok) {
+    throw new Error("Failed to fetch funding info");
+  }
+  return res.json();
+}
+
+export async function getFundingHistory(
+  symbol: string,
+  limit = 20
+): Promise<FundingHistoryResponse> {
+  const res = await fetch(`${API_BASE}/clob/funding/${symbol}/history?limit=${limit}`);
+  if (!res.ok) {
+    throw new Error("Failed to fetch funding history");
+  }
+  return res.json();
+}
+
+export async function estimateFunding(
+  symbol: string,
+  side: "long" | "short",
+  size: number
+): Promise<FundingEstimate> {
+  const res = await fetch(
+    `${API_BASE}/clob/funding/${symbol}/estimate?side=${side}&size=${size}`
+  );
+  if (!res.ok) {
+    throw new Error("Failed to estimate funding");
+  }
+  return res.json();
+}
+
+export async function getFundingStats(): Promise<FundingStats> {
+  const res = await fetch(`${API_BASE}/clob/funding-stats`);
+  if (!res.ok) {
+    throw new Error("Failed to fetch funding stats");
+  }
   return res.json();
 }
