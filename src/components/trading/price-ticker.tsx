@@ -42,7 +42,7 @@ function TickerItem({
       <span className="ticker-symbol">{symbol}</span>
       {price ? (
         <>
-          <span className="ticker-price">${formatPrice(price.price)}</span>
+          <span className="ticker-price">{formatPrice(price.price)}</span>
           <span className={`ticker-change ${isPositive ? "positive" : "negative"}`}>
             {formatChange(price.change, price.changePercent)}
           </span>

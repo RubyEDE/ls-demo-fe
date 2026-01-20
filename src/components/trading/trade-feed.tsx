@@ -33,7 +33,7 @@ function formatTime(timestamp: number): string {
 function TradeRow({ trade }: { trade: Trade }) {
   return (
     <div className={`trade-row ${trade.side}`}>
-      <span className="trade-price">${formatPrice(trade.price)}</span>
+      <span className="trade-price">{formatPrice(trade.price)}</span>
       <span className="trade-quantity">{formatQuantity(trade.quantity)}</span>
       <span className="trade-time">{formatTime(trade.timestamp)}</span>
     </div>

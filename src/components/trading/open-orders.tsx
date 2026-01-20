@@ -94,7 +94,7 @@ export function OpenOrders({ market }: OpenOrdersProps) {
                     <td className="col-symbol">{order.marketSymbol}</td>
                     <td className={`col-side ${order.side}`}>{order.side.toUpperCase()}</td>
                     <td className="col-type">{order.type}</td>
-                    <td className="col-price">${order.price.toFixed(2)}</td>
+                    <td className="col-price">{order.price.toFixed(2)}</td>
                     <td className="col-qty">{order.quantity.toFixed(2)}</td>
                     <td className="col-filled">
                       <div className="fill-cell">

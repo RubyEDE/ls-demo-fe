@@ -50,7 +50,7 @@ function OrderRow({
       />
       <span className="order-price">{formatPrice(entry.price)}</span>
       <span className="order-quantity">{formatQuantity(entry.quantity)}</span>
-      <span className="order-total">${formatPrice(entry.total)}</span>
+      <span className="order-total">{formatPrice(entry.total)}</span>
     </div>
   );
 }
@@ -128,7 +128,7 @@ export function OrderBook({ symbol, depth = 10, onPriceClick }: OrderBookProps) 
       <div className="spread-section">
         <span className="spread-label">Spread</span>
         <span className="spread-value">
-          ${formatPrice(orderBook.spread)} ({orderBook.spreadPercent.toFixed(2)}%)
+          {formatPrice(orderBook.spread)} ({orderBook.spreadPercent.toFixed(2)}%)
         </span>
       </div>
 

@@ -21,15 +21,15 @@ function formatPrice(price: number): string {
 
 function formatVolume(volume: number): string {
   if (volume >= 1_000_000_000) {
-    return `$${(volume / 1_000_000_000).toFixed(2)}B`;
+    return `${(volume / 1_000_000_000).toFixed(2)}B`;
   }
   if (volume >= 1_000_000) {
-    return `$${(volume / 1_000_000).toFixed(2)}M`;
+    return `${(volume / 1_000_000).toFixed(2)}M`;
   }
   if (volume >= 1_000) {
-    return `$${(volume / 1_000).toFixed(2)}K`;
+    return `${(volume / 1_000).toFixed(2)}K`;
   }
-  return `$${volume.toFixed(2)}`;
+  return volume.toFixed(2);
 }
 
 function formatPercent(value: number): string {
@@ -77,7 +77,7 @@ function MarketDropdown({ markets, selectedMarket, prices, lastTradePrices, onSe
           <span className="market-symbol">{selectedMarket?.baseAsset || "Select"}-PERP</span>
           {selectedDisplayPrice !== null && (
             <span className={`market-price ${selectedLastTrade?.side === "buy" ? "price-up" : selectedLastTrade?.side === "sell" ? "price-down" : ""}`}>
-              ${formatPrice(selectedDisplayPrice)}
+              {formatPrice(selectedDisplayPrice)}
             </span>
           )}
         </div>
@@ -112,7 +112,7 @@ function MarketDropdown({ markets, selectedMarket, prices, lastTradePrices, onSe
               >
                 <span className="item-symbol">{market.baseAsset}-PERP</span>
                 <span className={`item-price ${lastTrade?.side === "buy" ? "price-up" : lastTrade?.side === "sell" ? "price-down" : ""}`}>
-                  {displayPrice !== null ? `$${formatPrice(displayPrice)}` : "--"}
+                  {displayPrice !== null ? formatPrice(displayPrice) : "--"}
                 </span>
                 <span className={`item-change ${isPositive ? "positive" : "negative"}`}>
                   {priceFeed ? `${isPositive ? "+" : ""}${priceFeed.changePercent.toFixed(2)}%` : "--"}

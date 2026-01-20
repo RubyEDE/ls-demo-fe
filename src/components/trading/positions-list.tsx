@@ -14,8 +14,6 @@ interface PositionsListProps {
 
 function formatMoney(amount: number): string {
   return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   }).format(amount);
@@ -166,9 +164,9 @@ export function PositionsList({ market }: PositionsListProps) {
                       {position.side.toUpperCase()} {position.leverage.toFixed(0)}x
                     </td>
                     <td className="col-size">{formatSize(position.size)}</td>
-                    <td className="col-entry">${formatPrice(position.entryPrice)}</td>
-                    <td className="col-mark">{position.markPrice ? `$${formatPrice(position.markPrice)}` : "-"}</td>
-                    <td className="col-liq">${formatPrice(position.liquidationPrice)}</td>
+                    <td className="col-entry">{formatPrice(position.entryPrice)}</td>
+                    <td className="col-mark">{position.markPrice ? formatPrice(position.markPrice) : "-"}</td>
+                    <td className="col-liq">{formatPrice(position.liquidationPrice)}</td>
                     <td className={`col-pnl ${isProfitable ? "profit" : "loss"}`}>
                       {isProfitable ? "+" : ""}{formatMoney(position.unrealizedPnl)}
                     </td>
@@ -238,7 +236,7 @@ export function MarketPositionWidget({ marketSymbol }: MarketPositionWidgetProps
       </div>
       <div className="widget-details">
         <span className="widget-size-entry">
-          {formatSize(position.size)} @ ${formatPrice(position.entryPrice)}
+          {formatSize(position.size)} @ {formatPrice(position.entryPrice)}
         </span>
         <span className={`widget-pnl ${isProfitable ? "profit" : "loss"}`}>
           {isProfitable ? "+" : ""}

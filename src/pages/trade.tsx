@@ -43,7 +43,7 @@ export function TradePage() {
   // Update document title with last trade price
   useEffect(() => {
     if (currentLastTrade) {
-      document.title = `$${formatPrice(currentLastTrade.price)} | ${selectedSymbol} | Longsword`;
+      document.title = `${formatPrice(currentLastTrade.price)} | ${selectedSymbol} | Longsword`;
     } else {
       document.title = `${selectedSymbol} | Longsword`;
     }
@@ -79,7 +79,7 @@ export function TradePage() {
     ),
     onOrderFilled: useCallback(
       (order: OrderEvent) => {
-        addNotification(`Order filled: ${order.side.toUpperCase()} ${order.filledQuantity} ${order.symbol} @ $${order.price}`);
+        addNotification(`Order filled: ${order.side.toUpperCase()} ${order.filledQuantity} ${order.symbol} @ ${order.price}`);
         setOrdersKey((k) => k + 1);
       },
       [addNotification]
@@ -93,7 +93,7 @@ export function TradePage() {
     ),
     onBalanceUpdated: useCallback(
       (balance: BalanceUpdate) => {
-        addNotification(`Balance updated: $${balance.total.toFixed(2)}`);
+        addNotification(`Balance updated: ${balance.total.toFixed(2)}`);
       },
       [addNotification]
     ),
@@ -105,7 +105,7 @@ export function TradePage() {
     ),
     onPositionClosed: useCallback(
       (position: PositionEvent) => {
-        const pnlStr = position.realizedPnl >= 0 ? `+$${position.realizedPnl.toFixed(2)}` : `-$${Math.abs(position.realizedPnl).toFixed(2)}`;
+        const pnlStr = position.realizedPnl >= 0 ? `+${position.realizedPnl.toFixed(2)}` : `-${Math.abs(position.realizedPnl).toFixed(2)}`;
         addNotification(`Position closed: ${position.marketSymbol} (${pnlStr})`);
       },
       [addNotification]
@@ -197,25 +197,30 @@ export function TradePage() {
 
       {/* Mobile Bottom Navbar */}
       <nav className="mobile-bottom-nav">
-        <button
-          className={`mobile-nav-btn ${mobileTab === "markets" ? "active" : ""}`}
-          onClick={() => setMobileTab("markets")}
-        >
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="M3 3v18h18" />
-            <path d="M18 9l-5 5-4-4-3 3" />
-          </svg>
-          <span>Markets</span>
-        </button>
-        <button
-          className={`mobile-nav-btn ${mobileTab === "trade" ? "active" : ""}`}
-          onClick={() => setMobileTab("trade")}
-        >
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
-          </svg>
-          <span>Trade</span>
-        </button>
+        <div className="mobile-nav-container">
+          <button
+            className={`mobile-nav-btn ${mobileTab === "markets" ? "active" : ""}`}
+            onClick={() => setMobileTab("markets")}
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M3 3v18h18" />
+              <path d="M18 9l-5 5-4-4-3 3" />
+            </svg>
+            <span>Chart</span>
+          </button>
+          <button
+            className={`mobile-nav-btn ${mobileTab === "trade" ? "active" : ""}`}
+            onClick={() => setMobileTab("trade")}
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M3 6h18M3 12h18M3 18h18" />
+              <circle cx="17" cy="6" r="2" fill="currentColor" />
+              <circle cx="7" cy="12" r="2" fill="currentColor" />
+              <circle cx="14" cy="18" r="2" fill="currentColor" />
+            </svg>
+            <span>Trade</span>
+          </button>
+        </div>
       </nav>
     </div>
   );

@@ -9,8 +9,6 @@ interface TradeHistoryProps {
 
 function formatMoney(amount: number): string {
   return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   }).format(amount);
@@ -60,7 +58,7 @@ function TradeRow({ trade }: { trade: UserTrade }) {
           {trade.isMaker && <span className="trade-history-maker">Maker</span>}
         </div>
         <div className="trade-history-details">
-          <span className="trade-history-price">${formatPrice(trade.price)}</span>
+          <span className="trade-history-price">{formatPrice(trade.price)}</span>
           <span className="trade-history-qty">{formatQuantity(trade.quantity)}</span>
           <span className="trade-history-time">{formatDate(trade.timestamp)}</span>
         </div>

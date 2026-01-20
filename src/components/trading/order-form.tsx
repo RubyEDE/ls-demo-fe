@@ -266,11 +266,11 @@ export function OrderForm({ market, onOrderPlaced, selectedPrice }: OrderFormPro
         <div className="order-summary">
           <div className="summary-row">
             <span>Order Value</span>
-            <span className="summary-value">${orderValue.toFixed(2)}</span>
+            <span className="summary-value">{orderValue.toFixed(2)}</span>
           </div>
           <div className="summary-row">
             <span>Est. Margin ({leverage}x)</span>
-            <span className="summary-value">${requiredMargin.toFixed(2)}</span>
+            <span className="summary-value">{requiredMargin.toFixed(2)}</span>
           </div>
           <div className="summary-row">
             <span>Leverage</span>
