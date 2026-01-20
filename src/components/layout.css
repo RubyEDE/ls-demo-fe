@@ -63,34 +63,25 @@
 .nav {
   display: flex;
   align-items: center;
-  gap: 0.25rem;
-  padding: 0.25rem;
-  background: rgba(255, 255, 255, 0.03);
-  border-radius: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.04);
+  gap: 0.5rem;
 }
 
 .nav-link {
   color: var(--text-secondary);
   text-decoration: none;
-  padding: 0.5rem 1rem;
-  border-radius: 8px;
-  font-size: 0.8rem;
+  padding: 0.5rem 0.875rem;
+  font-size: 0.875rem;
   font-weight: 500;
-  letter-spacing: 0.02em;
-  transition: all 0.2s ease;
-  position: relative;
+  letter-spacing: 0.01em;
+  transition: color 0.2s ease;
 }
 
 .nav-link:hover {
   color: var(--text-primary);
-  background: rgba(255, 255, 255, 0.06);
 }
 
 .nav-link.active {
   color: var(--accent-cyan);
-  background: var(--accent-cyan-dim);
-  box-shadow: 0 0 12px rgba(0, 212, 170, 0.15);
 }
 
 .main-content {
