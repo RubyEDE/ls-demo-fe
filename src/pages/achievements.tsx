@@ -1,226 +1,39 @@
 import { useState, useMemo, useRef, useEffect } from "react";
+import { useAchievements } from "../hooks/use-achievements";
+import type { 
+  GroupedProgression, 
+  UserAchievementProgress, 
+  Achievement 
+} from "../types/achievements";
 import "./achievements.css";
 
-type AchievementRarity = "common" | "uncommon" | "rare" | "epic" | "legendary";
-
-interface Achievement {
-  id: string;
-  name: string;
-  description: string;
-  icon: string;
-  rarity: AchievementRarity;
-  points: number;
-  earnedAt?: string; // If set, achievement is earned
-  progress?: {
-    current: number;
-    target: number;
-  };
-}
-
-// Mock achievements data - replace with real data from API
-const MOCK_ACHIEVEMENTS: Achievement[] = [
-  {
-    id: "first-trade",
-    name: "First Blood",
-    description: "Execute your first trade on the platform",
-    icon: "⚔️",
-    rarity: "common",
-    points: 10,
-    earnedAt: "2024-01-15T10:30:00Z",
-  },
-  {
-    id: "volume-1k",
-    name: "Getting Started",
-    description: "Reach $1,000 in total trading volume",
-    icon: "📊",
-    rarity: "common",
-    points: 15,
-    earnedAt: "2024-01-16T14:22:00Z",
-  },
-  {
-    id: "volume-10k",
-    name: "Serious Trader",
-    description: "Reach $10,000 in total trading volume",
-    icon: "💹",
-    rarity: "uncommon",
-    points: 50,
-    earnedAt: "2024-01-20T09:15:00Z",
-  },
-  {
-    id: "volume-100k",
-    name: "Market Mover",
-    description: "Reach $100,000 in total trading volume",
-    icon: "🏦",
-    rarity: "rare",
-    points: 150,
-    progress: { current: 45230, target: 100000 },
-  },
-  {
-    id: "volume-1m",
-    name: "Whale Status",
-    description: "Reach $1,000,000 in total trading volume",
-    icon: "🐋",
-    rarity: "legendary",
-    points: 500,
-    progress: { current: 45230, target: 1000000 },
-  },
-  {
-    id: "win-streak-5",
-    name: "On Fire",
-    description: "Win 5 trades in a row",
-    icon: "🔥",
-    rarity: "uncommon",
-    points: 40,
-    earnedAt: "2024-01-18T16:45:00Z",
-  },
-  {
-    id: "win-streak-10",
-    name: "Unstoppable",
-    description: "Win 10 trades in a row",
-    icon: "⚡",
-    rarity: "rare",
-    points: 100,
-    progress: { current: 3, target: 10 },
-  },
-  {
-    id: "win-streak-25",
-    name: "Legendary Streak",
-    description: "Win 25 trades in a row",
-    icon: "👑",
-    rarity: "legendary",
-    points: 400,
-    progress: { current: 3, target: 25 },
-  },
-  {
-    id: "profit-1k",
-    name: "In The Green",
-    description: "Accumulate $1,000 in total profit",
-    icon: "💰",
-    rarity: "uncommon",
-    points: 35,
-    earnedAt: "2024-01-22T11:30:00Z",
-  },
-  {
-    id: "profit-10k",
-    name: "Money Maker",
-    description: "Accumulate $10,000 in total profit",
-    icon: "💎",
-    rarity: "rare",
-    points: 120,
-    progress: { current: 3420, target: 10000 },
-  },
-  {
-    id: "profit-100k",
-    name: "Master Trader",
-    description: "Accumulate $100,000 in total profit",
-    icon: "🏆",
-    rarity: "epic",
-    points: 300,
-    progress: { current: 3420, target: 100000 },
-  },
-  {
-    id: "different-markets-5",
-    name: "Diversified",
-    description: "Trade in 5 different markets",
-    icon: "🌐",
-    rarity: "common",
-    points: 20,
-    earnedAt: "2024-01-17T08:20:00Z",
-  },
-  {
-    id: "different-markets-all",
-    name: "Market Explorer",
-    description: "Trade in every available market",
-    icon: "🗺️",
-    rarity: "rare",
-    points: 100,
-    progress: { current: 8, target: 15 },
-  },
-  {
-    id: "night-owl",
-    name: "Night Owl",
-    description: "Execute a trade between 2 AM and 5 AM",
-    icon: "🦉",
-    rarity: "uncommon",
-    points: 25,
-  },
-  {
-    id: "early-bird",
-    name: "Early Bird",
-    description: "Execute a trade within 1 minute of market open",
-    icon: "🐦",
-    rarity: "uncommon",
-    points: 30,
-    earnedAt: "2024-01-19T09:31:00Z",
-  },
-  {
-    id: "diamond-hands",
-    name: "Diamond Hands",
-    description: "Hold a position for more than 7 days",
-    icon: "💎",
-    rarity: "rare",
-    points: 80,
-  },
-  {
-    id: "speed-demon",
-    name: "Speed Demon",
-    description: "Execute 10 trades within 1 minute",
-    icon: "🏎️",
-    rarity: "epic",
-    points: 200,
-  },
-  {
-    id: "comeback-kid",
-    name: "Comeback Kid",
-    description: "Recover from a 50% drawdown to break even",
-    icon: "🔄",
-    rarity: "epic",
-    points: 250,
-  },
-  {
-    id: "perfect-timing",
-    name: "Perfect Timing",
-    description: "Buy at the exact daily low and sell at the exact daily high",
-    icon: "⏱️",
-    rarity: "legendary",
-    points: 1000,
-  },
-  {
-    id: "hundred-trades",
-    name: "Centurion",
-    description: "Complete 100 trades",
-    icon: "🎖️",
-    rarity: "uncommon",
-    points: 45,
-    progress: { current: 47, target: 100 },
-  },
-];
-
-const RARITY_ORDER: Record<AchievementRarity, number> = {
-  common: 0,
-  uncommon: 1,
-  rare: 2,
-  epic: 3,
-  legendary: 4,
-};
-
-const RARITY_LABELS: Record<AchievementRarity, string> = {
-  common: "Common",
-  uncommon: "Uncommon",
-  rare: "Rare",
-  epic: "Epic",
-  legendary: "Legendary",
-};
-
 type FilterType = "all" | "earned" | "in-progress";
-type SortType = "points" | "name" | "rarity" | "recent";
+type SortType = "points" | "name" | "category" | "recent";
 
 const SORT_OPTIONS: { value: SortType; label: string }[] = [
   { value: "points", label: "Points" },
-  { value: "rarity", label: "Rarity" },
+  { value: "category", label: "Category" },
   { value: "name", label: "Name" },
   { value: "recent", label: "Recently Earned" },
 ];
+
+// Icon mapping from API icon identifiers to display
+const ICON_MAP: Record<string, string> = {
+  droplet: "💧",
+  droplets: "💦",
+  "glass-water": "🥛",
+  trophy: "🏆",
+  default: "🎯",
+};
+
+function getIconDisplay(iconId: string): string {
+  return ICON_MAP[iconId] || ICON_MAP.default;
+}
+
+// Format category name for display
+function formatCategoryName(category: string): string {
+  return category.charAt(0).toUpperCase() + category.slice(1).replace(/_/g, " ");
+}
 
 interface CustomSelectProps {
   value: SortType;
@@ -289,94 +102,124 @@ function CustomSelect({ value, onChange }: CustomSelectProps) {
   );
 }
 
-function formatEarnedDate(dateStr: string): string {
-  const date = new Date(dateStr);
-  return date.toLocaleDateString("en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  });
+// ===== PROGRESSION CARD COMPONENT =====
+interface ProgressionCardProps {
+  progression: GroupedProgression;
 }
 
-function formatNumber(num: number): string {
-  if (num >= 1000000) {
-    return (num / 1000000).toFixed(1) + "M";
-  }
-  if (num >= 1000) {
-    return (num / 1000).toFixed(1) + "K";
-  }
-  return num.toLocaleString();
-}
-
-interface AchievementCardProps {
-  achievement: Achievement;
-}
-
-function AchievementCard({ achievement }: AchievementCardProps) {
-  const isEarned = !!achievement.earnedAt;
-  const hasProgress = achievement.progress !== undefined;
-  const progressPercent = hasProgress
-    ? Math.min((achievement.progress!.current / achievement.progress!.target) * 100, 100)
-    : 0;
+function ProgressionCard({ progression }: ProgressionCardProps) {
+  const progressPercent = Math.round((progression.currentProgress / progression.maxThreshold) * 100);
+  const isComplete = progression.currentStage === progression.totalStages;
+  const hasMultipleStages = progression.totalStages > 1;
 
   return (
-    <div
-      className={`achievement-card ${isEarned ? "earned" : "not-earned"} rarity-${achievement.rarity}`}
-    >
-      <div className="achievement-card-glow" />
-      
-      <div className="achievement-icon-wrapper">
-        <div className={`achievement-icon ${!isEarned ? "not-earned" : ""}`}>
-          <span>{achievement.icon}</span>
+    <div className={`progression-card ${isComplete ? "complete" : ""}`}>
+      {/* Left: Tall image */}
+      <div className="progression-image">
+        <img 
+          src={`/achievements/${progression.category}.png`} 
+          alt={progression.category}
+          onError={(e) => {
+            e.currentTarget.style.display = 'none';
+            e.currentTarget.nextElementSibling?.classList.remove('hidden');
+          }}
+        />
+        <div className="progression-image-fallback hidden">
+          {getIconDisplay(progression.stages[progression.stages.length - 1]?.icon || "trophy")}
         </div>
-        {isEarned && (
-          <div className="achievement-checkmark">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
-              <polyline points="20 6 9 17 4 12" />
-            </svg>
-          </div>
-        )}
       </div>
 
+      {/* Right: Content */}
+      <div className="progression-content">
+        <div className="progression-header">
+          <h3 className="progression-title">{formatCategoryName(progression.category)}</h3>
+          <span className="card-points">{progression.totalPoints} pts</span>
+        </div>
+
+        <p className="progression-desc">
+          {progression.stages[Math.min(progression.currentStage, progression.totalStages - 1)]?.description}
+        </p>
+
+        {/* Progress bar only for multi-stage progressions */}
+        {hasMultipleStages && (
+          <div className="progression-bar">
+            <div 
+              className="progression-bar-fill"
+              style={{ width: `${Math.min(progressPercent, 100)}%` }}
+            />
+          </div>
+        )}
+
+        <div className="progression-footer">
+          {isComplete ? (
+            <span className="card-complete">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+              Complete
+            </span>
+          ) : hasMultipleStages ? (
+            <span className="progression-stage">{progression.currentStage}/{progression.totalStages}</span>
+          ) : null}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ===== STANDALONE ACHIEVEMENT CARD =====
+interface StandaloneCardProps {
+  achievement: UserAchievementProgress;
+}
+
+function StandaloneCard({ achievement }: StandaloneCardProps) {
+  const isEarned = achievement.isUnlocked;
+  const hasProgress = !isEarned && achievement.currentProgress > 0;
+
+  return (
+    <div className={`achievement-card ${isEarned ? "complete" : ""}`}>
+      {/* Left: Tall image */}
+      <div className="achievement-image">
+        <img 
+          src={`/achievements/${achievement.id}.png`} 
+          alt={achievement.name}
+          onError={(e) => {
+            e.currentTarget.style.display = 'none';
+            e.currentTarget.nextElementSibling?.classList.remove('hidden');
+          }}
+        />
+        <div className="achievement-image-fallback hidden">
+          {getIconDisplay(achievement.icon)}
+        </div>
+      </div>
+
+      {/* Right: Content */}
       <div className="achievement-content">
         <div className="achievement-header">
-          <h3 className="achievement-name">{achievement.name}</h3>
-          <div className="achievement-points">
-            <span className="points-value">{achievement.points}</span>
-            <span className="points-label">pts</span>
-          </div>
+          <h3 className="achievement-title">{achievement.name}</h3>
+          <span className="card-points">{achievement.points} pts</span>
         </div>
-        
-        <p className="achievement-description">{achievement.description}</p>
 
-        {hasProgress && !isEarned && (
-          <div className="achievement-progress">
-            <div className="progress-bar">
-              <div
-                className="progress-fill"
-                style={{ width: `${progressPercent}%` }}
-              />
-            </div>
-            <span className="progress-text">
-              {formatNumber(achievement.progress!.current)} / {formatNumber(achievement.progress!.target)}
-            </span>
+        <p className="achievement-desc">{achievement.description}</p>
+
+        {/* Progress bar only if has progress */}
+        {hasProgress && (
+          <div className="achievement-bar">
+            <div 
+              className="achievement-bar-fill"
+              style={{ width: `${achievement.progressPercentage}%` }}
+            />
           </div>
         )}
 
         <div className="achievement-footer">
-          <span className={`achievement-rarity rarity-${achievement.rarity}`}>
-            {RARITY_LABELS[achievement.rarity]}
-          </span>
-          {isEarned && achievement.earnedAt && (
-            <span className="earned-date">
-              Earned {formatEarnedDate(achievement.earnedAt)}
+          {isEarned && (
+            <span className="card-complete">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+              Complete
             </span>
-          )}
-          {!isEarned && !hasProgress && (
-            <span className="not-started">Not started</span>
-          )}
-          {!isEarned && hasProgress && (
-            <span className="in-progress-label">In progress</span>
           )}
         </div>
       </div>
@@ -384,46 +227,102 @@ function AchievementCard({ achievement }: AchievementCardProps) {
   );
 }
 
+// ===== PUBLIC ACHIEVEMENT CARD (for non-authenticated users) =====
+interface PublicCardProps {
+  achievement: Achievement;
+}
+
+function PublicCard({ achievement }: PublicCardProps) {
+  return (
+    <div className="achievement-card">
+      {/* Left: Tall image */}
+      <div className="achievement-image">
+        <img 
+          src={`/achievements/${achievement.id}.png`} 
+          alt={achievement.name}
+          onError={(e) => {
+            e.currentTarget.style.display = 'none';
+            e.currentTarget.nextElementSibling?.classList.remove('hidden');
+          }}
+        />
+        <div className="achievement-image-fallback hidden">
+          {getIconDisplay(achievement.icon)}
+        </div>
+      </div>
+
+      {/* Right: Content */}
+      <div className="achievement-content">
+        <div className="achievement-header">
+          <h3 className="achievement-title">{achievement.name}</h3>
+          <span className="card-points">{achievement.points} pts</span>
+        </div>
+
+        <p className="achievement-desc">{achievement.description}</p>
+
+        <div className="achievement-footer" />
+      </div>
+    </div>
+  );
+}
+
+// ===== MAIN PAGE COMPONENT =====
 export function AchievementsPage() {
+  const { 
+    progressions, 
+    standalone, 
+    publicAchievements, 
+    stats, 
+    isLoading, 
+    error,
+    isAuthenticated 
+  } = useAchievements();
+  
   const [filter, setFilter] = useState<FilterType>("all");
   const [sort, setSort] = useState<SortType>("points");
   const [searchQuery, setSearchQuery] = useState("");
 
-  const achievements = MOCK_ACHIEVEMENTS;
-
-  const stats = useMemo(() => {
-    const earned = achievements.filter((a) => !!a.earnedAt);
-    const inProgress = achievements.filter((a) => !a.earnedAt && a.progress);
-    const notStarted = achievements.filter((a) => !a.earnedAt && !a.progress);
-    
-    const earnedPoints = earned.reduce((sum, a) => sum + a.points, 0);
-    
+  // Compute display stats
+  const displayStats = useMemo(() => {
+    if (stats) {
+      return {
+        earned: stats.totalUnlocked,
+        total: stats.totalAchievements,
+        earnedPoints: stats.totalPoints,
+        maxPoints: stats.maxPoints,
+      };
+    }
+    // For public view, calculate from public achievements
+    const total = publicAchievements.length;
+    const maxPoints = publicAchievements.reduce((sum, a) => sum + a.points, 0);
     return { 
-      earned: earned.length,
-      inProgress: inProgress.length,
-      notStarted: notStarted.length,
-      total: achievements.length,
-      earnedPoints,
+      earned: 0,
+      total,
+      earnedPoints: 0,
+      maxPoints,
     };
-  }, [achievements]);
+  }, [stats, publicAchievements]);
 
-  const filteredAndSortedAchievements = useMemo(() => {
-    let filtered = [...achievements];
+  // Filter and sort progressions
+  const filteredProgressions = useMemo(() => {
+    let filtered = [...progressions];
 
     // Apply filter
     if (filter === "earned") {
-      filtered = filtered.filter((a) => !!a.earnedAt);
+      filtered = filtered.filter((p) => p.currentStage === p.totalStages);
     } else if (filter === "in-progress") {
-      filtered = filtered.filter((a) => !a.earnedAt);
+      filtered = filtered.filter((p) => p.currentStage < p.totalStages);
     }
 
     // Apply search
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
-      filtered = filtered.filter(
-        (a) =>
-          a.name.toLowerCase().includes(query) ||
-          a.description.toLowerCase().includes(query)
+      filtered = filtered.filter((p) => 
+        p.category.toLowerCase().includes(query) ||
+        p.progressionGroup.toLowerCase().includes(query) ||
+        p.stages.some(s => 
+          s.name.toLowerCase().includes(query) || 
+          s.description.toLowerCase().includes(query)
+        )
       );
     }
 
@@ -431,28 +330,143 @@ export function AchievementsPage() {
     filtered.sort((a, b) => {
       switch (sort) {
         case "points":
-          // Sort by points (highest first), then by earned status
-          const pointsDiff = b.points - a.points;
-          if (pointsDiff !== 0) return pointsDiff;
-          return a.earnedAt ? -1 : 1;
-        case "rarity":
-          const rarityDiff = RARITY_ORDER[b.rarity] - RARITY_ORDER[a.rarity];
-          if (rarityDiff !== 0) return rarityDiff;
-          return a.earnedAt ? -1 : 1;
+          return b.totalPoints - a.totalPoints;
+        case "category":
+          return a.category.localeCompare(b.category);
         case "name":
-          return a.name.localeCompare(b.name);
-        case "recent":
-          if (a.earnedAt && b.earnedAt) {
-            return new Date(b.earnedAt).getTime() - new Date(a.earnedAt).getTime();
+          return a.progressionGroup.localeCompare(b.progressionGroup);
+        case "recent": {
+          const aLatest = a.stages.filter(s => s.unlockedAt).sort((x, y) => 
+            new Date(y.unlockedAt!).getTime() - new Date(x.unlockedAt!).getTime()
+          )[0]?.unlockedAt;
+          const bLatest = b.stages.filter(s => s.unlockedAt).sort((x, y) => 
+            new Date(y.unlockedAt!).getTime() - new Date(x.unlockedAt!).getTime()
+          )[0]?.unlockedAt;
+          if (aLatest && bLatest) {
+            return new Date(bLatest).getTime() - new Date(aLatest).getTime();
           }
-          return a.earnedAt ? -1 : 1;
+          return aLatest ? -1 : bLatest ? 1 : 0;
+        }
         default:
           return 0;
       }
     });
 
     return filtered;
-  }, [achievements, filter, sort, searchQuery]);
+  }, [progressions, filter, sort, searchQuery]);
+
+  // Filter and sort standalone achievements
+  const filteredStandalone = useMemo(() => {
+    let filtered = [...standalone];
+
+    if (filter === "earned") {
+      filtered = filtered.filter((a) => a.isUnlocked);
+    } else if (filter === "in-progress") {
+      filtered = filtered.filter((a) => !a.isUnlocked);
+    }
+
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter((a) =>
+        a.name.toLowerCase().includes(query) ||
+        a.description.toLowerCase().includes(query) ||
+        a.category.toLowerCase().includes(query)
+      );
+    }
+
+    filtered.sort((a, b) => {
+      switch (sort) {
+        case "points":
+          return b.points - a.points;
+        case "category":
+          return a.category.localeCompare(b.category);
+        case "name":
+          return a.name.localeCompare(b.name);
+        case "recent":
+          if (a.unlockedAt && b.unlockedAt) {
+            return new Date(b.unlockedAt).getTime() - new Date(a.unlockedAt).getTime();
+          }
+          return a.unlockedAt ? -1 : b.unlockedAt ? 1 : 0;
+        default:
+          return 0;
+      }
+    });
+
+    return filtered;
+  }, [standalone, filter, sort, searchQuery]);
+
+  // Filter and sort public achievements
+  const filteredPublic = useMemo(() => {
+    let filtered = [...publicAchievements];
+
+    // For public view, "earned" filter shows nothing, "in-progress" shows all
+    if (filter === "earned") {
+      return [];
+    }
+
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter((a) =>
+        a.name.toLowerCase().includes(query) ||
+        a.description.toLowerCase().includes(query) ||
+        a.category.toLowerCase().includes(query)
+      );
+    }
+
+    filtered.sort((a, b) => {
+      switch (sort) {
+        case "points":
+          return b.points - a.points;
+        case "category":
+          return a.category.localeCompare(b.category);
+        case "name":
+          return a.name.localeCompare(b.name);
+        default:
+          return 0;
+      }
+    });
+
+    return filtered;
+  }, [publicAchievements, filter, sort, searchQuery]);
+
+  const hasResults = filteredProgressions.length > 0 || filteredStandalone.length > 0 || filteredPublic.length > 0;
+
+  // Show loading state
+  if (isLoading) {
+    return (
+      <div className="achievements-page">
+        <div className="achievements-bg">
+          <div className="bg-gradient-1" />
+          <div className="bg-gradient-2" />
+          <div className="bg-grid" />
+          <div className="bg-particles" />
+        </div>
+        <div className="achievements-loading">
+          <div className="loading-spinner" />
+          <p>Loading achievements...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error state
+  if (error) {
+    return (
+      <div className="achievements-page">
+        <div className="achievements-bg">
+          <div className="bg-gradient-1" />
+          <div className="bg-gradient-2" />
+          <div className="bg-grid" />
+          <div className="bg-particles" />
+        </div>
+        <div className="achievements-error">
+          <div className="error-icon">⚠️</div>
+          <h3>Failed to load achievements</h3>
+          <p>{error}</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="achievements-page">
@@ -497,18 +511,20 @@ export function AchievementsPage() {
             </div>
             <div>
               <h1>Achievements</h1>
-              <p className="header-subtitle">Earn points by completing trading milestones</p>
+              <p className="header-subtitle">
+                {isAuthenticated
+                  ? "Earn points by completing trading milestones"
+                  : "Sign in to track your progress"}
+              </p>
             </div>
           </div>
 
           {/* Points Display */}
           <div className="points-display">
-            <span className="points-number">{stats.earnedPoints.toLocaleString()}</span>
+            <span className="points-number">{displayStats.earnedPoints.toLocaleString()}</span>
             <span className="points-label">Points</span>
           </div>
         </div>
-
-       
       </header>
 
       {/* Filters */}
@@ -551,12 +567,23 @@ export function AchievementsPage() {
 
       {/* Achievement Grid */}
       <div className="achievements-grid">
-        {filteredAndSortedAchievements.map((achievement) => (
-          <AchievementCard key={achievement.id} achievement={achievement} />
+        {/* Progression cards (authenticated users) */}
+        {filteredProgressions.map((progression) => (
+          <ProgressionCard key={progression.progressionGroup} progression={progression} />
+        ))}
+        
+        {/* Standalone achievement cards (authenticated users) */}
+        {filteredStandalone.map((achievement) => (
+          <StandaloneCard key={achievement.id} achievement={achievement} />
+        ))}
+
+        {/* Public achievement cards (non-authenticated users) */}
+        {filteredPublic.map((achievement) => (
+          <PublicCard key={achievement.id} achievement={achievement} />
         ))}
       </div>
 
-      {filteredAndSortedAchievements.length === 0 && (
+      {!hasResults && (
         <div className="no-achievements">
           <div className="no-achievements-icon">🔍</div>
           <h3>No achievements found</h3>

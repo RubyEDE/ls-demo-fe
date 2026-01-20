@@ -1,9 +1,39 @@
+import { useEffect, useRef } from "react";
 import { Outlet, NavLink, useLocation } from "react-router-dom";
 import { useAuth } from "../context/auth-context";
+import { useReferralCodeFromUrl, useApplyReferralCode } from "../hooks/use-referrals";
 import { WalletButton } from "./wallet-button";
 import "./layout.css";
 
+// Auto-apply referral code when user authenticates
+function useAutoApplyReferral() {
+  const { isAuthenticated } = useAuth();
+  const { pendingCode, isValid, clearPendingCode } = useReferralCodeFromUrl();
+  const applyMutation = useApplyReferralCode();
+  const hasAttempted = useRef(false);
+
+  useEffect(() => {
+    // Only attempt once per session to avoid loops
+    if (
+      isAuthenticated &&
+      pendingCode &&
+      isValid &&
+      !applyMutation.isPending &&
+      !hasAttempted.current
+    ) {
+      hasAttempted.current = true;
+      applyMutation.mutate(pendingCode, {
+        onSuccess: () => clearPendingCode(),
+        onError: () => clearPendingCode(),
+      });
+    }
+  }, [isAuthenticated, pendingCode, isValid, applyMutation, clearPendingCode]);
+}
+
 export function Layout() {
+  // Auto-apply referral code on any page
+  useAutoApplyReferral();
+
   const { isAuthenticated } = useAuth();
   const location = useLocation();
   const isFullWidth = location.pathname === "/";
@@ -38,6 +68,12 @@ export function Layout() {
               className={({ isActive }) => (isActive ? "nav-link active" : "nav-link")}
             >
               Achievements
+            </NavLink>
+            <NavLink
+              to="/referrals"
+              className={({ isActive }) => (isActive ? "nav-link active" : "nav-link")}
+            >
+              Referrals
             </NavLink>
           </nav>
         </div>

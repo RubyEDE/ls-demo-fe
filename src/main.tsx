@@ -13,6 +13,21 @@ import { router } from "./router";
 import "@rainbow-me/rainbowkit/styles.css";
 import "./index.css";
 
+// Capture referral code from URL immediately on app load
+(function captureReferralCode() {
+  const REFERRAL_CODE_KEY = "pending_referral_code";
+  const urlParams = new URLSearchParams(window.location.search);
+  const refCode = urlParams.get("ref");
+  
+  if (refCode) {
+    localStorage.setItem(REFERRAL_CODE_KEY, refCode.toUpperCase());
+    // Clean URL without page reload
+    const url = new URL(window.location.href);
+    url.searchParams.delete("ref");
+    window.history.replaceState({}, "", url.toString());
+  }
+})();
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {

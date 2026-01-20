@@ -4,6 +4,7 @@ import { ProtectedRoute } from "./components/protected-route";
 import { TradePage } from "./pages/trade";
 import { FaucetPage } from "./pages/faucet";
 import { AchievementsPage } from "./pages/achievements";
+import { ReferralsPage } from "./pages/referrals";
 
 export const router = createBrowserRouter([
   {
@@ -25,6 +26,10 @@ export const router = createBrowserRouter([
       {
         path: "achievements",
         element: <AchievementsPage />,
+      },
+      {
+        path: "referrals",
+        element: <ReferralsPage />,
       },
     ],
   },

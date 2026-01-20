@@ -1,0 +1,447 @@
+/* ==================== Page Layout ==================== */
+
+.referrals-page {
+  position: relative;
+  height: calc(100vh - 60px);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* ==================== Background ==================== */
+
+.referrals-bg {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.bg-glow {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 800px;
+  height: 500px;
+  background: radial-gradient(ellipse at center top, rgba(245, 166, 35, 0.08) 0%, transparent 70%);
+}
+
+/* ==================== Hero Section ==================== */
+
+.referrals-hero {
+  padding: 3rem 2rem 2rem;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.referrals-hero .hero-icon {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, rgba(245, 166, 35, 0.15) 0%, rgba(245, 166, 35, 0.05) 100%);
+  border: 1px solid rgba(245, 166, 35, 0.2);
+  border-radius: 18px;
+  color: var(--accent-gold);
+}
+
+.referrals-hero .hero-icon svg {
+  width: 32px;
+  height: 32px;
+}
+
+.referrals-hero h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem;
+  color: var(--text-primary);
+}
+
+.referrals-hero p {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  margin: 0 0 2rem;
+  max-width: 400px;
+  margin-inline: auto;
+}
+
+/* ==================== Global Stats ==================== */
+
+.referral-global-stats {
+  display: inline-flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 0.875rem 1.5rem;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+}
+
+.referral-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.125rem;
+}
+
+.referral-stat-value {
+  font-size: 1.125rem;
+  font-weight: 700;
+  font-family: "JetBrains Mono", monospace;
+  color: var(--text-primary);
+}
+
+.referral-stat-label {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.referral-stat-divider {
+  width: 1px;
+  height: 28px;
+  background: var(--border-color);
+}
+
+/* ==================== Main Content ==================== */
+
+.referrals-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0 2rem 2rem;
+  gap: 1rem;
+}
+
+/* ==================== Share Card ==================== */
+
+.share-card {
+  width: 100%;
+  max-width: 480px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.share-card.skeleton {
+  height: 200px;
+  background: linear-gradient(90deg, var(--bg-secondary) 0%, var(--bg-tertiary) 50%, var(--bg-secondary) 100%);
+  background-size: 200% 100%;
+  animation: skeleton-pulse 1.5s ease infinite;
+}
+
+@keyframes skeleton-pulse {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.share-card-error {
+  text-align: center;
+  color: var(--color-danger);
+}
+
+.share-card-error p {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+/* Code Display */
+.code-display {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1.25rem;
+  background: linear-gradient(135deg, rgba(245, 166, 35, 0.1) 0%, rgba(245, 166, 35, 0.03) 100%);
+  border: 1px solid rgba(245, 166, 35, 0.2);
+  border-radius: 14px;
+}
+
+.code-label {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.code-value {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--accent-gold);
+  letter-spacing: 0.12em;
+}
+
+/* Link Section */
+.link-section {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.link-input-group {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 0 1rem;
+  transition: border-color 0.2s;
+}
+
+.link-input-group:focus-within {
+  border-color: rgba(245, 166, 35, 0.5);
+}
+
+.link-icon {
+  width: 18px;
+  height: 18px;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.link-input {
+  flex: 1;
+  background: none;
+  border: none;
+  padding: 0.875rem 0.75rem;
+  font-size: 0.8rem;
+  font-family: "JetBrains Mono", monospace;
+  color: var(--text-secondary);
+  outline: none;
+  min-width: 0;
+}
+
+.copy-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: var(--accent-gold);
+  color: var(--bg-primary);
+  border: none;
+  padding: 0 1.5rem;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.copy-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(245, 166, 35, 0.3);
+}
+
+.copy-btn.copied {
+  background: var(--color-success);
+}
+
+.copy-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* Social Share */
+.social-share {
+  display: flex;
+  justify-content: center;
+  gap: 0.75rem;
+  padding-top: 0.5rem;
+}
+
+.social-btn {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  transition: all 0.2s;
+}
+
+.social-btn svg {
+  width: 20px;
+  height: 20px;
+}
+
+.social-btn.twitter {
+  background: rgba(29, 161, 242, 0.1);
+  color: #1DA1F2;
+  border: 1px solid rgba(29, 161, 242, 0.2);
+}
+
+.social-btn.twitter:hover {
+  background: #1DA1F2;
+  color: white;
+  transform: translateY(-2px);
+}
+
+.social-btn.telegram {
+  background: rgba(0, 136, 204, 0.1);
+  color: #0088cc;
+  border: 1px solid rgba(0, 136, 204, 0.2);
+}
+
+.social-btn.telegram:hover {
+  background: #0088cc;
+  color: white;
+  transform: translateY(-2px);
+}
+
+/* ==================== Connect Card ==================== */
+
+.connect-card {
+  width: 100%;
+  max-width: 480px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
+  padding: 3rem 2rem;
+  text-align: center;
+}
+
+.connect-icon {
+  width: 72px;
+  height: 72px;
+  margin: 0 auto 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, rgba(245, 166, 35, 0.15) 0%, rgba(245, 166, 35, 0.05) 100%);
+  border: 1px solid rgba(245, 166, 35, 0.2);
+  border-radius: 20px;
+  color: var(--accent-gold);
+}
+
+.connect-icon svg {
+  width: 36px;
+  height: 36px;
+}
+
+.connect-card h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0 0 0.5rem;
+}
+
+.connect-card p {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* ==================== Referral Banner ==================== */
+
+.referral-banner {
+  width: 100%;
+  max-width: 480px;
+  background: linear-gradient(135deg, rgba(147, 112, 219, 0.1), rgba(96, 165, 250, 0.1));
+  border: 1px solid rgba(147, 112, 219, 0.25);
+  border-radius: 14px;
+  padding: 1rem 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.referral-banner-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.referral-banner-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.referral-banner-subtitle {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.referral-banner-dismiss {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 1.25rem;
+  cursor: pointer;
+  padding: 0.25rem;
+  line-height: 1;
+}
+
+.referral-banner-dismiss:hover {
+  color: var(--text-primary);
+}
+
+/* ==================== Responsive ==================== */
+
+@media (max-width: 600px) {
+  .referrals-page {
+    height: auto;
+    min-height: calc(100vh - 60px);
+    overflow: auto;
+  }
+
+  .referrals-hero {
+    padding: 2rem 1.5rem 1.5rem;
+  }
+
+  .referrals-hero h1 {
+    font-size: 1.5rem;
+  }
+
+  .referrals-hero p {
+    font-size: 0.9rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .referral-global-stats {
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 1rem;
+  }
+
+  .referral-stat-divider {
+    width: 40px;
+    height: 1px;
+  }
+
+  .referrals-content {
+    padding: 0 1rem 1.5rem;
+  }
+
+  .share-card,
+  .connect-card,
+  .referral-banner {
+    max-width: 100%;
+  }
+
+  .link-section {
+    flex-direction: column;
+  }
+
+  .copy-btn {
+    padding: 0.875rem 1.5rem;
+    justify-content: center;
+  }
+
+  .code-value {
+    font-size: 1.375rem;
+  }
+}

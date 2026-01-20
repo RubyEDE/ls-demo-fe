@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useAccount, useSignMessage } from "wagmi";
 
 const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:3000";
@@ -38,6 +38,9 @@ export function useEvmAuth() {
     isLoading: false,
     error: null,
   }));
+
+  // Track if we've attempted auto-sign for this address to avoid re-triggering
+  const autoSignAttemptedRef = useRef<string | null>(null);
 
   // Clear auth when wallet disconnects or address changes
   useEffect(() => {
@@ -94,6 +97,42 @@ export function useEvmAuth() {
     };
   }, []);
 
+  // Auto-trigger sign when wallet connects but user isn't authenticated
+  useEffect(() => {
+    const isAuthenticated = Boolean(
+      authState.token &&
+      authState.expiresAt &&
+      authState.expiresAt > Date.now() &&
+      authState.authenticatedAddress === address
+    );
+
+    // Only attempt auto-sign once per address
+    if (
+      isConnected &&
+      address &&
+      !isAuthenticated &&
+      !authState.isLoading &&
+      autoSignAttemptedRef.current !== address
+    ) {
+      autoSignAttemptedRef.current = address;
+      // Small delay to ensure wallet UI is ready
+      const timer = setTimeout(() => {
+        loginRef.current?.();
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [isConnected, address, authState.token, authState.expiresAt, authState.authenticatedAddress, authState.isLoading]);
+
+  // Reset auto-sign attempt when address changes or disconnects
+  useEffect(() => {
+    if (!isConnected) {
+      autoSignAttemptedRef.current = null;
+    }
+  }, [isConnected]);
+
+  // Ref to hold the login function for auto-sign effect
+  const loginRef = useRef<(() => Promise<void>) | null>(null);
+
   const login = useCallback(async () => {
     if (!address) {
       setAuthState(prev => ({ ...prev, error: "Wallet not connected" }));
@@ -147,6 +186,11 @@ export function useEvmAuth() {
       setAuthState(prev => ({ ...prev, isLoading: false, error: message }));
     }
   }, [address, chainId, signMessageAsync]);
+
+  // Keep loginRef updated with latest login function
+  useEffect(() => {
+    loginRef.current = login;
+  }, [login]);
 
   const logout = useCallback(() => {
     clearStoredAuth();
