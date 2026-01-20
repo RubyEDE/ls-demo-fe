@@ -1,14 +1,10 @@
 .trade-history-container {
-  background: linear-gradient(135deg, var(--bg-secondary), var(--bg-tertiary));
+  background: #131722;
   border: 1px solid var(--border-color);
   border-radius: 12px;
   padding: 1rem;
-  transition: all 0.3s ease;
 }
 
-.trade-history-container:hover {
-  border-color: var(--accent-cyan);
-}
 
 .trade-history-header {
   display: flex;

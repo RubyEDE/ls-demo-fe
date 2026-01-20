@@ -220,10 +220,12 @@ export function ReferralsPage() {
 
       {/* Hero */}
       <div className="referrals-hero">
-        <div className="hero-icon">
-          <UsersIcon />
+        <div className="hero-title-row">
+          <div className="hero-icon">
+            <UsersIcon />
+          </div>
+          <h1>Referral Program</h1>
         </div>
-        <h1>Referral Program</h1>
         <p>Invite friends and earn 10 credits for each user who uses the faucet!</p>
         {isAuthenticated && <MyStats />}
       </div>

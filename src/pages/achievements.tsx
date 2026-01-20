@@ -143,34 +143,35 @@ function ProgressionCard({ progression }: ProgressionCardProps) {
       <div className="progression-content">
         <div className="progression-header">
           <h3 className="progression-title">{formatCategoryName(progression.category)}</h3>
-          <span className="card-points">{progression.totalPoints} pts</span>
+          <span className="card-points">{progression.stages[currentStageIndex]?.points || 0} pts</span>
         </div>
 
         <p className="progression-desc">
           {progression.stages[Math.min(progression.currentStage, progression.totalStages - 1)]?.description}
         </p>
 
-        {/* Progress bar only for multi-stage progressions */}
-        {hasMultipleStages && (
-          <div className="progression-bar">
-            <div 
-              className="progression-bar-fill"
-              style={{ width: `${Math.min(progressPercent, 100)}%` }}
-            />
+        {/* Progress bar with count for multi-stage progressions */}
+        {hasMultipleStages && !isComplete && (
+          <div className="progression-progress">
+            <div className="progression-bar">
+              <div 
+                className="progression-bar-fill"
+                style={{ width: `${Math.min(progressPercent, 100)}%` }}
+              />
+            </div>
+            <span className="progression-count">{progression.currentProgress}/{currentThreshold}</span>
           </div>
         )}
 
         <div className="progression-footer">
-          {isComplete ? (
+          {isComplete && (
             <span className="card-complete">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
                 <polyline points="20 6 9 17 4 12" />
               </svg>
               Complete
             </span>
-          ) : hasMultipleStages ? (
-            <span className="progression-stage">{progression.currentStage}/{progression.totalStages}</span>
-          ) : null}
+          )}
         </div>
       </div>
     </div>

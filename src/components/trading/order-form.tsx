@@ -133,7 +133,6 @@ export function OrderForm({ market, onOrderPlaced, selectedPrice }: OrderFormPro
     <div className="order-form-container">
       <div className="order-form-header">
         <h3>Place Order</h3>
-        <span className="market-tag">{market.baseAsset}</span>
       </div>
 
       <form className="order-form" onSubmit={handleSubmit}>
@@ -266,11 +265,11 @@ export function OrderForm({ market, onOrderPlaced, selectedPrice }: OrderFormPro
         <div className="order-summary">
           <div className="summary-row">
             <span>Order Value</span>
-            <span className="summary-value">{orderValue.toFixed(2)}</span>
+            <span className="summary-value">{orderValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
           </div>
           <div className="summary-row">
             <span>Est. Margin ({leverage}x)</span>
-            <span className="summary-value">{requiredMargin.toFixed(2)}</span>
+            <span className="summary-value">{requiredMargin.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
           </div>
           <div className="summary-row">
             <span>Leverage</span>

@@ -48,7 +48,6 @@ export function TradeFeed({ symbol, maxTrades = 50 }: TradeFeedProps) {
       <div className="trade-feed-container">
         <div className="trade-feed-header">
           <h3>Recent Trades</h3>
-          <span className="symbol-tag">{symbol}</span>
         </div>
         <div className="trade-feed-loading">Connecting...</div>
       </div>
@@ -59,7 +58,6 @@ export function TradeFeed({ symbol, maxTrades = 50 }: TradeFeedProps) {
     <div className="trade-feed-container">
       <div className="trade-feed-header">
         <h3>Recent Trades</h3>
-        <span className="symbol-tag">{symbol}</span>
       </div>
 
       <div className="trade-feed-columns">

@@ -1143,13 +1143,20 @@
   overflow: hidden;
 }
 
-/* Progress bar */
+/* Progress bar with count */
+.progression-progress {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 10px 0 8px;
+}
+
 .progression-bar {
-  height: 3px;
+  flex: 1;
+  height: 4px;
   background: rgba(255, 255, 255, 0.08);
   border-radius: 2px;
   overflow: hidden;
-  margin: 10px 0 8px;
 }
 
 .progression-bar-fill {
@@ -1161,6 +1168,14 @@
 
 .progression-card.complete .progression-bar-fill {
   background: #22c55e;
+}
+
+.progression-count {
+  font-size: 0.85rem;
+  font-weight: 600;
+  font-family: 'JetBrains Mono', 'Rajdhani', monospace;
+  color: #8b5cf6;
+  white-space: nowrap;
 }
 
 /* Footer */

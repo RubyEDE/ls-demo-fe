@@ -77,7 +77,6 @@ export function OrderBook({ symbol, depth = 10, onPriceClick }: OrderBookProps) 
       <div className="order-book-container">
         <div className="order-book-header">
           <h3>Order Book</h3>
-          <span className="symbol-tag">{symbol}</span>
         </div>
         <div className="order-book-loading">Connecting...</div>
       </div>
@@ -89,7 +88,6 @@ export function OrderBook({ symbol, depth = 10, onPriceClick }: OrderBookProps) 
       <div className="order-book-container">
         <div className="order-book-header">
           <h3>Order Book</h3>
-          <span className="symbol-tag">{symbol}</span>
         </div>
         <div className="order-book-loading">Loading order book...</div>
       </div>
@@ -100,7 +98,6 @@ export function OrderBook({ symbol, depth = 10, onPriceClick }: OrderBookProps) 
     <div className="order-book-container">
       <div className="order-book-header">
         <h3>Order Book</h3>
-        <span className="symbol-tag">{symbol}</span>
       </div>
 
       <div className="order-book-columns">

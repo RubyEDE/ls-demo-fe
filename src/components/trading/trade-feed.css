@@ -1,16 +1,11 @@
 .trade-feed-container {
-  background: linear-gradient(135deg, var(--bg-secondary), var(--bg-tertiary));
+  background: #131722;
   border: 1px solid var(--border-color);
   border-radius: 12px;
   padding: 1rem;
   font-family: 'JetBrains Mono', monospace;
   display: flex;
   flex-direction: column;
-  transition: all 0.3s ease;
-}
-
-.trade-feed-container:hover {
-  border-color: var(--accent-cyan);
 }
 
 .trade-feed-header {

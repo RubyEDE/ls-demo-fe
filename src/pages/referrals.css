@@ -36,28 +36,36 @@
   flex-shrink: 0;
 }
 
+.referrals-hero .hero-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+
 .referrals-hero .hero-icon {
-  width: 64px;
-  height: 64px;
-  margin: 0 auto 1.25rem;
+  width: 48px;
+  height: 48px;
   display: flex;
   align-items: center;
   justify-content: center;
   background: linear-gradient(135deg, rgba(245, 166, 35, 0.15) 0%, rgba(245, 166, 35, 0.05) 100%);
   border: 1px solid rgba(245, 166, 35, 0.2);
-  border-radius: 18px;
+  border-radius: 14px;
   color: var(--accent-gold);
+  flex-shrink: 0;
 }
 
 .referrals-hero .hero-icon svg {
-  width: 32px;
-  height: 32px;
+  width: 24px;
+  height: 24px;
 }
 
 .referrals-hero h1 {
   font-size: 2rem;
   font-weight: 700;
-  margin: 0 0 0.5rem;
+  margin: 0;
   color: var(--text-primary);
 }
 
