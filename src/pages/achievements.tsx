@@ -35,6 +35,7 @@ function formatCategoryName(category: string): string {
   return category.charAt(0).toUpperCase() + category.slice(1).replace(/_/g, " ");
 }
 
+
 interface CustomSelectProps {
   value: SortType;
   onChange: (value: SortType) => void;
@@ -108,17 +109,26 @@ interface ProgressionCardProps {
 }
 
 function ProgressionCard({ progression }: ProgressionCardProps) {
-  const progressPercent = Math.round((progression.currentProgress / progression.maxThreshold) * 100);
   const isComplete = progression.currentStage === progression.totalStages;
   const hasMultipleStages = progression.totalStages > 1;
+  
+  // Calculate progress toward current stage (not overall max)
+  const currentStageIndex = Math.min(progression.currentStage, progression.totalStages - 1);
+  const currentThreshold = progression.stages[currentStageIndex]?.threshold || progression.maxThreshold;
+  const prevThreshold = currentStageIndex > 0 ? progression.stages[currentStageIndex - 1]?.threshold || 0 : 0;
+  
+  // Progress within the current stage
+  const progressInStage = Math.max(0, progression.currentProgress - prevThreshold);
+  const stageRange = currentThreshold - prevThreshold;
+  const progressPercent = isComplete ? 100 : (stageRange > 0 ? Math.round((progressInStage / stageRange) * 100) : 0);
 
   return (
     <div className={`progression-card ${isComplete ? "complete" : ""}`}>
       {/* Left: Tall image */}
       <div className="progression-image">
         <img 
-          src={`/achievements/${progression.category}.png`} 
-          alt={progression.category}
+          src={`/images/achievements/${progression.progressionGroup}.png`} 
+          alt={progression.progressionGroup}
           onError={(e) => {
             e.currentTarget.style.display = 'none';
             e.currentTarget.nextElementSibling?.classList.remove('hidden');
@@ -181,7 +191,7 @@ function StandaloneCard({ achievement }: StandaloneCardProps) {
       {/* Left: Tall image */}
       <div className="achievement-image">
         <img 
-          src={`/achievements/${achievement.id}.png`} 
+          src={`/images/achievements/${achievement.progressionGroup || achievement.id}.png`} 
           alt={achievement.name}
           onError={(e) => {
             e.currentTarget.style.display = 'none';
@@ -238,7 +248,7 @@ function PublicCard({ achievement }: PublicCardProps) {
       {/* Left: Tall image */}
       <div className="achievement-image">
         <img 
-          src={`/achievements/${achievement.id}.png`} 
+          src={`/images/achievements/${achievement.progressionGroup || achievement.id}.png`} 
           alt={achievement.name}
           onError={(e) => {
             e.currentTarget.style.display = 'none';
