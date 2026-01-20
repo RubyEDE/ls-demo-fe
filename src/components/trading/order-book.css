@@ -189,3 +189,43 @@
   background: var(--border-color);
   border-radius: 2px;
 }
+
+/* Mobile styles */
+@media (max-width: 600px) {
+  .order-book-container {
+    padding: 0.375rem;
+  }
+
+  .order-book-header h3 {
+    font-size: 0.65rem;
+  }
+
+  .symbol-tag {
+    font-size: 0.5rem;
+    padding: 0.1rem 0.25rem;
+  }
+
+  .order-book-columns {
+    font-size: 0.5rem;
+    padding: 0.2rem 0;
+  }
+
+  .order-row {
+    font-size: 0.7rem;
+    padding: 0.2rem 0.1rem;
+    line-height: 1.1;
+  }
+
+  .spread-section {
+    padding: 0.2rem 0;
+    margin: 0.1rem 0;
+  }
+
+  .spread-label {
+    font-size: 0.55rem;
+  }
+
+  .spread-value {
+    font-size: 0.6rem;
+  }
+}

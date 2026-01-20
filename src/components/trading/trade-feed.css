@@ -109,3 +109,37 @@
   color: var(--text-muted);
   font-size: 0.85rem;
 }
+
+/* Mobile styles */
+@media (max-width: 600px) {
+  .trade-feed-container {
+    padding: 0.5rem;
+  }
+
+  .trade-feed-header {
+    margin-bottom: 0.5rem;
+    padding-bottom: 0.5rem;
+  }
+
+  .trade-feed-header h3 {
+    font-size: 0.75rem;
+  }
+
+  .trade-feed-columns {
+    font-size: 0.6rem;
+    padding: 0.25rem 0;
+  }
+
+  .trade-feed-list {
+    max-height: none;
+  }
+
+  .trade-row {
+    padding: 0.25rem 0;
+    font-size: 0.7rem;
+  }
+
+  .trade-time {
+    font-size: 0.65rem;
+  }
+}

@@ -1,6 +1,6 @@
 .trade-terminal {
   width: 100%;
-  height: calc(100vh - 56px);
+  height: calc(100vh - 60px);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -192,19 +192,155 @@
   }
 }
 
+/* Mobile Bottom Navbar - hidden by default */
+.mobile-bottom-nav {
+  display: none;
+}
+
+/* Mobile Layout - hidden by default */
+.mobile-layout {
+  display: none;
+}
+
 @media (max-width: 600px) {
-  .terminal-sidebar {
+  .trade-terminal {
+    height: calc(100vh - 60px);
+    overflow: hidden;
+    padding-bottom: 0;
+  }
+
+  .terminal-top-bar {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    padding: 0.25rem 0.5rem;
+  }
+
+  /* Hide desktop layout on mobile */
+  .desktop-layout {
+    display: none;
+  }
+
+  /* Show mobile layout */
+  .mobile-layout {
+    display: flex;
     flex-direction: column;
-    height: auto;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
   }
 
-  .sidebar-left {
-    width: 100%;
-    border-right: none;
-    border-bottom: 2px solid #1e222d;
+  /* Markets View (Chart + Positions) */
+  .mobile-markets-view {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
   }
 
-  .sidebar-left .trade-feed-container {
-    max-height: 200px;
+  .mobile-markets-view .candlestick-chart-container {
+    flex: 1;
+    min-height: 0;
+    border: none;
+    border-radius: 0;
+  }
+
+  .mobile-markets-view .trading-tabs-container {
+    height: 180px;
+    flex-shrink: 0;
+    border: none;
+    border-radius: 0;
+    border-top: 2px solid #1e222d;
+  }
+
+  /* Trade View (Order Form + Order Book + Positions) */
+  .mobile-trade-view {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .mobile-trade-top {
+    display: flex;
+    flex-direction: row;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .mobile-trade-top .order-form-container {
+    flex: 1;
+    border: none;
+    border-radius: 0;
+    border-right: 2px solid #1e222d;
+    overflow-y: auto;
+  }
+
+  .mobile-trade-top .order-book-container {
+    flex: 1;
+    border: none;
+    border-radius: 0;
+    min-width: 0;
+  }
+
+  .mobile-trade-view .trading-tabs-container {
+    height: 180px;
+    flex-shrink: 0;
+    border: none;
+    border-radius: 0;
+    border-top: 2px solid #1e222d;
+  }
+
+  /* Mobile Bottom Navbar */
+  .mobile-bottom-nav {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    height: 56px;
+    flex-shrink: 0;
+    background: #131722;
+    border-top: 2px solid #1e222d;
+    padding: 0 1rem;
+    gap: 0.5rem;
+  }
+
+  .mobile-nav-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.25rem;
+    flex: 1;
+    padding: 0.5rem;
+    background: transparent;
+    border: none;
+    border-radius: 8px;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .mobile-nav-btn:hover {
+    color: var(--text-secondary);
+    background: rgba(255, 255, 255, 0.05);
+  }
+
+  .mobile-nav-btn.active {
+    color: var(--accent-cyan);
+    background: var(--accent-cyan-dim);
+  }
+
+  .mobile-nav-btn svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .mobile-nav-btn span {
+    font-size: 0.65rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
   }
 }

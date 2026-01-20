@@ -139,3 +139,21 @@
 .trading-tabs-content .trade-history-load-more {
   margin: 0.5rem;
 }
+
+/* Mobile styles */
+@media (max-width: 600px) {
+  .trading-tabs-container {
+    min-height: 0;
+  }
+
+  .trading-tab {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.7rem;
+  }
+
+  .trading-tab-badge {
+    font-size: 0.6rem;
+    padding: 0.1rem 0.3rem;
+    min-width: 16px;
+  }
+}

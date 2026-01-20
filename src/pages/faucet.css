@@ -209,6 +209,15 @@
   cursor: not-allowed;
 }
 
+.claim-btn.sign-in {
+  background: var(--accent-cyan);
+  box-shadow: 0 4px 16px rgba(0, 212, 170, 0.25);
+}
+
+.claim-btn.sign-in:hover:not(:disabled) {
+  box-shadow: 0 8px 24px rgba(0, 212, 170, 0.35);
+}
+
 .btn-spinner {
   width: 18px;
   height: 18px;

@@ -6,6 +6,7 @@ import {
   type FaucetStats,
   type FaucetHistoryItem,
 } from "../utils/faucet-api";
+import { useAuth } from "../context/auth-context";
 import "./faucet.css";
 
 // Water droplet animation component
@@ -183,15 +184,19 @@ function formatDate(dateStr: string): string {
 }
 
 export function FaucetPage() {
+  const { isConnected, isAuthenticated, isAuthLoading, login } = useAuth();
+  
   const [stats, setStats] = useState<FaucetStats | null>(null);
   const [history, setHistory] = useState<FaucetHistoryItem[]>([]);
 
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [isClaiming, setIsClaiming] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   const fetchData = useCallback(async () => {
+    if (!isAuthenticated) return;
+    
     setIsLoading(true);
     setError(null);
     try {
@@ -206,7 +211,7 @@ export function FaucetPage() {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [isAuthenticated]);
 
   useEffect(() => {
     fetchData();
@@ -233,6 +238,12 @@ export function FaucetPage() {
   }, [stats?.nextRequestAt, stats?.canRequest]);
 
   const handleClaim = async () => {
+    // If connected but not authenticated, trigger sign-in
+    if (isConnected && !isAuthenticated) {
+      login();
+      return;
+    }
+    
     setIsClaiming(true);
     setError(null);
     setSuccessMessage(null);
@@ -264,7 +275,7 @@ export function FaucetPage() {
     }
   };
 
-  if (isLoading) {
+  if (isAuthenticated && isLoading) {
     return (
       <div className="faucet-loading">
         <div className="spinner" />
@@ -321,10 +332,32 @@ export function FaucetPage() {
 
             <button
               onClick={handleClaim}
-              disabled={isClaiming || !stats?.canRequest}
-              className="claim-btn"
+              disabled={!isConnected || isAuthLoading || (isAuthenticated && (isClaiming || !stats?.canRequest))}
+              className={`claim-btn ${!isAuthenticated && isConnected ? "sign-in" : ""}`}
             >
-              {isClaiming ? (
+              {!isConnected ? (
+                <>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                  </svg>
+                  Connect Wallet
+                </>
+              ) : isAuthLoading ? (
+                <>
+                  <span className="btn-spinner" />
+                  Signing...
+                </>
+              ) : !isAuthenticated ? (
+                <>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
+                    <polyline points="10 17 15 12 10 7" />
+                    <line x1="15" y1="12" x2="3" y2="12" />
+                  </svg>
+                  Sign to Claim
+                </>
+              ) : isClaiming ? (
                 <>
                   <span className="btn-spinner" />
                   Claiming...
@@ -350,7 +383,11 @@ export function FaucetPage() {
             </button>
 
             <div className="cooldown-info">
-              {stats?.canRequest ? (
+              {!isConnected ? (
+                <span className="cooldown-waiting">Connect wallet to claim</span>
+              ) : !isAuthenticated ? (
+                <span className="cooldown-waiting">Sign a message to verify your wallet</span>
+              ) : stats?.canRequest ? (
                 <span className="cooldown-ready">Ready to claim</span>
               ) : (
                 <span className="cooldown-waiting">Cooldown active</span>
