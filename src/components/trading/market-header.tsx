@@ -72,11 +72,29 @@ function MarketDropdown({ markets, selectedMarket, prices, lastTradePrices, onSe
   const selectedDisplayPrice = selectedMarket ? getDisplayPrice(selectedMarket.baseAsset) : null;
   const selectedLastTrade = selectedMarket ? lastTradePrices?.get(selectedMarket.baseAsset.toUpperCase()) : null;
 
+  const getMarketImagePath = (baseAsset: string) => {
+    return `/images/markets/${baseAsset}.png`;
+  };
+
+  const formatMarketName = (baseAsset: string) => {
+    return baseAsset
+      .split("-")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(" ");
+  };
+
   return (
     <div className="market-dropdown" ref={dropdownRef}>
       <button className="market-dropdown-trigger" onClick={() => setIsOpen(!isOpen)}>
+        {selectedMarket && (
+          <img
+            src={getMarketImagePath(selectedMarket.baseAsset)}
+            alt={selectedMarket.baseAsset}
+            className="market-dropdown-image"
+          />
+        )}
         <div className="market-dropdown-selected">
-          <span className="market-symbol">{selectedMarket?.baseAsset || "Select"}-PERP</span>
+          <span className="market-symbol">{selectedMarket ? formatMarketName(selectedMarket.baseAsset) : "Select"}</span>
           {selectedDisplayPrice !== null && (
             <span className={`market-price ${selectedLastTrade?.side === "buy" ? "price-up" : selectedLastTrade?.side === "sell" ? "price-down" : ""}`}>
               {formatPrice(selectedDisplayPrice)}
@@ -112,7 +130,12 @@ function MarketDropdown({ markets, selectedMarket, prices, lastTradePrices, onSe
                   setIsOpen(false);
                 }}
               >
-                <span className="item-symbol">{market.baseAsset}-PERP</span>
+                <img
+                  src={getMarketImagePath(market.baseAsset)}
+                  alt={market.baseAsset}
+                  className="market-item-image"
+                />
+                <span className="item-symbol">{formatMarketName(market.baseAsset)}</span>
                 <span className={`item-price ${lastTrade?.side === "buy" ? "price-up" : lastTrade?.side === "sell" ? "price-down" : ""}`}>
                   {displayPrice !== null ? formatPrice(displayPrice) : "--"}
                 </span>

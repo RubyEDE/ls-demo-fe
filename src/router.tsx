@@ -4,11 +4,13 @@ import { TradePage } from "./pages/trade";
 import { FaucetPage } from "./pages/faucet";
 import { AchievementsPage } from "./pages/achievements";
 import { ReferralsPage } from "./pages/referrals";
+import { ErrorPage } from "./pages/error";
 
 export const router = createBrowserRouter([
   {
     path: "/",
     element: <Layout />,
+    errorElement: <ErrorPage />,
     children: [
       {
         index: true,

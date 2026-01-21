@@ -142,7 +142,7 @@ function ProgressionCard({ progression }: ProgressionCardProps) {
       {/* Right: Content */}
       <div className="progression-content">
         <div className="progression-header">
-          <h3 className="progression-title">{formatCategoryName(progression.category)}</h3>
+          <h3 className="progression-title">{progression.stages[currentStageIndex]?.name}</h3>
           <span className="card-points">{progression.stages[currentStageIndex]?.points || 0} pts</span>
         </div>
 

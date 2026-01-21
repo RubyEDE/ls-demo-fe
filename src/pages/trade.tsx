@@ -25,7 +25,7 @@ type MobileTab = "markets" | "trade";
 export function TradePage() {
   const { isAuthenticated } = useAuth();
   const { markets, getMarket } = useMarkets();
-  const [selectedSymbol, setSelectedSymbol] = useState("AAPL");
+  const [selectedSymbol, setSelectedSymbol] = useState("AK47-REDLINE");
   const [notifications, setNotifications] = useState<string[]>([]);
   const [ordersKey, setOrdersKey] = useState(0);
   const [selectedPrice, setSelectedPrice] = useState<{ price: number; timestamp: number } | null>(null);
