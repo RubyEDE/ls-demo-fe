@@ -187,6 +187,43 @@ function getTimeUntilFunding(isoString: string | undefined): string {
   return `${hours}h ${minutes}m`;
 }
 
+// Calculate next funding time (8-hour intervals: 00:00, 08:00, 16:00 UTC)
+function getNextFundingTime(): string {
+  const now = new Date();
+  const utcHours = now.getUTCHours();
+  
+  // Find next 8-hour boundary
+  let nextHour: number;
+  if (utcHours < 8) {
+    nextHour = 8;
+  } else if (utcHours < 16) {
+    nextHour = 16;
+  } else {
+    nextHour = 24; // Next day 00:00
+  }
+  
+  const next = new Date(now);
+  next.setUTCHours(nextHour % 24, 0, 0, 0);
+  if (nextHour === 24) {
+    next.setUTCDate(next.getUTCDate() + 1);
+  }
+  
+  return next.toISOString();
+}
+
+// Calculate predicted funding rate based on premium
+// Formula: fundingRate = clamp(premium * dampeningFactor, -1%, +1%)
+function calculatePredictedFundingRate(markPrice: number | null, indexPrice: number | null): number {
+  if (!markPrice || !indexPrice || indexPrice === 0) return 0;
+  
+  const premium = (markPrice - indexPrice) / indexPrice;
+  const dampeningFactor = 0.1; // 10% of premium
+  const fundingRate = premium * dampeningFactor;
+  
+  // Clamp to [-1%, +1%] per funding interval
+  return Math.max(-0.01, Math.min(0.01, fundingRate));
+}
+
 export function MarketHeader({ markets, selectedMarket, onSelectMarket, lastTradePrices }: MarketHeaderProps) {
   const symbols = markets.map((m) => m.baseAsset);
   const { prices } = usePriceFeed(symbols);
@@ -195,26 +232,48 @@ export function MarketHeader({ markets, selectedMarket, onSelectMarket, lastTrad
   const { data: fundingData } = useFundingInfo(selectedMarket?.symbol || "");
   const { fundingData: liveFundingData } = useFundingUpdates(selectedMarket?.symbol || "");
 
-  // Use real-time funding data if available, otherwise fall back to REST data
-  const fundingRate = liveFundingData?.fundingRate ?? fundingData?.fundingRate ?? selectedMarket?.fundingRate;
-  const nextFundingTime = liveFundingData?.nextFundingTime
-    ? new Date(liveFundingData.nextFundingTime).toISOString()
-    : fundingData?.nextFundingTime;
-
   const selectedPrice = selectedMarket
     ? prices.get(selectedMarket.baseAsset.toUpperCase())
     : null;
 
-  const markPrice = selectedMarket
-    ? selectedMarket.bestBid && selectedMarket.bestAsk
-      ? (selectedMarket.bestBid + selectedMarket.bestAsk) / 2
-      : selectedMarket.oraclePrice
+  // Get last trade price for this market
+  const lastTradePrice = selectedMarket
+    ? lastTradePrices?.get(selectedMarket.baseAsset.toUpperCase())?.price ?? null
     : null;
+
+  // Calculate mark price: weighted average of order book mid-price and last trade price
+  // This creates more realistic funding rates based on actual trading activity
+  const orderBookMid = selectedMarket?.bestBid && selectedMarket?.bestAsk
+    ? (selectedMarket.bestBid + selectedMarket.bestAsk) / 2
+    : null;
+  
+  const markPrice = selectedMarket
+    ? orderBookMid && lastTradePrice
+      ? (orderBookMid * 0.5 + lastTradePrice * 0.5) // Blend order book and last trade
+      : orderBookMid ?? lastTradePrice ?? selectedMarket.oraclePrice
+    : null;
+
+  // Get index price (oracle price)
+  const indexPrice = selectedMarket?.oraclePrice ?? null;
+
+  // Calculate predicted funding rate based on premium if backend returns 0 or no data
+  const backendFundingRate = liveFundingData?.fundingRate ?? fundingData?.fundingRate ?? selectedMarket?.fundingRate;
+  const predictedFundingRate = calculatePredictedFundingRate(markPrice, indexPrice);
+  
+  // Use backend rate if non-zero, otherwise use our predicted rate
+  const fundingRate = (backendFundingRate && backendFundingRate !== 0) 
+    ? backendFundingRate 
+    : predictedFundingRate;
+
+  // Get next funding time from backend or calculate locally
+  const nextFundingTime = liveFundingData?.nextFundingTime
+    ? new Date(liveFundingData.nextFundingTime).toISOString()
+    : fundingData?.nextFundingTime ?? getNextFundingTime();
 
   const change24h = selectedPrice?.change || 0;
   const changePercent = selectedPrice?.changePercent || 0;
   const isPositiveChange = change24h >= 0;
-  const isFundingPositive = (fundingRate ?? 0) >= 0;
+  const isFundingPositive = fundingRate >= 0;
 
   return (
     <div className="market-header">
@@ -236,7 +295,7 @@ export function MarketHeader({ markets, selectedMarket, onSelectMarket, lastTrad
           value={markPrice ? formatPrice(markPrice) : "--"}
         />
         <StatItem
-          label="Oracle"
+          label="Index"
           value={selectedMarket?.oraclePrice ? formatPrice(selectedMarket.oraclePrice) : "--"}
         />
         <StatItem
@@ -252,10 +311,10 @@ export function MarketHeader({ markets, selectedMarket, onSelectMarket, lastTrad
         />
         <StatItem
           label="Funding"
-          value={fundingRate !== undefined ? formatPercent(fundingRate) : "--"}
-          subValue={nextFundingTime ? ` (${getTimeUntilFunding(nextFundingTime)})` : undefined}
-          isPositive={isFundingPositive && fundingRate !== undefined}
-          isNegative={!isFundingPositive && fundingRate !== undefined}
+          value={formatPercent(fundingRate)}
+          subValue={` (${getTimeUntilFunding(nextFundingTime)})`}
+          isPositive={isFundingPositive}
+          isNegative={!isFundingPositive}
         />
       </div>
     </div>

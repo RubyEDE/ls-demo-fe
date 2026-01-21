@@ -21,11 +21,21 @@ export function OrderForm({ market, onOrderPlaced, selectedPrice }: OrderFormPro
   const [price, setPrice] = useState("");
   const [quantity, setQuantity] = useState("");
   const [postOnly, setPostOnly] = useState(false);
-  const [leverage, setLeverage] = useState(1);
+  const [leverage, setLeverage] = useState(() => {
+    const saved = localStorage.getItem("preferred_leverage");
+    return saved ? parseInt(saved, 10) : 1;
+  });
   const [showLeveragePopup, setShowLeveragePopup] = useState(false);
-  const [tempLeverage, setTempLeverage] = useState(1);
+  const [tempLeverage, setTempLeverage] = useState(leverage);
 
   const maxLeverage = market?.maxLeverage || 20;
+
+  // Clamp leverage to market's max if it exceeds
+  useEffect(() => {
+    if (leverage > maxLeverage) {
+      setLeverage(maxLeverage);
+    }
+  }, [maxLeverage, leverage]);
 
   const handleOpenLeveragePopup = () => {
     setTempLeverage(leverage);
@@ -34,6 +44,7 @@ export function OrderForm({ market, onOrderPlaced, selectedPrice }: OrderFormPro
 
   const handleConfirmLeverage = () => {
     setLeverage(tempLeverage);
+    localStorage.setItem("preferred_leverage", String(tempLeverage));
     setShowLeveragePopup(false);
   };
 
@@ -79,6 +90,7 @@ export function OrderForm({ market, onOrderPlaced, selectedPrice }: OrderFormPro
       type: orderType,
       price: orderType === "limit" ? parseFloat(price) : undefined,
       quantity: parseFloat(quantity),
+      leverage,
       postOnly: orderType === "limit" ? postOnly : undefined,
     });
 

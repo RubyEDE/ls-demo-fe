@@ -17,6 +17,21 @@ function formatTime(timestamp: string): string {
   });
 }
 
+function formatMarketName(marketSymbol: string): string {
+  // Remove -PERP suffix and format: "GLOVE-CASE-PERP" -> "Glove Case"
+  return marketSymbol
+    .replace("-PERP", "")
+    .split("-")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(" ");
+}
+
+function getMarketImagePath(marketSymbol: string): string {
+  // "GLOVE-CASE-PERP" -> "/images/markets/GLOVE-CASE.png"
+  const baseAsset = marketSymbol.replace("-PERP", "");
+  return `/images/markets/${baseAsset}.png`;
+}
+
 export function OpenOrders({ market }: OpenOrdersProps) {
   const { isAuthenticated } = useAuth();
   const { openOrders, isLoading, refresh } = useOrders({ market });
@@ -91,7 +106,14 @@ export function OpenOrders({ market }: OpenOrdersProps) {
                 const fillPercent = (order.filledQuantity / order.quantity) * 100;
                 return (
                   <tr key={order.orderId}>
-                    <td className="col-symbol">{order.marketSymbol}</td>
+                    <td className="col-symbol">
+                      <img
+                        src={getMarketImagePath(order.marketSymbol)}
+                        alt={order.marketSymbol}
+                        className="market-image"
+                      />
+                      {formatMarketName(order.marketSymbol)}
+                    </td>
                     <td className={`col-side ${order.side}`}>{order.side.toUpperCase()}</td>
                     <td className="col-type">{order.type}</td>
                     <td className="col-price">{order.price.toFixed(2)}</td>

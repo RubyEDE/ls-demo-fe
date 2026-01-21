@@ -41,6 +41,7 @@ export interface PlaceOrderParams {
   type: "limit" | "market";
   price?: number;
   quantity: number;
+  leverage?: number;
   postOnly?: boolean;
   reduceOnly?: boolean;
 }

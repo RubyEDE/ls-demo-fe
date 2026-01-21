@@ -46,6 +46,21 @@ function formatDate(timestamp: string): string {
   }) + " " + formatTime(timestamp);
 }
 
+function formatMarketName(marketSymbol: string): string {
+  // Remove -PERP suffix and format: "GLOVE-CASE-PERP" -> "Glove Case"
+  return marketSymbol
+    .replace("-PERP", "")
+    .split("-")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(" ");
+}
+
+function getMarketImagePath(marketSymbol: string): string {
+  // "GLOVE-CASE-PERP" -> "/images/markets/GLOVE-CASE.png"
+  const baseAsset = marketSymbol.replace("-PERP", "");
+  return `/images/markets/${baseAsset}.png`;
+}
+
 function TradeRow({ trade }: { trade: UserTrade }) {
   return (
     <div className="trade-history-row">
@@ -54,7 +69,12 @@ function TradeRow({ trade }: { trade: UserTrade }) {
           <span className={`trade-history-side ${trade.side}`}>
             {trade.side.toUpperCase()}
           </span>
-          <span className="trade-history-symbol">{trade.marketSymbol}</span>
+          <img
+            src={getMarketImagePath(trade.marketSymbol)}
+            alt={trade.marketSymbol}
+            className="trade-history-market-image"
+          />
+          <span className="trade-history-symbol">{formatMarketName(trade.marketSymbol)}</span>
           {trade.isMaker && <span className="trade-history-maker">Maker</span>}
         </div>
         <div className="trade-history-details">

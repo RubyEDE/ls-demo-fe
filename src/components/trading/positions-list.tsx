@@ -1,12 +1,25 @@
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { usePositions } from "../../hooks/use-positions";
 import { usePositionActions } from "../../hooks/use-position-actions";
 import { useAuth } from "../../context/auth-context";
 import { useBalance } from "../../context/balance-context";
 import { useUserEvents } from "../../hooks/use-user-events";
+import { useLastTradePrices } from "../../hooks/use-last-trade-prices";
 import type { Position } from "../../types/position";
 import type { PositionEvent } from "../../types/websocket";
 import "./positions-list.css";
+
+// Calculate unrealized PnL based on current mark price
+function calculateUnrealizedPnl(position: Position, currentMarkPrice: number | null): number {
+  if (currentMarkPrice === null) {
+    return position.unrealizedPnl; // fallback to server value
+  }
+  if (position.side === "long") {
+    return (currentMarkPrice - position.entryPrice) * position.size;
+  } else {
+    return (position.entryPrice - currentMarkPrice) * position.size;
+  }
+}
 
 interface PositionsListProps {
   market?: string;
@@ -27,11 +40,71 @@ function formatSize(size: number): string {
   return size.toFixed(4);
 }
 
+function formatMarketName(marketSymbol: string): string {
+  // Remove -PERP suffix and format: "GLOVE-CASE-PERP" -> "Glove Case"
+  return marketSymbol
+    .replace("-PERP", "")
+    .split("-")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(" ");
+}
+
+function getMarketImagePath(marketSymbol: string): string {
+  // "GLOVE-CASE-PERP" -> "/images/markets/GLOVE-CASE.png"
+  const baseAsset = marketSymbol.replace("-PERP", "");
+  return `/images/markets/${baseAsset}.png`;
+}
+
 export function PositionsList({ market }: PositionsListProps) {
   const { isAuthenticated } = useAuth();
   const { positions, summary, isLoading, refresh } = usePositions({ market });
   const { closePosition, closeAllPositions, isClosing } = usePositionActions();
   const { refreshBalance } = useBalance();
+
+  // Get unique symbols from positions for price subscription
+  const positionSymbols = useMemo(() => {
+    const symbols = positions.map((p) => p.marketSymbol.replace("-PERP", ""));
+    return [...new Set(symbols)];
+  }, [positions]);
+
+  // Subscribe to live prices for all position markets
+  const { prices: livePrices } = useLastTradePrices(positionSymbols);
+
+  // Calculate live PnL for a position
+  const getLivePnl = useCallback(
+    (position: Position): number => {
+      const baseSymbol = position.marketSymbol.replace("-PERP", "").toUpperCase();
+      const livePrice = livePrices.get(baseSymbol);
+      const currentMarkPrice = livePrice?.price ?? position.markPrice;
+      return calculateUnrealizedPnl(position, currentMarkPrice);
+    },
+    [livePrices]
+  );
+
+  // Calculate live mark price for a position
+  const getLiveMarkPrice = useCallback(
+    (position: Position): number | null => {
+      const baseSymbol = position.marketSymbol.replace("-PERP", "").toUpperCase();
+      const livePrice = livePrices.get(baseSymbol);
+      return livePrice?.price ?? position.markPrice;
+    },
+    [livePrices]
+  );
+
+  // Calculate live summary totals
+  const liveSummary = useMemo(() => {
+    if (!summary || positions.length === 0) return summary;
+
+    const totalLivePnl = positions.reduce((total, position) => {
+      return total + getLivePnl(position);
+    }, 0);
+
+    return {
+      ...summary,
+      totalUnrealizedPnl: totalLivePnl,
+      totalEquity: summary.totalMargin + totalLivePnl,
+    };
+  }, [summary, positions, getLivePnl]);
 
   // Listen to position WebSocket events for real-time updates
   useUserEvents({
@@ -106,22 +179,22 @@ export function PositionsList({ market }: PositionsListProps) {
         <h3>Positions ({positions.length})</h3>
       </div>
 
-      {summary && positions.length > 0 && (
+      {liveSummary && positions.length > 0 && (
         <div className="positions-summary">
           <div className="summary-item">
             <span className="label">Margin</span>
-            <span className="value">{formatMoney(summary.totalMargin)}</span>
+            <span className="value">{formatMoney(liveSummary.totalMargin)}</span>
           </div>
           <div className="summary-item">
             <span className="label">Unrealized PnL</span>
-            <span className={`value ${summary.totalUnrealizedPnl >= 0 ? "profit" : "loss"}`}>
-              {summary.totalUnrealizedPnl >= 0 ? "+" : ""}
-              {formatMoney(summary.totalUnrealizedPnl)}
+            <span className={`value ${liveSummary.totalUnrealizedPnl >= 0 ? "profit" : "loss"}`}>
+              {liveSummary.totalUnrealizedPnl >= 0 ? "+" : ""}
+              {formatMoney(liveSummary.totalUnrealizedPnl)}
             </span>
           </div>
           <div className="summary-item">
             <span className="label">Equity</span>
-            <span className="value">{formatMoney(summary.totalEquity)}</span>
+            <span className="value">{formatMoney(liveSummary.totalEquity)}</span>
           </div>
           {positions.length > 1 && (
             <button
@@ -155,20 +228,29 @@ export function PositionsList({ market }: PositionsListProps) {
             </thead>
             <tbody>
               {positions.map((position) => {
-                const isProfitable = position.unrealizedPnl >= 0;
-                const roe = position.margin > 0 ? (position.unrealizedPnl / position.margin) * 100 : 0;
+                const livePnl = getLivePnl(position);
+                const liveMarkPrice = getLiveMarkPrice(position);
+                const isProfitable = livePnl >= 0;
+                const roe = position.margin > 0 ? (livePnl / position.margin) * 100 : 0;
                 return (
                   <tr key={position.positionId}>
-                    <td className="col-symbol">{position.marketSymbol}</td>
+                    <td className="col-symbol">
+                      <img
+                        src={getMarketImagePath(position.marketSymbol)}
+                        alt={position.marketSymbol}
+                        className="market-image"
+                      />
+                      {formatMarketName(position.marketSymbol)}
+                    </td>
                     <td className={`col-side ${position.side}`}>
                       {position.side.toUpperCase()} {position.leverage.toFixed(0)}x
                     </td>
                     <td className="col-size">{formatSize(position.size)}</td>
                     <td className="col-entry">{formatPrice(position.entryPrice)}</td>
-                    <td className="col-mark">{position.markPrice ? formatPrice(position.markPrice) : "-"}</td>
+                    <td className="col-mark">{liveMarkPrice ? formatPrice(liveMarkPrice) : "-"}</td>
                     <td className="col-liq">{formatPrice(position.liquidationPrice)}</td>
                     <td className={`col-pnl ${isProfitable ? "profit" : "loss"}`}>
-                      {isProfitable ? "+" : ""}{formatMoney(position.unrealizedPnl)}
+                      {isProfitable ? "+" : ""}{formatMoney(livePnl)}
                     </td>
                     <td className={`col-roe ${isProfitable ? "profit" : "loss"}`}>
                       {isProfitable ? "+" : ""}{roe.toFixed(2)}%
@@ -203,14 +285,30 @@ export function MarketPositionWidget({ marketSymbol }: MarketPositionWidgetProps
   const { closePosition, isClosing } = usePositionActions();
   const { refreshBalance } = useBalance();
 
+  // Subscribe to live prices for this market
+  const baseSymbol = useMemo(
+    () => marketSymbol.replace("-PERP", ""),
+    [marketSymbol]
+  );
+  const symbols = useMemo(() => [baseSymbol], [baseSymbol]);
+  const { prices: livePrices } = useLastTradePrices(symbols);
+
   const position = getPosition(marketSymbol);
+
+  // Calculate live PnL
+  const livePnl = useMemo(() => {
+    if (!position) return 0;
+    const livePrice = livePrices.get(baseSymbol.toUpperCase());
+    const currentMarkPrice = livePrice?.price ?? position.markPrice;
+    return calculateUnrealizedPnl(position, currentMarkPrice);
+  }, [position, livePrices, baseSymbol]);
 
   if (!position) {
     return null;
   }
 
-  const isProfitable = position.unrealizedPnl >= 0;
-  const roe = position.margin > 0 ? (position.unrealizedPnl / position.margin) * 100 : 0;
+  const isProfitable = livePnl >= 0;
+  const roe = position.margin > 0 ? (livePnl / position.margin) * 100 : 0;
 
   const handleClose = async () => {
     const result = await closePosition(marketSymbol);
@@ -240,7 +338,7 @@ export function MarketPositionWidget({ marketSymbol }: MarketPositionWidgetProps
         </span>
         <span className={`widget-pnl ${isProfitable ? "profit" : "loss"}`}>
           {isProfitable ? "+" : ""}
-          {formatMoney(position.unrealizedPnl)} ({isProfitable ? "+" : ""}
+          {formatMoney(livePnl)} ({isProfitable ? "+" : ""}
           {roe.toFixed(1)}%)
         </span>
       </div>

@@ -81,6 +81,13 @@
   color: var(--color-danger);
 }
 
+.trade-history-market-image {
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  object-fit: cover;
+}
+
 .trade-history-symbol {
   font-size: 0.8rem;
   font-weight: 600;

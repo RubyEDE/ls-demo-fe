@@ -89,6 +89,16 @@
 .orders-table .col-symbol {
   color: var(--text-primary);
   font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.orders-table .col-symbol .market-image {
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  object-fit: cover;
 }
 
 .orders-table .col-side {
