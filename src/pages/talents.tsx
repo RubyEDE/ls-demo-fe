@@ -691,25 +691,16 @@ export function TalentsPage() {
     );
   }
 
+  // Format numbers for XP display
+  const formatXP = (num: number): string => {
+    if (num >= 1000) {
+      return (num / 1000).toFixed(1).replace(/\.0$/, "") + "k";
+    }
+    return num.toString();
+  };
+
   return (
     <div className="talents-page">
-      {/* Header */}
-      <div className="talents-header">
-        <div className="header-left">
-          <h1>Talent Tree</h1>
-          <div className="header-stats">
-            <div className="stat">
-              <span className="stat-label">Lvl</span>
-              <span className="stat-value">{levelInfo?.level ?? talentTree?.userLevel ?? 1}</span>
-            </div>
-            <div className="stat available">
-              <span className="stat-label">Available</span>
-              <span className="stat-value">{talentTree?.availablePoints ?? 0}</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
       {/* Error */}
       {error && (
         <div className="talents-error">
@@ -758,6 +749,17 @@ export function TalentsPage() {
             <ElectricLinesCanvas />
           </div>
 
+          {/* Title Section */}
+          <div className="talents-title-section">
+            <h1 className="talents-title">Talent Tree</h1>
+            {talentTree.availablePoints > 0 && (
+              <div className="available-points-badge">
+                <span className="points-number">{talentTree.availablePoints}</span>
+                <span className="points-label">points available</span>
+              </div>
+            )}
+          </div>
+
           {/* Combined Tree Container */}
           <div className="talent-trees-container">
             <ParticleCanvas />
@@ -790,6 +792,27 @@ export function TalentsPage() {
               />
             </div>
           </div>
+
+          {/* Experience Bar */}
+          {levelInfo && (
+            <div className="talents-xp-section">
+              <div className="xp-level-badge">
+                <span className="level-number">{levelInfo.level}</span>
+              </div>
+              <div className="xp-bar-wrapper">
+                <div className="xp-bar">
+                  <div 
+                    className="xp-bar-fill" 
+                    style={{ width: `${levelInfo.progressPercentage}%` }}
+                  />
+                </div>
+                <div className="xp-labels">
+                  <span className="xp-current">{formatXP(levelInfo.experience)} XP</span>
+                  <span className="xp-next">Level {levelInfo.level + 1}: {formatXP(levelInfo.experienceForNextLevel)} XP</span>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Mobile Talent Sheet */}
           <TalentSheet
