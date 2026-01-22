@@ -3,6 +3,7 @@ import { Outlet, NavLink, useLocation } from "react-router-dom";
 import { useAuth } from "../context/auth-context";
 import { useReferralCodeFromUrl, useApplyReferralCode } from "../hooks/use-referrals";
 import { WalletButton } from "./wallet-button";
+import { XPNotifications } from "./xp-notifications";
 import "./layout.css";
 
 // Auto-apply referral code when user authenticates
@@ -147,6 +148,9 @@ export function Layout() {
       <main className={`main-content ${isFullWidth ? "full-width" : ""}`}>
         <Outlet />
       </main>
+
+      {/* XP Notifications */}
+      <XPNotifications />
     </div>
   );
 }

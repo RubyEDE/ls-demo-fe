@@ -6,7 +6,10 @@ import {
   type FaucetStats,
   type FaucetHistoryItem,
 } from "../utils/faucet-api";
+import { getTalentBonuses } from "../utils/talents-api";
+import type { TalentBonusesResponse } from "../types/talents";
 import { useAuth } from "../context/auth-context";
+import { useBalance } from "../context/balance-context";
 import "./faucet.css";
 
 // Water droplet animation component
@@ -183,16 +186,27 @@ function formatDate(dateStr: string): string {
   });
 }
 
+const BASE_CLAIM_AMOUNT = 100;
+
 export function FaucetPage() {
   const { isConnected, isAuthenticated, isAuthLoading, login } = useAuth();
+  const { refreshBalance } = useBalance();
   
   const [stats, setStats] = useState<FaucetStats | null>(null);
   const [history, setHistory] = useState<FaucetHistoryItem[]>([]);
+  const [bonuses, setBonuses] = useState<TalentBonusesResponse | null>(null);
 
   const [isLoading, setIsLoading] = useState(false);
   const [isClaiming, setIsClaiming] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
+  // Calculate boosted claim amount
+  const claimAmount = bonuses 
+    ? Math.round(BASE_CLAIM_AMOUNT * bonuses.faucet.amountMultiplier) 
+    : BASE_CLAIM_AMOUNT;
+  const hasBoost = bonuses && bonuses.faucet.amountMultiplier > 1;
+  const claimsPerCooldown = bonuses?.faucet.claimsPerCooldown ?? 1;
 
   const fetchData = useCallback(async () => {
     if (!isAuthenticated) return;
@@ -200,12 +214,14 @@ export function FaucetPage() {
     setIsLoading(true);
     setError(null);
     try {
-      const [statsData, historyData] = await Promise.all([
+      const [statsData, historyData, bonusData] = await Promise.all([
         getFaucetStats(),
         getFaucetHistory(10, 0),
+        getTalentBonuses().catch(() => null),
       ]);
       setStats(statsData);
       setHistory(historyData.history);
+      if (bonusData) setBonuses(bonusData);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load data");
     } finally {
@@ -252,21 +268,13 @@ export function FaucetPage() {
       const result = await requestFromFaucet();
       setSuccessMessage(`+${result.amount} USDC claimed!`);
 
-      setStats(prev =>
-        prev
-          ? {
-              ...prev,
-              canRequest: false,
-              totalRequests: prev.totalRequests + 1,
-              totalAmountReceived: prev.totalAmountReceived + result.amount,
-              lastRequestAt: new Date().toISOString(),
-              nextRequestAt: result.nextRequestAt,
-            }
-          : prev
-      );
-
-      // Refresh history
-      const historyData = await getFaucetHistory(10, 0);
+      // Refresh all data to get updated stats and balance
+      const [statsData, historyData] = await Promise.all([
+        getFaucetStats(),
+        getFaucetHistory(10, 0),
+        refreshBalance(),
+      ]);
+      setStats(statsData);
       setHistory(historyData.history);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Claim failed");
@@ -305,11 +313,14 @@ export function FaucetPage() {
         <div className="claim-section">
           <div className="claim-card">
             <div className="claim-amount-display">
-              <div className="amount-circle">
-                <span className="amount-value">100</span>
+              <div className={`amount-circle ${hasBoost ? "boosted" : ""}`}>
+                <span className="amount-value">{claimAmount}</span>
                 <span className="amount-currency">USDC</span>
               </div>
-              <span className="amount-subtitle">per claim</span>
+              <span className="amount-subtitle">
+                per claim
+                {claimsPerCooldown > 1 && ` · ${claimsPerCooldown}x per day`}
+              </span>
             </div>
 
             {error && (

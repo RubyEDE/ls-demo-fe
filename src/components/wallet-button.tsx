@@ -1,6 +1,7 @@
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useAuth } from "../context/auth-context";
 import { useBalance } from "../context/balance-context";
+import { LevelDisplay } from "./level-display";
 import "./wallet-button.css";
 
 function formatMoney(amount: number): string {
@@ -61,6 +62,9 @@ export function WalletButton() {
 
               return (
                 <>
+                  {isAuthenticated && (
+                    <LevelDisplay />
+                  )}
                   {isAuthenticated && availableBalance !== null && (
                     <div className="balance-display">
                       <span className="balance-label">Balance</span>

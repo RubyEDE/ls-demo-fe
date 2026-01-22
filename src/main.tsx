@@ -8,6 +8,7 @@ import { config } from "./config/wagmi";
 import { AuthProvider } from "./context/auth-context";
 import { WebSocketProvider } from "./context/websocket-context";
 import { BalanceProvider } from "./context/balance-context";
+import { LevelProvider } from "./context/level-context";
 import { CandleProvider } from "./context/candle-context";
 import { router } from "./router";
 import "@rainbow-me/rainbowkit/styles.css";
@@ -51,9 +52,11 @@ createRoot(document.getElementById("root")!).render(
           <AuthProvider>
             <WebSocketProvider>
               <BalanceProvider>
-                <CandleProvider>
-                  <RouterProvider router={router} />
-                </CandleProvider>
+                <LevelProvider>
+                  <CandleProvider>
+                    <RouterProvider router={router} />
+                  </CandleProvider>
+                </LevelProvider>
               </BalanceProvider>
             </WebSocketProvider>
           </AuthProvider>

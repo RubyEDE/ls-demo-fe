@@ -1,0 +1,277 @@
+/* Level Display Link */
+.level-display-link,
+.level-badge-link {
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  transition: transform 0.2s ease;
+}
+
+.level-display-link:hover,
+.level-badge-link:hover {
+  transform: scale(1.02);
+}
+
+.level-display-link.loading {
+  opacity: 0.7;
+}
+
+.level-info {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+}
+
+/* Level Badge */
+.level-badge {
+  position: relative;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, var(--accent-gold), #e67e22);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 2px 6px rgba(245, 166, 35, 0.3);
+  transition: box-shadow 0.3s ease;
+}
+
+/* Glow effect when has points */
+.level-display-link.has-points .level-badge,
+.level-badge-link.has-points .level-badge {
+  box-shadow: 
+    0 0 8px rgba(245, 166, 35, 0.6),
+    0 0 16px rgba(245, 166, 35, 0.4),
+    0 0 24px rgba(245, 166, 35, 0.2);
+  animation: levelGlow 2s ease-in-out infinite;
+}
+
+@keyframes levelGlow {
+  0%, 100% {
+    box-shadow: 
+      0 0 8px rgba(245, 166, 35, 0.6),
+      0 0 16px rgba(245, 166, 35, 0.4),
+      0 0 24px rgba(245, 166, 35, 0.2);
+  }
+  50% {
+    box-shadow: 
+      0 0 12px rgba(245, 166, 35, 0.8),
+      0 0 24px rgba(245, 166, 35, 0.5),
+      0 0 36px rgba(245, 166, 35, 0.3);
+  }
+}
+
+/* Points indicator badge */
+.points-indicator {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  background: var(--color-success);
+  color: white;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.6rem;
+  font-weight: 700;
+  border-radius: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(38, 166, 91, 0.4);
+  animation: pointsBounce 2s ease-in-out infinite;
+}
+
+@keyframes pointsBounce {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+.level-badge-number {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--bg-primary);
+}
+
+/* Level Details */
+.level-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 100px;
+}
+
+.level-label {
+  font-size: 0.65rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* XP Progress */
+.xp-progress-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.xp-progress-bar {
+  height: 4px;
+  background: var(--bg-tertiary);
+  border-radius: 2px;
+  overflow: hidden;
+  position: relative;
+  transition: box-shadow 0.3s ease;
+}
+
+/* Glow effect when receiving XP */
+.xp-progress-bar.xp-receiving {
+  box-shadow: 
+    0 0 8px rgba(0, 212, 170, 0.6),
+    0 0 16px rgba(0, 212, 170, 0.4),
+    0 0 24px rgba(0, 212, 170, 0.2);
+  animation: barPulse 0.6s ease-out;
+}
+
+.xp-progress-bar.xp-receiving::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 20px;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.8), transparent);
+  animation: xpLand 0.4s ease-out forwards;
+}
+
+.xp-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent-cyan), #00b894);
+  border-radius: 2px;
+  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+}
+
+/* Shimmer effect on the fill when receiving */
+.xp-progress-bar.xp-receiving .xp-progress-fill {
+  animation: fillShimmer 0.6s ease-out;
+}
+
+.xp-progress-bar.xp-receiving .xp-progress-fill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.4) 50%,
+    transparent 100%
+  );
+  animation: shimmerPass 0.6s ease-out;
+}
+
+@keyframes barPulse {
+  0% {
+    transform: scaleY(1);
+  }
+  50% {
+    transform: scaleY(1.5);
+  }
+  100% {
+    transform: scaleY(1);
+  }
+}
+
+@keyframes xpLand {
+  0% {
+    opacity: 1;
+    transform: translateX(-100%);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fillShimmer {
+  0% {
+    filter: brightness(1);
+  }
+  50% {
+    filter: brightness(1.5);
+  }
+  100% {
+    filter: brightness(1);
+  }
+}
+
+@keyframes shimmerPass {
+  0% {
+    transform: translateX(-100%);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+
+.xp-text {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  color: var(--text-secondary);
+}
+
+/* Mobile styles */
+@media (max-width: 768px) {
+  .level-details {
+    display: none;
+  }
+
+  .level-badge {
+    width: 24px;
+    height: 24px;
+    border-radius: 6px;
+  }
+
+  .level-badge-number {
+    font-size: 0.65rem;
+  }
+
+  .points-indicator {
+    min-width: 14px;
+    height: 14px;
+    font-size: 0.55rem;
+    top: -5px;
+    right: -5px;
+  }
+}
+
+@media (max-width: 480px) {
+  .level-badge {
+    width: 22px;
+    height: 22px;
+  }
+
+  .level-badge-number {
+    font-size: 0.6rem;
+  }
+
+  .points-indicator {
+    min-width: 12px;
+    height: 12px;
+    font-size: 0.5rem;
+    top: -4px;
+    right: -4px;
+  }
+}
