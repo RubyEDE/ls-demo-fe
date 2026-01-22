@@ -185,6 +185,7 @@ interface TalentNodeProps {
   canAllocate: boolean;
   isAllocating: boolean;
   onAllocate: () => void;
+  onSelect: () => void;
 }
 
 function TalentNode({
@@ -193,6 +194,7 @@ function TalentNode({
   canAllocate,
   isAllocating,
   onAllocate,
+  onSelect,
 }: TalentNodeProps) {
   const meta = TALENT_TREES[treeType];
   const isMaxed = talent.currentPoints >= talent.maxPoints;
@@ -208,12 +210,23 @@ function TalentNode({
     .filter(Boolean)
     .join(" ");
 
+  const handleClick = () => {
+    // Always select to show details (sheet on mobile, tooltip on desktop)
+    onSelect();
+    
+    // On desktop, also allocate if possible (mobile will use the sheet button)
+    const isDesktop = window.matchMedia("(min-width: 581px)").matches;
+    if (isDesktop && canAllocate) {
+      onAllocate();
+    }
+  };
+
   return (
     <div className={nodeClass} data-tree={treeType}>
       <button
         className="talent-node-btn"
-        onClick={onAllocate}
-        disabled={!canAllocate || isAllocating}
+        onClick={handleClick}
+        disabled={isAllocating}
         style={{ "--node-color": meta.color, "--node-glow": meta.glowColor } as React.CSSProperties}
       >
         <div className="node-glow" />
@@ -224,7 +237,7 @@ function TalentNode({
           {talent.currentPoints}/{talent.maxPoints}
         </div>
         
-        {/* Tooltip */}
+        {/* Tooltip - desktop only */}
         <div className="talent-tooltip">
           <div className="tooltip-header">
             <span className="tooltip-name">{talent.name}</span>
@@ -243,6 +256,118 @@ function TalentNode({
   );
 }
 
+// Mobile bottom sheet for talent details
+interface TalentSheetProps {
+  talent: TalentInfo | null;
+  treeType: TalentTreeType | null;
+  canAllocate: boolean;
+  isAllocating: boolean;
+  onAllocate: () => void;
+  onClose: () => void;
+}
+
+function TalentSheet({
+  talent,
+  treeType,
+  canAllocate,
+  isAllocating,
+  onAllocate,
+  onClose,
+}: TalentSheetProps) {
+  if (!talent || !treeType) return null;
+
+  const meta = TALENT_TREES[treeType];
+  const isMaxed = talent.currentPoints >= talent.maxPoints;
+
+  return (
+    <>
+      <div 
+        className="talent-sheet-overlay" 
+        onClick={onClose}
+        style={{
+          position: 'fixed',
+          inset: 0,
+          background: 'rgba(0, 0, 0, 0.7)',
+          zIndex: 99998,
+        }}
+      />
+      <div 
+        className="talent-sheet" 
+        data-tree={treeType}
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          position: 'fixed',
+          top: '50vh',
+          left: '50vw',
+          transform: 'translate(-50%, -50%)',
+          width: '90vw',
+          maxWidth: '320px',
+          background: '#1a1a2e',
+          border: `2px solid ${meta.color}`,
+          borderRadius: '16px',
+          padding: '1.25rem',
+          zIndex: 999999,
+          boxShadow: `0 0 30px ${meta.color}33`,
+        }}
+      >
+        <div className="sheet-handle" />
+        
+        <div className="sheet-header">
+          <div 
+            className="sheet-icon"
+            style={{ "--sheet-color": meta.color } as React.CSSProperties}
+          >
+            <TalentIcon talentId={talent.id} size={28} />
+          </div>
+          <div className="sheet-title">
+            <h3>{talent.name}</h3>
+            <span className="sheet-points">{talent.currentPoints} / {talent.maxPoints}</span>
+          </div>
+          <button className="sheet-close" onClick={onClose}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
+        </div>
+
+        <p className="sheet-description">{talent.description}</p>
+
+        {!talent.isUnlocked && (
+          <div className="sheet-locked">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+              <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+            </svg>
+            Requires previous talent
+          </div>
+        )}
+
+        {isMaxed && (
+          <div className="sheet-maxed">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="20 6 9 17 4 12" />
+            </svg>
+            Fully Unlocked
+          </div>
+        )}
+
+        {canAllocate && (
+          <button 
+            className="sheet-allocate-btn"
+            onClick={onAllocate}
+            disabled={isAllocating}
+            style={{ "--btn-color": meta.color } as React.CSSProperties}
+          >
+            {isAllocating ? "Allocating..." : "Allocate Point"}
+          </button>
+        )}
+      </div>
+    </>
+  );
+}
+
 // Tree column with connecting lines
 interface TreeColumnProps {
   treeType: TalentTreeType;
@@ -250,6 +375,7 @@ interface TreeColumnProps {
   availablePoints: number;
   isAllocating: boolean;
   onAllocate: (talentId: TalentId) => void;
+  onSelectTalent: (talent: TalentInfo, treeType: TalentTreeType) => void;
 }
 
 function TreeColumn({
@@ -258,6 +384,7 @@ function TreeColumn({
   availablePoints,
   isAllocating,
   onAllocate,
+  onSelectTalent,
 }: TreeColumnProps) {
   const meta = TALENT_TREES[treeType];
   const sortedTalents = [...talents].sort((a, b) => a.tier - b.tier);
@@ -318,6 +445,7 @@ function TreeColumn({
                 canAllocate={canAllocate}
                 isAllocating={isAllocating}
                 onAllocate={() => onAllocate(talent.id)}
+                onSelect={() => onSelectTalent(talent, treeType)}
               />
             );
           })}
@@ -336,6 +464,20 @@ export function TalentsPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [isAllocating, setIsAllocating] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  
+  // Mobile sheet state
+  const [selectedTalent, setSelectedTalent] = useState<TalentInfo | null>(null);
+  const [selectedTreeType, setSelectedTreeType] = useState<TalentTreeType | null>(null);
+
+  const handleSelectTalent = (talent: TalentInfo, treeType: TalentTreeType) => {
+    setSelectedTalent(talent);
+    setSelectedTreeType(treeType);
+  };
+
+  const handleCloseSheet = () => {
+    setSelectedTalent(null);
+    setSelectedTreeType(null);
+  };
 
   const fetchData = useCallback(async () => {
     if (!isAuthenticated) return;
@@ -368,6 +510,20 @@ export function TalentsPage() {
     try {
       const result = await allocateTalentPoint(talentId);
       setTalentTree(result.talentTree);
+      
+      // Notify level display to update points indicator
+      window.dispatchEvent(new CustomEvent("talentPointAllocated"));
+      
+      // Update selected talent if sheet is open
+      if (selectedTalent && selectedTreeType) {
+        const updatedTalents = selectedTreeType === "faucet" 
+          ? result.talentTree.faucetTree 
+          : result.talentTree.leverageTree;
+        const updatedTalent = updatedTalents.find(t => t.id === selectedTalent.id);
+        if (updatedTalent) {
+          setSelectedTalent(updatedTalent);
+        }
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to allocate point");
     } finally {
@@ -457,6 +613,7 @@ export function TalentsPage() {
                 availablePoints={talentTree.availablePoints}
                 isAllocating={isAllocating}
                 onAllocate={handleAllocate}
+                onSelectTalent={handleSelectTalent}
               />
               
               <div className="trees-divider" />
@@ -467,11 +624,25 @@ export function TalentsPage() {
                 availablePoints={talentTree.availablePoints}
                 isAllocating={isAllocating}
                 onAllocate={handleAllocate}
+                onSelectTalent={handleSelectTalent}
               />
             </div>
           </div>
 
-          {/* {bonuses && <BonusesDisplay bonuses={bonuses} />} */}
+          {/* Mobile Talent Sheet */}
+          <TalentSheet
+            talent={selectedTalent}
+            treeType={selectedTreeType}
+            canAllocate={
+              selectedTalent !== null &&
+              talentTree.availablePoints > 0 &&
+              selectedTalent.isUnlocked &&
+              selectedTalent.currentPoints < selectedTalent.maxPoints
+            }
+            isAllocating={isAllocating}
+            onAllocate={() => selectedTalent && handleAllocate(selectedTalent.id)}
+            onClose={handleCloseSheet}
+          />
         </div>
       )}
     </div>

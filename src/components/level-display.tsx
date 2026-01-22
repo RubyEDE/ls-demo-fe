@@ -32,7 +32,17 @@ export function LevelDisplay({ compact = false }: LevelDisplayProps) {
     fetchTalentPoints();
     // Refresh every 30 seconds to catch level ups
     const interval = setInterval(fetchTalentPoints, 30000);
-    return () => clearInterval(interval);
+    
+    // Listen for talent point allocation events
+    const handleTalentAllocated = () => {
+      fetchTalentPoints();
+    };
+    window.addEventListener("talentPointAllocated", handleTalentAllocated);
+    
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener("talentPointAllocated", handleTalentAllocated);
+    };
   }, [fetchTalentPoints]);
 
   // Don't show if not authenticated or no level info

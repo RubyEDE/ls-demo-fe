@@ -1,7 +1,8 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useCallback } from "react";
 import { useTrading } from "../../hooks/use-trading";
 import { useAuth } from "../../context/auth-context";
 import { useBalance } from "../../context/balance-context";
+import { getTalentBonuses } from "../../utils/talents-api";
 import type { Market } from "../../types/clob";
 import "./order-form.css";
 
@@ -27,8 +28,29 @@ export function OrderForm({ market, onOrderPlaced, selectedPrice }: OrderFormPro
   });
   const [showLeveragePopup, setShowLeveragePopup] = useState(false);
   const [tempLeverage, setTempLeverage] = useState(leverage);
+  const [leverageBonus, setLeverageBonus] = useState(0);
 
-  const maxLeverage = market?.maxLeverage || 20;
+  // Fetch talent bonuses for leverage
+  const fetchLeverageBonus = useCallback(async () => {
+    if (!isAuthenticated) {
+      setLeverageBonus(0);
+      return;
+    }
+    try {
+      const bonuses = await getTalentBonuses();
+      setLeverageBonus(bonuses.leverage.maxLeverageBonus);
+    } catch {
+      // Silently fail - talents might not be available
+    }
+  }, [isAuthenticated]);
+
+  useEffect(() => {
+    fetchLeverageBonus();
+  }, [fetchLeverageBonus]);
+
+  const baseMaxLeverage = market?.maxLeverage || 20;
+  const maxLeverage = baseMaxLeverage + leverageBonus;
+  const hasLeverageBonus = leverageBonus > 0;
 
   // Clamp leverage to market's max if it exceeds
   useEffect(() => {
@@ -186,10 +208,13 @@ export function OrderForm({ market, onOrderPlaced, selectedPrice }: OrderFormPro
 
         {/* Leverage Button */}
         <div className="input-group">
-          <label>Leverage</label>
+          <label>
+            Leverage
+            {hasLeverageBonus && <span className="label-bonus">+{leverageBonus} max</span>}
+          </label>
           <button
             type="button"
-            className="leverage-btn"
+            className={`leverage-btn ${hasLeverageBonus ? "boosted" : ""}`}
             onClick={handleOpenLeveragePopup}
           >
             <span className="leverage-value">{leverage}x</span>
@@ -203,7 +228,9 @@ export function OrderForm({ market, onOrderPlaced, selectedPrice }: OrderFormPro
             <div className="leverage-popup" onClick={(e) => e.stopPropagation()}>
               <div className="leverage-popup-header">
                 <h4>Adjust Leverage</h4>
-                <span className="leverage-popup-value">{tempLeverage}x</span>
+                <span className={`leverage-popup-value ${hasLeverageBonus ? "boosted" : ""}`}>
+                  {tempLeverage}x
+                </span>
               </div>
               <div className="leverage-slider-container">
                 <input
@@ -213,11 +240,14 @@ export function OrderForm({ market, onOrderPlaced, selectedPrice }: OrderFormPro
                   step={1}
                   value={tempLeverage}
                   onChange={(e) => setTempLeverage(Number(e.target.value))}
-                  className="leverage-slider"
+                  className={`leverage-slider ${hasLeverageBonus ? "boosted" : ""}`}
                 />
                 <div className="leverage-slider-labels">
                   <span>1x</span>
-                  <span>{maxLeverage}x</span>
+                  <span className={hasLeverageBonus ? "boosted" : ""}>
+                    {maxLeverage}x
+                    {hasLeverageBonus && <span className="bonus-tag">+{leverageBonus}</span>}
+                  </span>
                 </div>
               </div>
               <div className="leverage-popup-actions">
