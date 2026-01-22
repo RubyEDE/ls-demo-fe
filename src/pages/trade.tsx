@@ -72,14 +72,14 @@ export function TradePage() {
   useUserEvents({
     onOrderCreated: useCallback(
       (order: OrderEvent) => {
-        addNotification(`Order created: ${order.side.toUpperCase()} ${order.quantity} ${order.symbol}`);
+        addNotification(`Order created: ${order.side.toUpperCase()} ${Number(order.quantity.toFixed(2))} ${order.symbol}`);
         setOrdersKey((k) => k + 1);
       },
       [addNotification]
     ),
     onOrderFilled: useCallback(
       (order: OrderEvent) => {
-        addNotification(`Order filled: ${order.side.toUpperCase()} ${order.filledQuantity} ${order.symbol} @ ${order.price}`);
+        addNotification(`Order filled: ${order.side.toUpperCase()} ${Number(order.filledQuantity.toFixed(2))} ${order.symbol} @ ${Number(order.price.toFixed(2))}`);
         setOrdersKey((k) => k + 1);
       },
       [addNotification]
@@ -99,7 +99,7 @@ export function TradePage() {
     ),
     onPositionOpened: useCallback(
       (position: PositionEvent) => {
-        addNotification(`Position opened: ${position.side.toUpperCase()} ${position.size} ${position.marketSymbol}`);
+        addNotification(`Position opened: ${position.side.toUpperCase()} ${Number(position.size.toFixed(2))} ${position.marketSymbol}`);
       },
       [addNotification]
     ),

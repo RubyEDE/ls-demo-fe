@@ -14,6 +14,154 @@ import type {
 import { TALENT_TREES } from "../types/talents";
 import "./talents.css";
 
+// Electric lines background effect
+function ElectricLinesCanvas() {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    const resizeCanvas = () => {
+      canvas.width = canvas.offsetWidth * window.devicePixelRatio;
+      canvas.height = canvas.offsetHeight * window.devicePixelRatio;
+      ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+    };
+    resizeCanvas();
+    window.addEventListener("resize", resizeCanvas);
+
+    interface ElectricLine {
+      points: { x: number; y: number }[];
+      opacity: number;
+      life: number;
+      maxLife: number;
+      color: string;
+      width: number;
+    }
+
+    const lines: ElectricLine[] = [];
+    const colors = ["rgba(0, 212, 170, ", "rgba(245, 166, 35, "];
+
+    const createLine = (): ElectricLine => {
+      // Start from edges for more "running across" feel
+      const edge = Math.floor(Math.random() * 4);
+      let startX: number, startY: number, direction: number;
+      
+      switch (edge) {
+        case 0: // top
+          startX = Math.random() * canvas.offsetWidth;
+          startY = 0;
+          direction = Math.PI / 2 + (Math.random() - 0.5) * 0.8;
+          break;
+        case 1: // right
+          startX = canvas.offsetWidth;
+          startY = Math.random() * canvas.offsetHeight;
+          direction = Math.PI + (Math.random() - 0.5) * 0.8;
+          break;
+        case 2: // bottom
+          startX = Math.random() * canvas.offsetWidth;
+          startY = canvas.offsetHeight;
+          direction = -Math.PI / 2 + (Math.random() - 0.5) * 0.8;
+          break;
+        default: // left
+          startX = 0;
+          startY = Math.random() * canvas.offsetHeight;
+          direction = (Math.random() - 0.5) * 0.8;
+          break;
+      }
+      
+      const points: { x: number; y: number }[] = [{ x: startX, y: startY }];
+      
+      // Generate longer jagged path
+      const segments = 8 + Math.floor(Math.random() * 8);
+      let x = startX;
+      let y = startY;
+      
+      for (let i = 0; i < segments; i++) {
+        const length = 30 + Math.random() * 60;
+        const angle = direction + (Math.random() - 0.5) * 0.8;
+        x += Math.cos(angle) * length;
+        y += Math.sin(angle) * length;
+        points.push({ x, y });
+      }
+
+      return {
+        points,
+        opacity: 0,
+        life: 0,
+        maxLife: 40 + Math.random() * 40,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        width: 0.5 + Math.random() * 0.8,
+      };
+    };
+
+    let animationId: number;
+    let frameCount = 0;
+
+    const animate = () => {
+      ctx.clearRect(0, 0, canvas.offsetWidth, canvas.offsetHeight);
+      frameCount++;
+
+      // Spawn new lines more frequently
+      if (frameCount % 15 === 0 && lines.length < 8) {
+        lines.push(createLine());
+      }
+
+      for (let i = lines.length - 1; i >= 0; i--) {
+        const line = lines[i];
+        line.life++;
+
+        // Fade in then out
+        const progress = line.life / line.maxLife;
+        if (progress < 0.1) {
+          line.opacity = progress * 10 * 0.18;
+        } else if (progress > 0.7) {
+          line.opacity = (1 - progress) / 0.3 * 0.18;
+        } else {
+          line.opacity = 0.18;
+        }
+
+        if (line.life >= line.maxLife) {
+          lines.splice(i, 1);
+          continue;
+        }
+
+        // Draw the line
+        ctx.beginPath();
+        ctx.strokeStyle = line.color + line.opacity + ")";
+        ctx.lineWidth = line.width;
+        ctx.lineCap = "round";
+        ctx.lineJoin = "round";
+
+        ctx.moveTo(line.points[0].x, line.points[0].y);
+        for (let j = 1; j < line.points.length; j++) {
+          ctx.lineTo(line.points[j].x, line.points[j].y);
+        }
+        ctx.stroke();
+
+        // Draw glow
+        ctx.strokeStyle = line.color + (line.opacity * 0.3) + ")";
+        ctx.lineWidth = line.width * 3;
+        ctx.stroke();
+      }
+
+      animationId = requestAnimationFrame(animate);
+    };
+
+    animationId = requestAnimationFrame(animate);
+
+    return () => {
+      cancelAnimationFrame(animationId);
+      window.removeEventListener("resize", resizeCanvas);
+    };
+  }, []);
+
+  return <canvas ref={canvasRef} className="electric-lines-canvas" />;
+}
+
 // Particle system for ambient effects
 function ParticleCanvas() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -602,9 +750,23 @@ export function TalentsPage() {
       {/* Main Content */}
       {isAuthenticated && talentTree && (
         <div className="talents-content">
+          {/* Background decorations */}
+          <div className="talents-bg-decor">
+            <div className="bg-orb bg-orb-1" />
+            <div className="bg-orb bg-orb-2" />
+            <div className="bg-grid" />
+            <ElectricLinesCanvas />
+          </div>
+
           {/* Combined Tree Container */}
           <div className="talent-trees-container">
             <ParticleCanvas />
+            
+            {/* Corner decorations */}
+            <div className="corner-decor corner-tl" />
+            <div className="corner-decor corner-tr" />
+            <div className="corner-decor corner-bl" />
+            <div className="corner-decor corner-br" />
             
             <div className="talent-trees">
               <TreeColumn
