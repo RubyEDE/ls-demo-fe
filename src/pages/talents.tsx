@@ -14,7 +14,7 @@ import type {
 import { TALENT_TREES } from "../types/talents";
 import "./talents.css";
 
-// Electric lines background effect
+// Mystical flowing lines background effect
 function ElectricLinesCanvas() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -33,68 +33,80 @@ function ElectricLinesCanvas() {
     resizeCanvas();
     window.addEventListener("resize", resizeCanvas);
 
-    interface ElectricLine {
+    interface FlowingLine {
       points: { x: number; y: number }[];
-      opacity: number;
-      life: number;
-      maxLife: number;
+      drawProgress: number; // 0 to 1, how much of the line is drawn
+      fadeProgress: number; // 0 to 1, for fading out
       color: string;
       width: number;
+      speed: number;
+      totalLength: number;
     }
 
-    const lines: ElectricLine[] = [];
+    const lines: FlowingLine[] = [];
     const colors = ["rgba(0, 212, 170, ", "rgba(245, 166, 35, "];
 
-    const createLine = (): ElectricLine => {
-      // Start from edges for more "running across" feel
+    const createLine = (): FlowingLine => {
+      // Start from edges
       const edge = Math.floor(Math.random() * 4);
       let startX: number, startY: number, direction: number;
       
       switch (edge) {
         case 0: // top
           startX = Math.random() * canvas.offsetWidth;
-          startY = 0;
-          direction = Math.PI / 2 + (Math.random() - 0.5) * 0.8;
+          startY = -10;
+          direction = Math.PI / 2 + (Math.random() - 0.5) * 0.6;
           break;
         case 1: // right
-          startX = canvas.offsetWidth;
+          startX = canvas.offsetWidth + 10;
           startY = Math.random() * canvas.offsetHeight;
-          direction = Math.PI + (Math.random() - 0.5) * 0.8;
+          direction = Math.PI + (Math.random() - 0.5) * 0.6;
           break;
         case 2: // bottom
           startX = Math.random() * canvas.offsetWidth;
-          startY = canvas.offsetHeight;
-          direction = -Math.PI / 2 + (Math.random() - 0.5) * 0.8;
+          startY = canvas.offsetHeight + 10;
+          direction = -Math.PI / 2 + (Math.random() - 0.5) * 0.6;
           break;
         default: // left
-          startX = 0;
+          startX = -10;
           startY = Math.random() * canvas.offsetHeight;
-          direction = (Math.random() - 0.5) * 0.8;
+          direction = (Math.random() - 0.5) * 0.6;
           break;
       }
       
       const points: { x: number; y: number }[] = [{ x: startX, y: startY }];
       
-      // Generate longer jagged path
-      const segments = 8 + Math.floor(Math.random() * 8);
+      // Generate smooth flowing path using curves
+      const segments = 12 + Math.floor(Math.random() * 10);
       let x = startX;
       let y = startY;
+      let currentDirection = direction;
       
       for (let i = 0; i < segments; i++) {
-        const length = 30 + Math.random() * 60;
-        const angle = direction + (Math.random() - 0.5) * 0.8;
-        x += Math.cos(angle) * length;
-        y += Math.sin(angle) * length;
+        // Gradual direction change for smoother curves
+        currentDirection += (Math.random() - 0.5) * 0.4;
+        const length = 25 + Math.random() * 35;
+        x += Math.cos(currentDirection) * length;
+        y += Math.sin(currentDirection) * length;
         points.push({ x, y });
+      }
+
+      // Calculate total path length for progress tracking
+      let totalLength = 0;
+      for (let i = 1; i < points.length; i++) {
+        const dx = points[i].x - points[i - 1].x;
+        const dy = points[i].y - points[i - 1].y;
+        totalLength += Math.sqrt(dx * dx + dy * dy);
       }
 
       return {
         points,
-        opacity: 0,
-        life: 0,
-        maxLife: 40 + Math.random() * 40,
+        drawProgress: 0,
+        fadeProgress: 0,
         color: colors[Math.floor(Math.random() * colors.length)],
-        width: 0.5 + Math.random() * 0.8,
+        width: 0.8 + Math.random() * 0.6,
+        speed: 0.008 + Math.random() * 0.006,
+        totalLength,
       };
     };
 
@@ -105,47 +117,105 @@ function ElectricLinesCanvas() {
       ctx.clearRect(0, 0, canvas.offsetWidth, canvas.offsetHeight);
       frameCount++;
 
-      // Spawn new lines more frequently
-      if (frameCount % 15 === 0 && lines.length < 8) {
+      // Spawn new lines
+      if (frameCount % 25 === 0 && lines.length < 6) {
         lines.push(createLine());
       }
 
       for (let i = lines.length - 1; i >= 0; i--) {
         const line = lines[i];
-        line.life++;
-
-        // Fade in then out
-        const progress = line.life / line.maxLife;
-        if (progress < 0.1) {
-          line.opacity = progress * 10 * 0.18;
-        } else if (progress > 0.7) {
-          line.opacity = (1 - progress) / 0.3 * 0.18;
+        
+        // Progress the drawing
+        if (line.drawProgress < 1) {
+          line.drawProgress += line.speed;
         } else {
-          line.opacity = 0.18;
+          // Start fading once fully drawn
+          line.fadeProgress += 0.008;
         }
 
-        if (line.life >= line.maxLife) {
+        if (line.fadeProgress >= 1) {
           lines.splice(i, 1);
           continue;
         }
 
-        // Draw the line
+        // Calculate opacity based on fade progress
+        const baseOpacity = 0.15;
+        const opacity = baseOpacity * (1 - line.fadeProgress);
+
+        // Draw the line progressively with smooth curves
+        const targetLength = line.drawProgress * line.totalLength;
+        let drawnLength = 0;
+        
         ctx.beginPath();
-        ctx.strokeStyle = line.color + line.opacity + ")";
+        ctx.strokeStyle = line.color + opacity + ")";
         ctx.lineWidth = line.width;
         ctx.lineCap = "round";
         ctx.lineJoin = "round";
 
         ctx.moveTo(line.points[0].x, line.points[0].y);
+        
         for (let j = 1; j < line.points.length; j++) {
-          ctx.lineTo(line.points[j].x, line.points[j].y);
+          const prev = line.points[j - 1];
+          const curr = line.points[j];
+          const segmentLength = Math.sqrt(
+            Math.pow(curr.x - prev.x, 2) + Math.pow(curr.y - prev.y, 2)
+          );
+          
+          if (drawnLength + segmentLength <= targetLength) {
+            // Draw full segment with quadratic curve for smoothness
+            if (j < line.points.length - 1) {
+              const next = line.points[j + 1];
+              const midX = (curr.x + next.x) / 2;
+              const midY = (curr.y + next.y) / 2;
+              ctx.quadraticCurveTo(curr.x, curr.y, midX, midY);
+            } else {
+              ctx.lineTo(curr.x, curr.y);
+            }
+            drawnLength += segmentLength;
+          } else {
+            // Draw partial segment
+            const remaining = targetLength - drawnLength;
+            const ratio = remaining / segmentLength;
+            const partialX = prev.x + (curr.x - prev.x) * ratio;
+            const partialY = prev.y + (curr.y - prev.y) * ratio;
+            ctx.lineTo(partialX, partialY);
+            break;
+          }
         }
+        
         ctx.stroke();
 
-        // Draw glow
-        ctx.strokeStyle = line.color + (line.opacity * 0.3) + ")";
-        ctx.lineWidth = line.width * 3;
+        // Draw soft glow
+        ctx.strokeStyle = line.color + (opacity * 0.25) + ")";
+        ctx.lineWidth = line.width * 4;
         ctx.stroke();
+        
+        // Draw brighter head/tip
+        if (line.drawProgress < 1) {
+          const headProgress = Math.min(line.drawProgress * line.totalLength, line.totalLength);
+          let accum = 0;
+          for (let j = 1; j < line.points.length; j++) {
+            const prev = line.points[j - 1];
+            const curr = line.points[j];
+            const segLen = Math.sqrt(Math.pow(curr.x - prev.x, 2) + Math.pow(curr.y - prev.y, 2));
+            if (accum + segLen >= headProgress) {
+              const ratio = (headProgress - accum) / segLen;
+              const headX = prev.x + (curr.x - prev.x) * ratio;
+              const headY = prev.y + (curr.y - prev.y) * ratio;
+              
+              // Glowing head
+              const gradient = ctx.createRadialGradient(headX, headY, 0, headX, headY, 8);
+              gradient.addColorStop(0, line.color + "0.4)");
+              gradient.addColorStop(1, line.color + "0)");
+              ctx.fillStyle = gradient;
+              ctx.beginPath();
+              ctx.arc(headX, headY, 8, 0, Math.PI * 2);
+              ctx.fill();
+              break;
+            }
+            accum += segLen;
+          }
+        }
       }
 
       animationId = requestAnimationFrame(animate);
