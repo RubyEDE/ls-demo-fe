@@ -356,6 +356,8 @@
   gap: 16px;
   flex-wrap: wrap;
   animation: fadeSlideUp 0.4s ease-out 0.1s both;
+  position: relative;
+  z-index: 10;
 }
 
 .search-wrapper {
@@ -441,6 +443,14 @@
 .sort-dropdown label {
   color: rgba(255, 255, 255, 0.5);
   font-size: 0.875rem;
+}
+
+.custom-select-trigger .sort-icon-mobile {
+  display: none;
+  width: 18px;
+  height: 18px;
+  color: rgba(255, 255, 255, 0.6);
+  flex-shrink: 0;
 }
 
 /* Custom Select */
@@ -874,30 +884,46 @@
   }
 
   .header-content {
-    flex-direction: column;
-    align-items: flex-start;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  .header-title-section {
+    gap: 12px;
   }
 
   .achievements-header h1 {
-    font-size: 1.75rem;
+    font-size: 1.25rem;
+  }
+
+  .header-subtitle {
+    display: none;
   }
 
   .trophy-icon {
-    width: 48px;
-    height: 48px;
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
   }
 
   .trophy-icon svg {
-    width: 28px;
-    height: 28px;
+    width: 22px;
+    height: 22px;
   }
 
   .points-display {
-    align-items: flex-start;
+    align-items: flex-end;
+    flex-shrink: 0;
   }
 
   .points-display .points-number {
-    font-size: 2.25rem;
+    font-size: 1.5rem;
+  }
+
+  .points-display .points-label {
+    font-size: 0.7rem;
   }
 
   .stats-breakdown {
@@ -912,23 +938,68 @@
   .achievements-filters {
     flex-direction: column;
     align-items: stretch;
+    gap: 12px;
   }
 
   .search-wrapper {
     max-width: none;
   }
 
+  .search-input {
+    font-size: 16px;
+  }
+
   .filter-group {
-    flex-direction: column;
-    align-items: stretch;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
   }
 
   .filter-tabs {
-    justify-content: center;
+    flex: 1;
+    justify-content: flex-start;
+  }
+
+  .filter-tab {
+    padding: 8px 14px;
+    font-size: 0.8rem;
   }
 
   .sort-dropdown {
-    justify-content: center;
+    gap: 0;
+  }
+
+  .sort-dropdown label {
+    display: none;
+  }
+
+  .custom-select {
+    min-width: auto;
+  }
+
+  .custom-select-trigger {
+    padding: 10px;
+    gap: 0;
+  }
+
+  .custom-select-trigger span {
+    display: none;
+  }
+
+  .custom-select-trigger .sort-icon-mobile {
+    display: block;
+  }
+
+  .custom-select-trigger .custom-select-arrow {
+    display: none;
+  }
+
+  .custom-select-dropdown {
+    left: auto;
+    right: 0;
+    min-width: 160px;
+    z-index: 1000;
   }
 
   .achievements-grid {

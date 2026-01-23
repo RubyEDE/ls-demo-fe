@@ -299,10 +299,9 @@ export function FaucetPage() {
         <WaterDroplets />
         <div className="hero-glow" />
         <div className="hero-content">
-          <div className="hero-badge">Testnet Faucet</div>
-          <h1 className="hero-title">Get USDC</h1>
+          <h1 className="hero-title">Longsword Faucet</h1>
           <p className="hero-subtitle">
-            Claim every day to start trading on our testnet
+            Claim daily to start trading on testnet
           </p>
         </div>
       </div>

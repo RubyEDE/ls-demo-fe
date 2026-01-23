@@ -62,8 +62,8 @@ export function Layout() {
     <div className="app-container">
       <header className={`header ${isTradePage ? "header-terminal" : ""}`}>
         <div className="header-left">
-          <NavLink to="/" className="title">
-            Longsword
+          <NavLink to="/" className="logo-link">
+            <img src="/logo.svg" alt="Longsword" className="logo" />
           </NavLink>
           <nav className="nav nav-desktop">
             <NavLink

@@ -35,29 +35,15 @@
   gap: 0.75rem;
 }
 
-.title {
-  font-size: 1.35rem;
-  font-weight: 700;
-  background: linear-gradient(135deg, #ffffff 0%, var(--accent-cyan) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  margin: 0;
-  letter-spacing: -0.03em;
-  text-decoration: none;
+.logo-link {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  text-decoration: none;
 }
 
-.title::before {
-  content: "";
-  width: 8px;
-  height: 8px;
-  background: var(--accent-cyan);
-  border-radius: 2px;
-  transform: rotate(45deg);
-  box-shadow: 0 0 12px rgba(0, 212, 170, 0.5);
+.logo {
+  height: 68px;
+  width: auto;
 }
 
 .nav {
@@ -259,13 +245,8 @@
     gap: 1rem;
   }
 
-  .title {
-    font-size: 1.15rem;
-  }
-
-  .title::before {
-    width: 6px;
-    height: 6px;
+  .logo {
+    height: 60px;
   }
 }
 
@@ -280,7 +261,7 @@
     border-left: none;
   }
 
-  .title {
-    font-size: 1rem;
+  .logo {
+    height: 60px;
   }
 }

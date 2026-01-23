@@ -204,7 +204,7 @@
   /* 2 columns only - hide Total */
   .order-book-columns {
     grid-template-columns: 1fr 1fr;
-    font-size: 0.55rem;
+    font-size: 0.65rem;
     padding: 0.2rem 0;
   }
 
