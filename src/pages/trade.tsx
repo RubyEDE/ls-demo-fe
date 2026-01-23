@@ -79,7 +79,7 @@ export function TradePage() {
     ),
     onOrderFilled: useCallback(
       (order: OrderEvent) => {
-        addNotification(`Order filled: ${order.side.toUpperCase()} ${Number(order.filledQuantity.toFixed(2))} ${order.symbol} @ ${Number(order.price.toFixed(2))}`);
+        addNotification(`Order filled: ${order.side.toUpperCase()} ${Number(order.filledQuantity.toFixed(2))} ${order.symbol} @ ${Number(order.price?.toFixed(2) ?? 0)}`);
         setOrdersKey((k) => k + 1);
       },
       [addNotification]

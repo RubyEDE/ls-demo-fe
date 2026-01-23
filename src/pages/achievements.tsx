@@ -30,12 +30,6 @@ function getIconDisplay(iconId: string): string {
   return ICON_MAP[iconId] || ICON_MAP.default;
 }
 
-// Format category name for display
-function formatCategoryName(category: string): string {
-  return category.charAt(0).toUpperCase() + category.slice(1).replace(/_/g, " ");
-}
-
-
 interface CustomSelectProps {
   value: SortType;
   onChange: (value: SortType) => void;

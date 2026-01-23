@@ -190,8 +190,8 @@
   background-clip: text;
 }
 
-.available-points-badge {
-  animation: fadeInUp 0.6s ease-out 0.15s backwards;
+.available-points-badge.visible {
+  animation: fadeInUp 0.6s ease-out 0.15s backwards, points-glow 2s ease-in-out 0.75s infinite;
 }
 
 .available-points-badge {
@@ -202,7 +202,29 @@
   background: var(--color-success-dim);
   border: 1px solid rgba(0, 212, 170, 0.3);
   border-radius: 100px;
+  transition: 
+    opacity 0.4s ease,
+    transform 0.4s ease,
+    max-height 0.4s ease,
+    padding 0.4s ease,
+    margin 0.4s ease;
+  max-height: 50px;
+  overflow: hidden;
+}
+
+.available-points-badge.visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
   animation: points-glow 2s ease-in-out infinite;
+}
+
+.available-points-badge.hidden {
+  opacity: 0;
+  transform: translateY(-10px) scale(0.95);
+  max-height: 0;
+  padding: 0 1rem;
+  margin: 0;
+  pointer-events: none;
 }
 
 @keyframes points-glow {
@@ -215,12 +237,22 @@
   font-weight: 700;
   font-family: 'JetBrains Mono', monospace;
   color: var(--color-success);
+  transition: opacity 0.3s ease;
+}
+
+.available-points-badge.hidden .points-number {
+  opacity: 0;
 }
 
 .available-points-badge .points-label {
   font-size: 0.75rem;
   color: var(--color-success);
   opacity: 0.8;
+  transition: opacity 0.3s ease;
+}
+
+.available-points-badge.hidden .points-label {
+  opacity: 0;
 }
 
 /* XP Section */

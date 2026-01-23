@@ -5,6 +5,38 @@
   position: relative;
   padding: 0 24px 48px;
   overflow-x: hidden;
+  animation: pageIn 0.4s ease-out;
+}
+
+@keyframes pageIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeSlideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* ===== BACKGROUND EFFECTS ===== */
@@ -191,6 +223,7 @@
   padding: 32px 0;
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
   overflow: hidden;
+  animation: fadeSlideDown 0.5s ease-out;
 }
 
 .header-content {
@@ -322,6 +355,7 @@
   align-items: center;
   gap: 16px;
   flex-wrap: wrap;
+  animation: fadeSlideUp 0.4s ease-out 0.1s both;
 }
 
 .search-wrapper {
@@ -532,6 +566,7 @@
   grid-template-columns: repeat(2, 1fr);
   grid-auto-rows: 140px;
   gap: 20px;
+  animation: fadeSlideUp 0.5s ease-out 0.15s both;
 }
 
 /* ===== BASE CARD STYLES (shared between achievement and progression) ===== */
@@ -969,6 +1004,7 @@
   min-height: 400px;
   gap: 16px;
   color: var(--text-secondary, #a0a0b0);
+  animation: pageIn 0.3s ease-out;
 }
 
 .loading-spinner {

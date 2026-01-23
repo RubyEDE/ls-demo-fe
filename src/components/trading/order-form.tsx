@@ -21,7 +21,7 @@ export function OrderForm({ market, onOrderPlaced, selectedPrice }: OrderFormPro
   const [orderType, setOrderType] = useState<"limit" | "market">("limit");
   const [price, setPrice] = useState("");
   const [quantity, setQuantity] = useState("");
-  const [postOnly, setPostOnly] = useState(false);
+  const [postOnly, _setPostOnly] = useState(false);
   const [leverage, setLeverage] = useState(() => {
     const saved = localStorage.getItem("preferred_leverage");
     return saved ? parseInt(saved, 10) : 1;
@@ -123,12 +123,6 @@ export function OrderForm({ market, onOrderPlaced, selectedPrice }: OrderFormPro
       // Refresh balance to reflect locked funds
       refreshBalance();
     }
-  };
-
-  const setQuickPrice = (type: "bid" | "ask") => {
-    if (!market) return;
-    const p = type === "bid" ? market.bestBid : market.bestAsk;
-    if (p) setPrice(p.toFixed(2));
   };
 
   if (!market) {

@@ -1,9 +1,55 @@
 .trade-terminal {
   width: 100%;
   height: calc(100vh - 60px);
+  height: calc(100dvh - 60px);
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  animation: fadeIn 0.4s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Staggered fade-in for child elements */
+.terminal-top-bar {
+  animation: fadeSlideDown 0.4s ease-out;
+}
+
+.terminal-main {
+  animation: fadeSlideUp 0.5s ease-out 0.1s both;
+}
+
+.terminal-sidebar {
+  animation: fadeSlideUp 0.5s ease-out 0.15s both;
+}
+
+@keyframes fadeSlideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* Floating notifications */
@@ -203,10 +249,21 @@
 }
 
 @media (max-width: 600px) {
+  /* Prevent body scroll on mobile when trade page is active */
+  html:has(.trade-terminal),
+  body:has(.trade-terminal) {
+    overflow: hidden;
+    height: 100%;
+    height: 100dvh;
+    position: fixed;
+    width: 100%;
+  }
+
   .trade-terminal {
     height: calc(100vh - 60px);
+    height: calc(100dvh - 60px);
     overflow: hidden;
-    padding-bottom: 0;
+    position: relative;
   }
 
   .terminal-top-bar {
@@ -236,6 +293,7 @@
     flex: 1;
     min-height: 0;
     overflow: hidden;
+    animation: fadeSlideUp 0.5s ease-out 0.1s both;
   }
 
   .mobile-markets-view .candlestick-chart-container {
@@ -246,7 +304,7 @@
   }
 
   .mobile-markets-view .trading-tabs-container {
-    height: 180px;
+    height: 140px;
     flex-shrink: 0;
     border: none;
     border-radius: 0;
@@ -260,6 +318,7 @@
     flex: 1;
     min-height: 0;
     overflow: hidden;
+    animation: fadeSlideUp 0.5s ease-out 0.1s both;
   }
 
   .mobile-trade-top {
@@ -286,7 +345,7 @@
   }
 
   .mobile-trade-view .trading-tabs-container {
-    height: 180px;
+    height: 140px;
     flex-shrink: 0;
     border: none;
     border-radius: 0;
@@ -298,10 +357,12 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 48px;
+    height: calc(48px + env(safe-area-inset-bottom, 0px));
+    padding-bottom: env(safe-area-inset-bottom, 0px);
     flex-shrink: 0;
     background: #131722;
     border-top: 1px solid #1e222d;
+    animation: fadeSlideUp 0.4s ease-out 0.2s both;
   }
 
   .mobile-nav-container {

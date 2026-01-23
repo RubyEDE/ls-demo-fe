@@ -7,6 +7,7 @@
   padding: 2rem;
   color: var(--text-secondary);
   min-height: 300px;
+  animation: fadeIn 0.3s ease-out;
 }
 
 .faucet-loading p {
@@ -35,6 +36,49 @@
   min-height: calc(100vh - 60px);
   display: flex;
   flex-direction: column;
+  animation: fadeIn 0.4s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeSlideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 /* Hero Section */
@@ -45,6 +89,7 @@
   background: linear-gradient(180deg, rgba(0, 212, 170, 0.03) 0%, transparent 100%);
   border-bottom: 1px solid var(--border-color);
   overflow: hidden;
+  animation: fadeSlideDown 0.5s ease-out;
 }
 
 .hero-glow {
@@ -115,6 +160,7 @@
   max-width: 1000px;
   margin: 0 auto;
   width: 100%;
+  animation: fadeSlideUp 0.5s ease-out 0.1s both;
 }
 
 @media (max-width: 900px) {
@@ -137,6 +183,7 @@
   border-radius: 16px;
   padding: 1.5rem;
   text-align: center;
+  animation: scaleIn 0.4s ease-out 0.15s both;
 }
 
 .claim-amount-display {
@@ -264,6 +311,7 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 0.75rem;
+  animation: fadeSlideUp 0.4s ease-out 0.2s both;
 }
 
 .stat-card {
@@ -381,6 +429,7 @@
   padding: 1.25rem;
   display: flex;
   flex-direction: column;
+  animation: fadeSlideUp 0.5s ease-out 0.2s both;
 }
 
 .history-header {

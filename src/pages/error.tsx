@@ -5,11 +5,18 @@ export function ErrorPage() {
   const error = useRouteError();
   const navigate = useNavigate();
 
-  const is404 = isRouteErrorResponse(error) && error.status === 404;
-  const statusCode = isRouteErrorResponse(error) ? error.status : 500;
-  const statusText = isRouteErrorResponse(error) 
-    ? error.statusText 
-    : "Something went wrong";
+  // Extract error details with proper type narrowing
+  let is404: boolean = false;
+  let statusCode: number = 500;
+  let statusText: string = "Something went wrong";
+  
+  if (isRouteErrorResponse(error)) {
+    is404 = error.status === 404;
+    statusCode = error.status;
+    statusText = error.statusText || "Error";
+  }
+  
+  const title: string = is404 ? "Page Not Found" : statusText;
 
   return (
     <div className="error-page">
@@ -46,7 +53,7 @@ export function ErrorPage() {
 
         {/* Message */}
         <h1 className="error-title">
-          {is404 ? "Page Not Found" : statusText}
+          {title}
         </h1>
         <p className="error-description">
           {is404 
@@ -74,16 +81,11 @@ export function ErrorPage() {
         </div>
 
         {/* Debug Info (only in development) */}
-        {import.meta.env.DEV && error && (
+        {import.meta.env.DEV && error instanceof Error && (
           <details className="error-details">
             <summary>Technical Details</summary>
             <pre>
-              {isRouteErrorResponse(error)
-                ? JSON.stringify({ status: error.status, statusText: error.statusText, data: error.data }, null, 2)
-                : error instanceof Error
-                  ? error.stack || error.message
-                  : String(error)
-              }
+              {error.stack || error.message}
             </pre>
           </details>
         )}

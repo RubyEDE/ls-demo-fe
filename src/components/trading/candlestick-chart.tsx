@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useRef, useState, useCallback, useLayoutEffect } from "react";
 import { createChart, CandlestickSeries, type IChartApi, type ISeriesApi } from "lightweight-charts";
 import { useCandles, useCandleData } from "../../context/candle-context";
 import type { CandleInterval } from "../../types/candles";
@@ -25,10 +25,12 @@ export function CandlestickChart({ symbol, height }: CandlestickChartProps) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const seriesRef = useRef<ISeriesApi<any> | null>(null);
   const [interval, setInterval] = useState<CandleInterval>("5m");
+  const [isChartReady, setIsChartReady] = useState(false);
   const prevCandleCountRef = useRef<number>(0);
   const initialLoadDoneRef = useRef<boolean>(false);
   const renderedIntervalRef = useRef<CandleInterval | null>(null);
   const defaultVisibleBarsRef = useRef<number>(100);
+  const mountedRef = useRef<boolean>(true);
 
   // Set the symbol in the candle context to subscribe to all intervals
   const { setSymbol } = useCandles();
@@ -41,103 +43,159 @@ export function CandlestickChart({ symbol, height }: CandlestickChartProps) {
   // Get candle data for the selected interval
   const { candles, currentCandle, isLoading, error } = useCandleData(interval);
 
-  // Initialize chart
+  // Track mount state
   useEffect(() => {
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+    };
+  }, []);
+
+  // Initialize chart - use useLayoutEffect to ensure DOM is ready
+  useLayoutEffect(() => {
     console.log("[Chart] Init effect, container:", !!chartContainerRef.current);
     if (!chartContainerRef.current) return;
 
-    const containerHeight = height || chartWrapperRef.current?.clientHeight || 400;
-    console.log("[Chart] Creating chart with width:", chartContainerRef.current.clientWidth);
-    const chart = createChart(chartContainerRef.current, {
-      width: chartContainerRef.current.clientWidth,
-      height: containerHeight,
-      layout: {
-        background: { color: "#131722" },
-        textColor: "#8b8f9a",
-      },
-      grid: {
-        vertLines: { color: "rgba(255, 255, 255, 0.06)" },
-        horzLines: { color: "rgba(255, 255, 255, 0.06)" },
-      },
-      crosshair: {
-        mode: 1,
-        vertLine: {
-          color: "rgba(0, 212, 170, 0.4)",
-          width: 1,
-          style: 2,
-        },
-        horzLine: {
-          color: "rgba(0, 212, 170, 0.4)",
-          width: 1,
-          style: 2,
-        },
-      },
-      timeScale: {
-        timeVisible: true,
-        secondsVisible: false,
-        borderColor: "rgba(255, 255, 255, 0.08)",
-        minBarSpacing: 2,
-        tickMarkFormatter: (time: number) => {
-          const date = new Date(time * 1000);
-          const hours = date.getHours().toString().padStart(2, "0");
-          const minutes = date.getMinutes().toString().padStart(2, "0");
-          return `${hours}:${minutes}`;
-        },
-      },
-      localization: {
-        timeFormatter: (time: number) => {
-          const date = new Date(time * 1000);
-          return date.toLocaleString([], {
-            month: "short",
-            day: "numeric",
-            hour: "2-digit",
-            minute: "2-digit",
-            hour12: false,
-          });
-        },
-      },
-      rightPriceScale: {
-        borderColor: "rgba(255, 255, 255, 0.08)",
-      },
-    });
+    // Reset state for fresh mount
+    setIsChartReady(false);
+    initialLoadDoneRef.current = false;
+    prevCandleCountRef.current = 0;
+    renderedIntervalRef.current = null;
 
-    const candlestickSeries = chart.addSeries(CandlestickSeries, {
-      upColor: "#22c55e",
-      downColor: "#ef4444",
-      borderUpColor: "#22c55e",
-      borderDownColor: "#ef4444",
-      wickUpColor: "#22c55e",
-      wickDownColor: "#ef4444",
-    });
+    // Use requestAnimationFrame to ensure the container is properly sized
+    // This fixes issues when navigating back to the page
+    const initChart = () => {
+      if (!chartContainerRef.current || !mountedRef.current) return;
 
-    chartRef.current = chart;
-    seriesRef.current = candlestickSeries;
-    console.log("[Chart] Chart and series created successfully");
+      const containerWidth = chartContainerRef.current.clientWidth;
+      const containerHeight = height || chartWrapperRef.current?.clientHeight || 400;
 
-    // Prevent zooming out beyond default visible bars
-    const timeScale = chart.timeScale();
-    timeScale.subscribeVisibleLogicalRangeChange((logicalRange) => {
-      if (!logicalRange) return;
-      const visibleBars = logicalRange.to - logicalRange.from;
-      const maxBars = defaultVisibleBarsRef.current;
-      
-      // If trying to zoom out beyond default, reset to max allowed
-      if (visibleBars > maxBars) {
-        timeScale.setVisibleLogicalRange({
-          from: logicalRange.to - maxBars,
-          to: logicalRange.to,
-        });
+      // If container has no width yet, wait for next frame
+      if (containerWidth === 0) {
+        console.log("[Chart] Container has no width, waiting...");
+        requestAnimationFrame(initChart);
+        return;
       }
-    });
+
+      console.log("[Chart] Creating chart with width:", containerWidth, "height:", containerHeight);
+      
+      // Clean up any existing chart first
+      if (chartRef.current) {
+        try {
+          chartRef.current.remove();
+        } catch {
+          // Ignore cleanup errors
+        }
+        chartRef.current = null;
+        seriesRef.current = null;
+      }
+
+      const chart = createChart(chartContainerRef.current, {
+        width: containerWidth,
+        height: containerHeight,
+        layout: {
+          background: { color: "#131722" },
+          textColor: "#8b8f9a",
+        },
+        grid: {
+          vertLines: { color: "rgba(255, 255, 255, 0.06)" },
+          horzLines: { color: "rgba(255, 255, 255, 0.06)" },
+        },
+        crosshair: {
+          mode: 1,
+          vertLine: {
+            color: "rgba(0, 212, 170, 0.4)",
+            width: 1,
+            style: 2,
+          },
+          horzLine: {
+            color: "rgba(0, 212, 170, 0.4)",
+            width: 1,
+            style: 2,
+          },
+        },
+        timeScale: {
+          timeVisible: true,
+          secondsVisible: false,
+          borderColor: "rgba(255, 255, 255, 0.08)",
+          minBarSpacing: 2,
+          tickMarkFormatter: (time: number) => {
+            const date = new Date(time * 1000);
+            const hours = date.getHours().toString().padStart(2, "0");
+            const minutes = date.getMinutes().toString().padStart(2, "0");
+            return `${hours}:${minutes}`;
+          },
+        },
+        localization: {
+          timeFormatter: (time: number) => {
+            const date = new Date(time * 1000);
+            return date.toLocaleString([], {
+              month: "short",
+              day: "numeric",
+              hour: "2-digit",
+              minute: "2-digit",
+              hour12: false,
+            });
+          },
+        },
+        rightPriceScale: {
+          borderColor: "rgba(255, 255, 255, 0.08)",
+        },
+      });
+
+      const candlestickSeries = chart.addSeries(CandlestickSeries, {
+        upColor: "#22c55e",
+        downColor: "#ef4444",
+        borderUpColor: "#22c55e",
+        borderDownColor: "#ef4444",
+        wickUpColor: "#22c55e",
+        wickDownColor: "#ef4444",
+      });
+
+      chartRef.current = chart;
+      seriesRef.current = candlestickSeries;
+      
+      // Mark chart as ready after a small delay to ensure it's fully initialized
+      requestAnimationFrame(() => {
+        if (mountedRef.current) {
+          setIsChartReady(true);
+          console.log("[Chart] Chart and series created successfully, marked as ready");
+        }
+      });
+
+      // Prevent zooming out beyond default visible bars
+      const timeScale = chart.timeScale();
+      timeScale.subscribeVisibleLogicalRangeChange((logicalRange) => {
+        if (!logicalRange) return;
+        const visibleBars = logicalRange.to - logicalRange.from;
+        const maxBars = defaultVisibleBarsRef.current;
+        
+        // If trying to zoom out beyond default, reset to max allowed
+        if (visibleBars > maxBars) {
+          timeScale.setVisibleLogicalRange({
+            from: logicalRange.to - maxBars,
+            to: logicalRange.to,
+          });
+        }
+      });
+    };
+
+    // Start chart initialization
+    requestAnimationFrame(initChart);
 
     // Handle resize with ResizeObserver
     const resizeObserver = new ResizeObserver(() => {
       if (chartContainerRef.current && chartRef.current && chartWrapperRef.current) {
+        const newWidth = chartContainerRef.current.clientWidth;
         const newHeight = height || chartWrapperRef.current.clientHeight;
-        chartRef.current.applyOptions({
-          width: chartContainerRef.current.clientWidth,
-          height: newHeight,
-        });
+        
+        // Only resize if we have valid dimensions
+        if (newWidth > 0 && newHeight > 0) {
+          chartRef.current.applyOptions({
+            width: newWidth,
+            height: newHeight,
+          });
+        }
       }
     });
 
@@ -147,9 +205,16 @@ export function CandlestickChart({ symbol, height }: CandlestickChartProps) {
 
     return () => {
       resizeObserver.disconnect();
-      chart.remove();
-      chartRef.current = null;
-      seriesRef.current = null;
+      if (chartRef.current) {
+        try {
+          chartRef.current.remove();
+        } catch {
+          // Ignore cleanup errors during unmount
+        }
+        chartRef.current = null;
+        seriesRef.current = null;
+      }
+      setIsChartReady(false);
     };
   }, [height]);
 
@@ -159,14 +224,18 @@ export function CandlestickChart({ symbol, height }: CandlestickChartProps) {
     prevCandleCountRef.current = 0;
     renderedIntervalRef.current = null;
     // Clear the series data to prevent "Cannot update oldest data" errors
-    if (seriesRef.current) {
-      seriesRef.current.setData([]);
+    if (seriesRef.current && isChartReady) {
+      try {
+        seriesRef.current.setData([]);
+      } catch {
+        // Ignore errors during reset
+      }
     }
-  }, [symbol, interval]);
+  }, [symbol, interval, isChartReady]);
 
-  // Update data
+  // Update data - only when chart is ready
   useEffect(() => {
-    if (!seriesRef.current) {
+    if (!seriesRef.current || !isChartReady) {
       return;
     }
     
@@ -249,11 +318,11 @@ export function CandlestickChart({ symbol, height }: CandlestickChartProps) {
       prevCandleCountRef.current = 0;
       renderedIntervalRef.current = null;
     }
-  }, [candles, interval, isLoading]);
+  }, [candles, interval, isLoading, isChartReady]);
 
   // Handle real-time current candle updates
   useEffect(() => {
-    if (!seriesRef.current || !currentCandle) return;
+    if (!seriesRef.current || !currentCandle || !isChartReady) return;
 
     // Validate candle data - time must be a number
     if (typeof currentCandle.time !== "number" || isNaN(currentCandle.time) || currentCandle.time <= 0) {
@@ -282,7 +351,7 @@ export function CandlestickChart({ symbol, height }: CandlestickChartProps) {
       // Silently ignore update errors - they can happen during interval switches
       console.warn("[Chart] Error updating current candle:", err);
     }
-  }, [currentCandle]);
+  }, [currentCandle, isChartReady]);
 
   const handleIntervalChange = useCallback((newInterval: CandleInterval) => {
     setInterval(newInterval);

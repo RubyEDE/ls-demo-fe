@@ -512,13 +512,9 @@
     padding: 0.375rem;
   }
 
+  /* Hide header on mobile */
   .order-form-header {
-    margin-bottom: 0.375rem;
-    padding-bottom: 0.25rem;
-  }
-
-  .order-form-header h3 {
-    font-size: 0.7rem;
+    display: none;
   }
 
   .order-form {
@@ -556,23 +552,41 @@
     font-size: 0.6rem;
   }
 
+  /* Prevent iOS zoom on input focus - must be 16px minimum */
   .input-group input {
     padding: 0.25rem 0.375rem;
+    font-size: 16px;
+  }
+
+  /* Smaller placeholder text */
+  .input-group input::placeholder {
     font-size: 0.75rem;
+  }
+
+  /* Hide hint on mobile to save space */
+  .input-hint {
+    display: none;
   }
 
   .order-summary {
     padding: 0.375rem;
   }
 
+  /* Only show Order Value on mobile */
   .summary-row {
     padding: 0.125rem 0;
     font-size: 0.65rem;
+    display: none;
   }
 
+  .summary-row:first-child {
+    display: flex;
+  }
+
+  /* Bigger submit button on mobile */
   .submit-btn {
-    padding: 0.375rem;
-    font-size: 0.75rem;
+    padding: 0.625rem;
+    font-size: 0.85rem;
   }
 
   .order-form-auth-required {

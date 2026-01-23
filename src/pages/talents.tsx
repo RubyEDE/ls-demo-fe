@@ -822,12 +822,10 @@ export function TalentsPage() {
           {/* Title Section */}
           <div className="talents-title-section">
             <h1 className="talents-title">Talent Tree</h1>
-            {talentTree.availablePoints > 0 && (
-              <div className="available-points-badge">
-                <span className="points-number">{talentTree.availablePoints}</span>
-                <span className="points-label">points available</span>
-              </div>
-            )}
+            <div className={`available-points-badge ${talentTree.availablePoints > 0 ? 'visible' : 'hidden'}`}>
+              <span className="points-number">{talentTree.availablePoints || 0}</span>
+              <span className="points-label">points available</span>
+            </div>
           </div>
 
           {/* Combined Tree Container */}
