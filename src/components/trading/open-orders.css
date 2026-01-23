@@ -172,17 +172,23 @@
 
 /* Mobile compact styles */
 @media (max-width: 600px) {
+  .orders-table-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
   .orders-table {
-    font-size: 0.6rem;
+    font-size: 0.65rem;
+    min-width: max-content;
   }
 
   .orders-table th {
-    padding: 0.25rem 0.25rem;
+    padding: 0.3rem 0.4rem;
     font-size: 0.55rem;
   }
 
   .orders-table td {
-    padding: 0.25rem 0.25rem;
+    padding: 0.3rem 0.4rem;
   }
 
   .orders-table .col-symbol .market-image {
@@ -196,6 +202,16 @@
 
   .orders-table .col-type {
     font-size: 0.5rem;
+  }
+
+  /* Sticky action column */
+  .orders-table th.col-action-header,
+  .orders-table td.col-action {
+    position: sticky;
+    right: 0;
+    background: #131722;
+    box-shadow: -4px 0 8px rgba(0, 0, 0, 0.3);
+    z-index: 1;
   }
 
   .fill-bar {
@@ -212,8 +228,8 @@
   }
 
   .cancel-order-btn {
-    padding: 0.15rem 0.35rem;
-    font-size: 0.55rem;
+    padding: 0.2rem 0.4rem;
+    font-size: 0.6rem;
   }
 
   .cancel-all-btn {

@@ -276,17 +276,23 @@
 
 /* Mobile compact styles */
 @media (max-width: 600px) {
+  .positions-table-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
   .positions-table {
-    font-size: 0.6rem;
+    font-size: 0.65rem;
+    min-width: max-content;
   }
 
   .positions-table th {
-    padding: 0.25rem 0.25rem;
+    padding: 0.3rem 0.4rem;
     font-size: 0.55rem;
   }
 
   .positions-table td {
-    padding: 0.25rem 0.25rem;
+    padding: 0.3rem 0.4rem;
   }
 
   .positions-table .col-symbol .market-image {
@@ -298,9 +304,19 @@
     gap: 0.25rem;
   }
 
+  /* Sticky action column */
+  .positions-table th:last-child,
+  .positions-table td.col-action {
+    position: sticky;
+    right: 0;
+    background: #131722;
+    box-shadow: -4px 0 8px rgba(0, 0, 0, 0.3);
+    z-index: 1;
+  }
+
   .close-position-btn {
-    padding: 0.15rem 0.35rem;
-    font-size: 0.55rem;
+    padding: 0.2rem 0.4rem;
+    font-size: 0.6rem;
   }
 
   .positions-summary {

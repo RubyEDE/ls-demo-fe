@@ -83,6 +83,8 @@
   border: none;
   border-radius: 0;
   height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 .trading-tabs-content .positions-header,
@@ -160,6 +162,28 @@
     font-size: 0.55rem;
     padding: 0.05rem 0.25rem;
     min-width: 14px;
+  }
+
+  /* Hide headers on mobile - tabs already indicate the content */
+  .trading-tabs-content .positions-header,
+  .trading-tabs-content .open-orders-header,
+  .trading-tabs-content .trade-feed-header,
+  .trading-tabs-content .trade-history-header {
+    display: none;
+  }
+
+  /* Remove container padding on mobile for full-height scroll area */
+  .trading-tabs-content .positions-container,
+  .trading-tabs-content .open-orders-container {
+    padding: 0;
+  }
+
+  /* Make table wrapper fill remaining height for easier horizontal scroll */
+  .trading-tabs-content .positions-table-wrapper,
+  .trading-tabs-content .orders-table-wrapper {
+    flex: 1;
+    min-height: 0;
+    padding: 0.25rem;
   }
 
   .trading-tabs-content .positions-list,

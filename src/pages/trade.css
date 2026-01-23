@@ -304,7 +304,7 @@
   }
 
   .mobile-markets-view .trading-tabs-container {
-    height: 140px;
+    height: 160px;
     flex-shrink: 0;
     border: none;
     border-radius: 0;
@@ -345,7 +345,7 @@
   }
 
   .mobile-trade-view .trading-tabs-container {
-    height: 140px;
+    height: 160px;
     flex-shrink: 0;
     border: none;
     border-radius: 0;

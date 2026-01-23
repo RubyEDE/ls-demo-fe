@@ -179,7 +179,7 @@ export function PositionsList({ market }: PositionsListProps) {
         <h3>Positions ({positions.length})</h3>
       </div>
 
-      {liveSummary && positions.length > 0 && (
+      {/* {liveSummary && positions.length > 0 && (
         <div className="positions-summary">
           <div className="summary-item">
             <span className="label">Margin</span>
@@ -206,7 +206,7 @@ export function PositionsList({ market }: PositionsListProps) {
             </button>
           )}
         </div>
-      )}
+      )} */}
 
       {positions.length === 0 ? (
         <div className="positions-empty">No open positions</div>
