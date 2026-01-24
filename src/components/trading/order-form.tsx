@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect, useCallback } from "react";
+import { createPortal } from "react-dom";
 import { useTrading } from "../../hooks/use-trading";
 import { useAuth } from "../../context/auth-context";
 import { useBalance } from "../../context/balance-context";
@@ -216,8 +217,8 @@ export function OrderForm({ market, onOrderPlaced, selectedPrice }: OrderFormPro
           </button>
         </div>
 
-        {/* Leverage Popup */}
-        {showLeveragePopup && (
+        {/* Leverage Popup - rendered via portal to escape transform stacking context */}
+        {showLeveragePopup && createPortal(
           <div className="leverage-popup-overlay" onClick={handleCancelLeverage}>
             <div className="leverage-popup" onClick={(e) => e.stopPropagation()}>
               <div className="leverage-popup-header">
@@ -261,7 +262,8 @@ export function OrderForm({ market, onOrderPlaced, selectedPrice }: OrderFormPro
                 </button>
               </div>
             </div>
-          </div>
+          </div>,
+          document.body
         )}
 
         {/* Price Input (Limit only) */}

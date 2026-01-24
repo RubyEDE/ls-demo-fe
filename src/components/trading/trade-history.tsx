@@ -23,27 +23,30 @@ function formatQuantity(qty: number): string {
 }
 
 function formatTime(timestamp: string): string {
-  return new Date(timestamp).toLocaleTimeString("en-US", {
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
-    hour12: false,
-  });
-}
-
-function formatDate(timestamp: string): string {
   const date = new Date(timestamp);
   const today = new Date();
   const isToday = date.toDateString() === today.toDateString();
-  
+
   if (isToday) {
-    return formatTime(timestamp);
+    return date.toLocaleTimeString("en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    });
   }
-  
-  return date.toLocaleDateString("en-US", {
-    month: "short",
-    day: "numeric",
-  }) + " " + formatTime(timestamp);
+
+  return (
+    date.toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+    }) +
+    " " +
+    date.toLocaleTimeString("en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    })
+  );
 }
 
 function formatMarketName(marketSymbol: string): string {
@@ -63,37 +66,30 @@ function getMarketImagePath(marketSymbol: string): string {
 
 function TradeRow({ trade }: { trade: UserTrade }) {
   return (
-    <div className="trade-history-row">
-      <div className="trade-history-info">
-        <div className="trade-history-main">
-          <span className={`trade-history-side ${trade.side}`}>
-            {trade.side.toUpperCase()}
-          </span>
-          <img
-            src={getMarketImagePath(trade.marketSymbol)}
-            alt={trade.marketSymbol}
-            className="trade-history-market-image"
-          />
-          <span className="trade-history-symbol">{formatMarketName(trade.marketSymbol)}</span>
-          {trade.isMaker && <span className="trade-history-maker">Maker</span>}
-        </div>
-        <div className="trade-history-details">
-          <span className="trade-history-price">{formatPrice(trade.price)}</span>
-          <span className="trade-history-qty">{formatQuantity(trade.quantity)}</span>
-          <span className="trade-history-time">{formatDate(trade.timestamp)}</span>
-        </div>
-      </div>
-      <div className="trade-history-values">
-        <span className="trade-history-value">{formatMoney(trade.quoteQuantity)}</span>
-        <span className="trade-history-fee">Fee: {formatMoney(trade.fee)}</span>
-      </div>
-    </div>
+    <tr>
+      <td className="col-symbol">
+        <img
+          src={getMarketImagePath(trade.marketSymbol)}
+          alt={trade.marketSymbol}
+          className="market-image"
+        />
+        {formatMarketName(trade.marketSymbol)}
+      </td>
+      <td className={`col-side ${trade.side}`}>{trade.side.toUpperCase()}</td>
+      <td className="col-type">
+        {trade.isMaker ? <span className="maker-badge">Maker</span> : <span className="taker-badge">Taker</span>}
+      </td>
+      <td className="col-price">{formatPrice(trade.price)}</td>
+      <td className="col-qty">{formatQuantity(trade.quantity)}</td>
+      <td className="col-value">{formatMoney(trade.quoteQuantity)}</td>
+      <td className="col-time">{formatTime(trade.timestamp)}</td>
+    </tr>
   );
 }
 
 export function TradeHistory({ market }: TradeHistoryProps) {
   const { isAuthenticated } = useAuth();
-  const { trades, isLoading, hasMore, loadMore } = useTradeHistory({ market });
+  const { trades, isLoading, hasMore, error, loadMore, refresh } = useTradeHistory({ market });
 
   if (!isAuthenticated) {
     return (
@@ -117,20 +113,51 @@ export function TradeHistory({ market }: TradeHistoryProps) {
     );
   }
 
+  if (error) {
+    return (
+      <div className="trade-history-container">
+        <div className="trade-history-header">
+          <h3>Trade History</h3>
+        </div>
+        <div className="trade-history-error">
+          <span>Error: {error}</span>
+          <button onClick={refresh} className="trade-history-retry">
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="trade-history-container">
       <div className="trade-history-header">
-        <h3>Trade History</h3>
+        <h3>Trade History ({trades.length}{hasMore ? "+" : ""})</h3>
       </div>
 
       {trades.length === 0 ? (
         <div className="trade-history-empty">No trades yet</div>
       ) : (
         <>
-          <div className="trade-history-list">
-            {trades.map((trade) => (
-              <TradeRow key={trade.tradeId} trade={trade} />
-            ))}
+          <div className="trades-table-wrapper">
+            <table className="trades-table">
+              <thead>
+                <tr>
+                  <th>Symbol</th>
+                  <th>Side</th>
+                  <th>Type</th>
+                  <th>Price</th>
+                  <th>Qty</th>
+                  <th>Value</th>
+                  <th>Time</th>
+                </tr>
+              </thead>
+              <tbody>
+                {trades.map((trade) => (
+                  <TradeRow key={trade.tradeId} trade={trade} />
+                ))}
+              </tbody>
+            </table>
           </div>
           {hasMore && (
             <button

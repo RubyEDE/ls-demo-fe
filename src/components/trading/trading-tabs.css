@@ -80,6 +80,7 @@
 .trading-tabs-content .trade-feed-container,
 .trading-tabs-content .trade-history-container {
   background: transparent;
+  display: none;
   border: none;
   border-radius: 0;
   height: 100%;
@@ -92,6 +93,7 @@
 .trading-tabs-content .trade-feed-header,
 .trading-tabs-content .trade-history-header {
   padding: 0.75rem 1rem 0.5rem;
+  display: none;
   margin-bottom: 0;
   border-bottom: none;
 }
