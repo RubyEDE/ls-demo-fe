@@ -2,8 +2,7 @@ import { useState, useMemo, useRef, useEffect } from "react";
 import { useAchievements } from "../hooks/use-achievements";
 import type { 
   GroupedProgression, 
-  UserAchievementProgress, 
-  Achievement 
+  UserAchievementProgress
 } from "../types/achievements";
 import "./achievements.css";
 
@@ -241,50 +240,12 @@ function StandaloneCard({ achievement }: StandaloneCardProps) {
   );
 }
 
-// ===== PUBLIC ACHIEVEMENT CARD (for non-authenticated users) =====
-interface PublicCardProps {
-  achievement: Achievement;
-}
-
-function PublicCard({ achievement }: PublicCardProps) {
-  return (
-    <div className="achievement-card">
-      {/* Left: Tall image */}
-      <div className="achievement-image">
-        <img 
-          src={`/images/achievements/${achievement.progressionGroup || achievement.id}.png`} 
-          alt={achievement.name}
-          onError={(e) => {
-            e.currentTarget.style.display = 'none';
-            e.currentTarget.nextElementSibling?.classList.remove('hidden');
-          }}
-        />
-        <div className="achievement-image-fallback hidden">
-          {getIconDisplay(achievement.icon)}
-        </div>
-      </div>
-
-      {/* Right: Content */}
-      <div className="achievement-content">
-        <div className="achievement-header">
-          <h3 className="achievement-title">{achievement.name}</h3>
-          <span className="card-points">{achievement.points} pts</span>
-        </div>
-
-        <p className="achievement-desc">{achievement.description}</p>
-
-        <div className="achievement-footer" />
-      </div>
-    </div>
-  );
-}
 
 // ===== MAIN PAGE COMPONENT =====
 export function AchievementsPage() {
   const { 
     progressions, 
     standalone, 
-    publicAchievements, 
     stats, 
     isLoading, 
     error,
@@ -305,16 +266,17 @@ export function AchievementsPage() {
         maxPoints: stats.maxPoints,
       };
     }
-    // For public view, calculate from public achievements
-    const total = publicAchievements.length;
-    const maxPoints = publicAchievements.reduce((sum, a) => sum + a.points, 0);
+    // For public view, calculate from progressions and standalone
+    const progressionPoints = progressions.reduce((sum, p) => sum + p.totalPoints, 0);
+    const standalonePoints = standalone.reduce((sum, a) => sum + a.points, 0);
+    const totalAchievements = progressions.reduce((sum, p) => sum + p.stages.length, 0) + standalone.length;
     return { 
       earned: 0,
-      total,
+      total: totalAchievements,
       earnedPoints: 0,
-      maxPoints,
+      maxPoints: progressionPoints + standalonePoints,
     };
-  }, [stats, publicAchievements]);
+  }, [stats, progressions, standalone]);
 
   // Filter and sort progressions
   const filteredProgressions = useMemo(() => {
@@ -409,41 +371,7 @@ export function AchievementsPage() {
     return filtered;
   }, [standalone, filter, sort, searchQuery]);
 
-  // Filter and sort public achievements
-  const filteredPublic = useMemo(() => {
-    let filtered = [...publicAchievements];
-
-    // For public view, "earned" filter shows nothing, "in-progress" shows all
-    if (filter === "earned") {
-      return [];
-    }
-
-    if (searchQuery.trim()) {
-      const query = searchQuery.toLowerCase();
-      filtered = filtered.filter((a) =>
-        a.name.toLowerCase().includes(query) ||
-        a.description.toLowerCase().includes(query) ||
-        a.category.toLowerCase().includes(query)
-      );
-    }
-
-    filtered.sort((a, b) => {
-      switch (sort) {
-        case "points":
-          return b.points - a.points;
-        case "category":
-          return a.category.localeCompare(b.category);
-        case "name":
-          return a.name.localeCompare(b.name);
-        default:
-          return 0;
-      }
-    });
-
-    return filtered;
-  }, [publicAchievements, filter, sort, searchQuery]);
-
-  const hasResults = filteredProgressions.length > 0 || filteredStandalone.length > 0 || filteredPublic.length > 0;
+  const hasResults = filteredProgressions.length > 0 || filteredStandalone.length > 0;
 
   // Show loading state
   if (isLoading) {
@@ -581,19 +509,14 @@ export function AchievementsPage() {
 
       {/* Achievement Grid */}
       <div className="achievements-grid">
-        {/* Progression cards (authenticated users) */}
+        {/* Progression cards */}
         {filteredProgressions.map((progression) => (
           <ProgressionCard key={progression.progressionGroup} progression={progression} />
         ))}
         
-        {/* Standalone achievement cards (authenticated users) */}
+        {/* Standalone achievement cards */}
         {filteredStandalone.map((achievement) => (
           <StandaloneCard key={achievement.id} achievement={achievement} />
-        ))}
-
-        {/* Public achievement cards (non-authenticated users) */}
-        {filteredPublic.map((achievement) => (
-          <PublicCard key={achievement.id} achievement={achievement} />
         ))}
       </div>
 

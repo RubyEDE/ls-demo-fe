@@ -119,7 +119,6 @@ function MarketDropdown({ markets, selectedMarket, prices, lastTradePrices, onSe
             const lastTrade = lastTradePrices?.get(market.baseAsset.toUpperCase());
             const displayPrice = lastTrade?.price ?? priceFeed?.price ?? null;
             const isSelected = selectedMarket?.symbol === market.symbol;
-            const isPositive = priceFeed ? priceFeed.change >= 0 : true;
 
             return (
               <button
@@ -139,9 +138,7 @@ function MarketDropdown({ markets, selectedMarket, prices, lastTradePrices, onSe
                 <span className={`item-price ${lastTrade?.side === "buy" ? "price-up" : lastTrade?.side === "sell" ? "price-down" : ""}`}>
                   {displayPrice !== null ? formatPrice(displayPrice) : "--"}
                 </span>
-                <span className={`item-change ${isPositive ? "positive" : "negative"}`}>
-                  {priceFeed ? `${isPositive ? "+" : ""}${priceFeed.changePercent.toFixed(2)}%` : "--"}
-                </span>
+            
               </button>
             );
           })}

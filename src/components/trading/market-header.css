@@ -148,12 +148,10 @@
 }
 
 .market-item-image {
-  width: 28px;
-  height: 28px;
-  border-radius: 6px;
+  width: 36px;
+  height: 36px;
   object-fit: cover;
   flex-shrink: 0;
-  border: 1px solid rgba(255, 255, 255, 0.08);
   transition: transform 0.2s ease, border-color 0.2s ease;
 }
 

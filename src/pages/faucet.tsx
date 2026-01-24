@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from "react";
+import { useConnectModal } from "@rainbow-me/rainbowkit";
 import {
   getFaucetStats,
   getFaucetHistory,
@@ -191,6 +192,7 @@ const BASE_CLAIM_AMOUNT = 100;
 export function FaucetPage() {
   const { isConnected, isAuthenticated, isAuthLoading, login } = useAuth();
   const { refreshBalance } = useBalance();
+  const { openConnectModal } = useConnectModal();
   
   const [stats, setStats] = useState<FaucetStats | null>(null);
   const [history, setHistory] = useState<FaucetHistoryItem[]>([]);
@@ -254,8 +256,14 @@ export function FaucetPage() {
   }, [stats?.nextRequestAt, stats?.canRequest]);
 
   const handleClaim = async () => {
+    // If not connected, open connect modal
+    if (!isConnected) {
+      openConnectModal?.();
+      return;
+    }
+    
     // If connected but not authenticated, trigger sign-in
-    if (isConnected && !isAuthenticated) {
+    if (!isAuthenticated) {
       login();
       return;
     }
@@ -342,7 +350,7 @@ export function FaucetPage() {
 
             <button
               onClick={handleClaim}
-              disabled={!isConnected || isAuthLoading || (isAuthenticated && (isClaiming || !stats?.canRequest))}
+              disabled={isAuthLoading || (isAuthenticated && (isClaiming || !stats?.canRequest))}
               className={`claim-btn ${!isAuthenticated && isConnected ? "sign-in" : ""}`}
             >
               {!isConnected ? (

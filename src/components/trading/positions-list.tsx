@@ -57,8 +57,8 @@ function getMarketImagePath(marketSymbol: string): string {
 
 export function PositionsList({ market }: PositionsListProps) {
   const { isAuthenticated } = useAuth();
-  const { positions, summary, isLoading, refresh } = usePositions({ market });
-  const { closePosition, closeAllPositions, isClosing } = usePositionActions();
+  const { positions, isLoading, refresh } = usePositions({ market });
+  const { closePosition, isClosing } = usePositionActions();
   const { refreshBalance } = useBalance();
 
   // Get unique symbols from positions for price subscription
@@ -91,20 +91,20 @@ export function PositionsList({ market }: PositionsListProps) {
     [livePrices]
   );
 
-  // Calculate live summary totals
-  const liveSummary = useMemo(() => {
-    if (!summary || positions.length === 0) return summary;
+  // Calculate live summary totals (currently unused - summary section commented out)
+  // const _liveSummary = useMemo(() => {
+  //   if (!summary || positions.length === 0) return summary;
 
-    const totalLivePnl = positions.reduce((total, position) => {
-      return total + getLivePnl(position);
-    }, 0);
+  //   const totalLivePnl = positions.reduce((total, position) => {
+  //     return total + getLivePnl(position);
+  //   }, 0);
 
-    return {
-      ...summary,
-      totalUnrealizedPnl: totalLivePnl,
-      totalEquity: summary.totalMargin + totalLivePnl,
-    };
-  }, [summary, positions, getLivePnl]);
+  //   return {
+  //     ...summary,
+  //     totalUnrealizedPnl: totalLivePnl,
+  //     totalEquity: summary.totalMargin + totalLivePnl,
+  //   };
+  // }, [summary, positions, getLivePnl]);
 
   // Listen to position WebSocket events for real-time updates
   useUserEvents({
@@ -145,11 +145,12 @@ export function PositionsList({ market }: PositionsListProps) {
     }
   };
 
-  const handleCloseAll = async () => {
-    await closeAllPositions(positions);
-    refresh();
-    refreshBalance();
-  };
+  // Currently unused - summary section commented out
+  // const _handleCloseAll = async () => {
+  //   await closeAllPositions(positions);
+  //   refresh();
+  //   refreshBalance();
+  // };
 
   if (!isAuthenticated) {
     return (

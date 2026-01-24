@@ -11,6 +11,7 @@ import type {
   UserAchievementProgress,
   AchievementStats,
   LeaderboardEntry,
+  ProgressionStage,
 } from "../types/achievements";
 import { useAuth } from "../context/auth-context";
 
@@ -23,6 +24,71 @@ interface UseAchievementsReturn {
   error: string | null;
   isAuthenticated: boolean;
   refresh: () => Promise<void>;
+}
+
+// Group public achievements into progressions and standalone (same structure as authenticated view)
+function groupPublicAchievements(achievements: Achievement[]): {
+  progressions: GroupedProgression[];
+  standalone: UserAchievementProgress[];
+} {
+  const progressionMap = new Map<string, Achievement[]>();
+  const standaloneAchievements: Achievement[] = [];
+
+  // Separate progression vs standalone achievements
+  for (const achievement of achievements) {
+    if (achievement.isProgression && achievement.progressionGroup) {
+      const existing = progressionMap.get(achievement.progressionGroup) || [];
+      existing.push(achievement);
+      progressionMap.set(achievement.progressionGroup, existing);
+    } else {
+      standaloneAchievements.push(achievement);
+    }
+  }
+
+  // Build grouped progressions
+  const progressions: GroupedProgression[] = [];
+  for (const [progressionGroup, groupAchievements] of progressionMap) {
+    // Sort by progression order
+    groupAchievements.sort((a, b) => (a.progressionOrder || 0) - (b.progressionOrder || 0));
+
+    const stages: ProgressionStage[] = groupAchievements.map((a) => ({
+      id: a.id,
+      name: a.name,
+      description: a.description,
+      icon: a.icon,
+      points: a.points,
+      threshold: a.requirement.threshold,
+      order: a.progressionOrder || 0,
+      isUnlocked: false,
+      unlockedAt: null,
+    }));
+
+    const totalPoints = groupAchievements.reduce((sum, a) => sum + a.points, 0);
+    const maxThreshold = Math.max(...groupAchievements.map((a) => a.requirement.threshold));
+
+    progressions.push({
+      progressionGroup,
+      category: groupAchievements[0].category,
+      currentProgress: 0,
+      maxThreshold,
+      totalPoints,
+      earnedPoints: 0,
+      currentStage: 0,
+      totalStages: groupAchievements.length,
+      stages,
+    });
+  }
+
+  // Convert standalone to UserAchievementProgress format (with no progress)
+  const standalone: UserAchievementProgress[] = standaloneAchievements.map((a) => ({
+    ...a,
+    isUnlocked: false,
+    unlockedAt: null,
+    currentProgress: 0,
+    progressPercentage: 0,
+  }));
+
+  return { progressions, standalone };
 }
 
 export function useAchievements(): UseAchievementsReturn {
@@ -51,11 +117,12 @@ export function useAchievements(): UseAchievementsReturn {
         setPublicAchievements([]);
         setStats(userStats);
       } else {
-        // Fetch public achievements
+        // Fetch public achievements and group them the same way
         const achievements = await getAchievements();
+        const grouped = groupPublicAchievements(achievements);
+        setProgressions(grouped.progressions);
+        setStandalone(grouped.standalone);
         setPublicAchievements(achievements);
-        setProgressions([]);
-        setStandalone([]);
         setStats(null);
       }
     } catch (err) {

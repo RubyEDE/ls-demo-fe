@@ -46,6 +46,10 @@
   width: auto;
 }
 
+.logo-mobile {
+  display: none;
+}
+
 .nav {
   display: flex;
   align-items: center;
@@ -53,7 +57,7 @@
 }
 
 .nav-link {
-  color: var(--text-secondary);
+  color: #ffffff;
   text-decoration: none;
   padding: 0.5rem 0.875rem;
   font-size: 0.875rem;
@@ -198,7 +202,7 @@
 }
 
 .nav-mobile-link {
-  color: var(--text-secondary);
+  color: #ffffff;
   text-decoration: none;
   padding: 1rem 1.25rem;
   border-radius: 10px;
@@ -245,8 +249,13 @@
     gap: 1rem;
   }
 
-  .logo {
-    height: 60px;
+  .logo-desktop {
+    display: none;
+  }
+
+  .logo-mobile {
+    display: block;
+    height: 40px;
   }
 }
 
@@ -261,7 +270,7 @@
     border-left: none;
   }
 
-  .logo {
-    height: 60px;
+  .logo-mobile {
+    height: 36px;
   }
 }

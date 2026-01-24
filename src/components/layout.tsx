@@ -41,9 +41,10 @@ export function Layout() {
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  // Close mobile menu on route change
+  // Close mobile menu and scroll to top on route change
   useEffect(() => {
     setIsMobileMenuOpen(false);
+    window.scrollTo(0, 0);
   }, [location.pathname]);
 
   // Prevent body scroll when mobile menu is open
@@ -63,7 +64,8 @@ export function Layout() {
       <header className={`header ${isTradePage ? "header-terminal" : ""}`}>
         <div className="header-left">
           <NavLink to="/" className="logo-link">
-            <img src="/logo.svg" alt="Longsword" className="logo" />
+            <img src="/logo.svg" alt="Longsword" className="logo logo-desktop" />
+            <img src="/mobile-logo.png" alt="Longsword" className="logo logo-mobile" />
           </NavLink>
           <nav className="nav nav-desktop">
             <NavLink
