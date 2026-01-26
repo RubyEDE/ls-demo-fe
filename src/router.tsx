@@ -5,6 +5,7 @@ import { FaucetPage } from "./pages/faucet";
 import { TalentsPage } from "./pages/talents";
 import { AchievementsPage } from "./pages/achievements";
 import { ReferralsPage } from "./pages/referrals";
+import { LoadingPage } from "./pages/loading";
 import { ErrorPage } from "./pages/error";
 
 export const router = createBrowserRouter([
@@ -32,6 +33,10 @@ export const router = createBrowserRouter([
       {
         path: "referrals",
         element: <ReferralsPage />,
+      },
+      {
+        path: "loading",
+        element: <LoadingPage />,
       },
     ],
   },

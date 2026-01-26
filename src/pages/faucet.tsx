@@ -11,6 +11,7 @@ import { getTalentBonuses } from "../utils/talents-api";
 import type { TalentBonusesResponse } from "../types/talents";
 import { useAuth } from "../context/auth-context";
 import { useBalance } from "../context/balance-context";
+import { SwordLoader } from "../components/sword-loader";
 import "./faucet.css";
 
 // Water droplet animation component
@@ -294,8 +295,7 @@ export function FaucetPage() {
   if (isAuthenticated && isLoading) {
     return (
       <div className="faucet-loading">
-        <div className="spinner" />
-        <p>Loading faucet...</p>
+        <SwordLoader text="Loading faucet..." />
       </div>
     );
   }

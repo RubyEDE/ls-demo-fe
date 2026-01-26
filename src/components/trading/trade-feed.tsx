@@ -1,5 +1,6 @@
 import { useTradeFeed } from "../../hooks/use-trade-feed";
 import type { Trade } from "../../types/websocket";
+import { SwordLoader } from "../sword-loader";
 import "./trade-feed.css";
 
 interface TradeFeedProps {
@@ -49,7 +50,9 @@ export function TradeFeed({ symbol, maxTrades = 50 }: TradeFeedProps) {
         <div className="trade-feed-header">
           <h3>Recent Trades</h3>
         </div>
-        <div className="trade-feed-loading">Connecting...</div>
+        <div className="trade-feed-loading">
+          <SwordLoader size="small" showParticles={false} />
+        </div>
       </div>
     );
   }

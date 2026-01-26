@@ -12,6 +12,7 @@ import type {
   TalentTreeType,
 } from "../types/talents";
 import { TALENT_TREES } from "../types/talents";
+import { SwordLoader } from "../components/sword-loader";
 import "./talents.css";
 
 // Mystical flowing lines background effect
@@ -752,11 +753,7 @@ export function TalentsPage() {
   if (isAuthenticated && isLoading) {
     return (
       <div className="talents-loading">
-        <div className="loading-orb">
-          <div className="orb-ring" />
-          <div className="orb-core" />
-        </div>
-        <p>Loading talents...</p>
+        <SwordLoader text="Loading talents..." />
       </div>
     );
   }

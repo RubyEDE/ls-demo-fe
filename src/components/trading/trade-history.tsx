@@ -1,6 +1,7 @@
 import { useTradeHistory } from "../../hooks/use-trade-history";
 import { useAuth } from "../../context/auth-context";
 import type { UserTrade } from "../../types/clob";
+import { SwordLoader } from "../sword-loader";
 import "./trade-history.css";
 
 interface TradeHistoryProps {
@@ -108,7 +109,9 @@ export function TradeHistory({ market }: TradeHistoryProps) {
         <div className="trade-history-header">
           <h3>Trade History</h3>
         </div>
-        <div className="trade-history-loading">Loading trades...</div>
+        <div className="trade-history-loading">
+          <SwordLoader size="small" showParticles={false} />
+        </div>
       </div>
     );
   }

@@ -4,6 +4,7 @@ import type {
   GroupedProgression, 
   UserAchievementProgress
 } from "../types/achievements";
+import { SwordLoader } from "../components/sword-loader";
 import "./achievements.css";
 
 type FilterType = "all" | "earned" | "in-progress";
@@ -384,8 +385,7 @@ export function AchievementsPage() {
           <div className="bg-particles" />
         </div>
         <div className="achievements-loading">
-          <div className="loading-spinner" />
-          <p>Loading achievements...</p>
+          <SwordLoader text="Loading achievements..." />
         </div>
       </div>
     );

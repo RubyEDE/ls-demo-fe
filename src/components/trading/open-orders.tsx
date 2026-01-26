@@ -3,6 +3,7 @@ import { useTrading } from "../../hooks/use-trading";
 import { useAuth } from "../../context/auth-context";
 import { useBalance } from "../../context/balance-context";
 import type { Order } from "../../types/clob";
+import { SwordLoader } from "../sword-loader";
 import "./open-orders.css";
 
 interface OpenOrdersProps {
@@ -69,7 +70,9 @@ export function OpenOrders({ market }: OpenOrdersProps) {
         <div className="open-orders-header">
           <h3>Open Orders</h3>
         </div>
-        <div className="open-orders-loading">Loading orders...</div>
+        <div className="open-orders-loading">
+          <SwordLoader size="small" showParticles={false} />
+        </div>
       </div>
     );
   }

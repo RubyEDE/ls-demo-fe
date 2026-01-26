@@ -7,6 +7,7 @@ import { useUserEvents } from "../../hooks/use-user-events";
 import { useLastTradePrices } from "../../hooks/use-last-trade-prices";
 import type { Position } from "../../types/position";
 import type { PositionEvent } from "../../types/websocket";
+import { SwordLoader } from "../sword-loader";
 import "./positions-list.css";
 
 // Calculate unrealized PnL based on current mark price
@@ -169,7 +170,9 @@ export function PositionsList({ market }: PositionsListProps) {
         <div className="positions-header">
           <h3>Positions</h3>
         </div>
-        <div className="positions-loading">Loading positions...</div>
+        <div className="positions-loading">
+          <SwordLoader size="small" showParticles={false} />
+        </div>
       </div>
     );
   }

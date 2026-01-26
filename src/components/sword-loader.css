@@ -1,0 +1,341 @@
+/* Sword Loader Component */
+
+.sword-loader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+}
+
+.sword-loader-text {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  animation: text-pulse 2s ease-in-out infinite;
+}
+
+@keyframes text-pulse {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+
+/* Sword Container */
+.sword-container {
+  position: relative;
+  width: 80px;
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sword-container.small {
+  width: 48px;
+  height: 72px;
+}
+
+.sword-container.large {
+  width: 120px;
+  height: 180px;
+}
+
+/* The Sword */
+.sword {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  animation: sword-float 3s ease-in-out infinite;
+}
+
+/* Blade */
+.sword-blade {
+  position: absolute;
+  left: 50%;
+  top: 8%;
+  transform: translateX(-50%);
+  width: 12%;
+  height: 55%;
+  background: linear-gradient(
+    180deg,
+    #ffffff 0%,
+    #e0e0e0 20%,
+    #c0c0c0 50%,
+    #a0a0a0 100%
+  );
+  clip-path: polygon(50% 0%, 100% 15%, 100% 100%, 0% 100%, 0% 15%);
+  border-radius: 2px 2px 0 0;
+}
+
+.sword-blade::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 0;
+  transform: translateX(-50%);
+  width: 2px;
+  height: 100%;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.8) 0%,
+    rgba(255, 255, 255, 0.2) 100%
+  );
+}
+
+/* Blade Glow */
+.sword-glow {
+  position: absolute;
+  left: 50%;
+  top: 8%;
+  transform: translateX(-50%);
+  width: 24%;
+  height: 55%;
+  background: radial-gradient(
+    ellipse at center,
+    var(--accent-cyan) 0%,
+    transparent 70%
+  );
+  opacity: 0;
+  filter: blur(8px);
+  animation: blade-glow 2s ease-in-out infinite;
+}
+
+@keyframes blade-glow {
+  0%, 100% { opacity: 0; }
+  50% { opacity: 0.6; }
+}
+
+/* Guard/Crossguard */
+.sword-guard {
+  position: absolute;
+  left: 50%;
+  top: 60%;
+  transform: translateX(-50%);
+  width: 45%;
+  height: 8%;
+  background: linear-gradient(
+    90deg,
+    #8b6914 0%,
+    #d4a520 30%,
+    #ffd700 50%,
+    #d4a520 70%,
+    #8b6914 100%
+  );
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.sword-guard::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 20%;
+  height: 120%;
+  background: linear-gradient(
+    180deg,
+    #ffd700 0%,
+    #b8860b 100%
+  );
+  border-radius: 2px;
+}
+
+/* Grip/Handle */
+.sword-grip {
+  position: absolute;
+  left: 50%;
+  top: 66%;
+  transform: translateX(-50%);
+  width: 10%;
+  height: 22%;
+  background: repeating-linear-gradient(
+    0deg,
+    #3d2914 0px,
+    #3d2914 4px,
+    #5a3d1a 4px,
+    #5a3d1a 8px
+  );
+  border-radius: 2px;
+}
+
+/* Pommel */
+.sword-pommel {
+  position: absolute;
+  left: 50%;
+  bottom: 6%;
+  transform: translateX(-50%);
+  width: 18%;
+  height: 8%;
+  background: radial-gradient(
+    circle at 40% 40%,
+    #ffd700 0%,
+    #b8860b 60%,
+    #8b6914 100%
+  );
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Pommel gem */
+.sword-pommel::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 40%;
+  height: 40%;
+  background: radial-gradient(
+    circle at 30% 30%,
+    var(--accent-cyan) 0%,
+    #007a6a 100%
+  );
+  border-radius: 50%;
+  animation: gem-pulse 2s ease-in-out infinite;
+}
+
+@keyframes gem-pulse {
+  0%, 100% { 
+    box-shadow: 0 0 4px var(--accent-cyan);
+    opacity: 0.7;
+  }
+  50% { 
+    box-shadow: 0 0 12px var(--accent-cyan), 0 0 20px var(--accent-cyan);
+    opacity: 1;
+  }
+}
+
+/* Float animation */
+@keyframes sword-float {
+  0%, 100% { 
+    transform: translateY(0) rotate(0deg);
+  }
+  25% {
+    transform: translateY(-8px) rotate(1deg);
+  }
+  50% { 
+    transform: translateY(-12px) rotate(0deg);
+  }
+  75% {
+    transform: translateY(-8px) rotate(-1deg);
+  }
+}
+
+/* Particle effects container */
+.sword-particles {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.sword-particle {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: var(--accent-cyan);
+  border-radius: 50%;
+  opacity: 0;
+  animation: particle-float 3s ease-out infinite;
+}
+
+.sword-particle:nth-child(1) {
+  left: 30%;
+  bottom: 20%;
+  animation-delay: 0s;
+}
+
+.sword-particle:nth-child(2) {
+  left: 50%;
+  bottom: 15%;
+  animation-delay: 0.5s;
+}
+
+.sword-particle:nth-child(3) {
+  left: 70%;
+  bottom: 25%;
+  animation-delay: 1s;
+}
+
+.sword-particle:nth-child(4) {
+  left: 40%;
+  bottom: 30%;
+  animation-delay: 1.5s;
+}
+
+.sword-particle:nth-child(5) {
+  left: 60%;
+  bottom: 18%;
+  animation-delay: 2s;
+}
+
+@keyframes particle-float {
+  0% {
+    opacity: 0;
+    transform: translateY(0) scale(0);
+  }
+  10% {
+    opacity: 1;
+    transform: translateY(-10px) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-80px) scale(0.5);
+  }
+}
+
+/* Slash variant - sword does a slashing animation */
+.sword-container.slash .sword {
+  animation: sword-slash 1.5s ease-in-out infinite;
+  transform-origin: bottom center;
+}
+
+@keyframes sword-slash {
+  0%, 100% {
+    transform: rotate(-30deg);
+  }
+  50% {
+    transform: rotate(30deg);
+  }
+}
+
+/* Spin variant - sword spins */
+.sword-container.spin .sword {
+  animation: sword-spin 2s linear infinite;
+}
+
+@keyframes sword-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Pulse variant - sword pulses */
+.sword-container.pulse .sword {
+  animation: sword-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes sword-pulse {
+  0%, 100% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+  50% {
+    transform: scale(1.1);
+    filter: brightness(1.2);
+  }
+}
+
+.sword-container.pulse .sword-glow {
+  animation: blade-glow-intense 1.5s ease-in-out infinite;
+}
+
+@keyframes blade-glow-intense {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.9; }
+}

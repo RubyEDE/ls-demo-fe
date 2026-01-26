@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, useCallback, useLayoutEffect } from "react
 import { createChart, CandlestickSeries, type IChartApi, type ISeriesApi } from "lightweight-charts";
 import { useCandles, useCandleData } from "../../context/candle-context";
 import type { CandleInterval } from "../../types/candles";
+import { SwordLoader } from "../sword-loader";
 import "./candlestick-chart.css";
 
 interface CandlestickChartProps {
@@ -383,8 +384,7 @@ export function CandlestickChart({ symbol, height }: CandlestickChartProps) {
       <div ref={chartWrapperRef} className="chart-wrapper" style={height ? { height } : undefined}>
         {isLoading && candles.length === 0 && (
           <div className="chart-loading">
-            <div className="loading-spinner" />
-            <span>Loading chart...</span>
+            <SwordLoader size="small" showParticles={false} />
           </div>
         )}
 

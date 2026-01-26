@@ -1,5 +1,6 @@
 import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/auth-context";
+import { SwordLoader } from "./sword-loader";
 import type { ReactNode } from "react";
 
 interface ProtectedRouteProps {
@@ -15,8 +16,7 @@ export function ProtectedRoute({ children, requireAuth = true }: ProtectedRouteP
   if (isConnecting) {
     return (
       <div className="loading-container">
-        <div className="spinner" />
-        <p>Connecting...</p>
+        <SwordLoader text="Connecting..." />
       </div>
     );
   }

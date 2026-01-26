@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { useOrderBook } from "../../hooks/use-order-book";
 import type { OrderBookEntry } from "../../types/websocket";
+import { SwordLoader } from "../sword-loader";
 import "./order-book.css";
 
 interface OrderBookProps {
@@ -78,7 +79,9 @@ export function OrderBook({ symbol, depth = 10, onPriceClick }: OrderBookProps) 
         <div className="order-book-header">
           <h3>Order Book</h3>
         </div>
-        <div className="order-book-loading">Connecting...</div>
+        <div className="order-book-loading">
+          <SwordLoader size="small" showParticles={false} />
+        </div>
       </div>
     );
   }
@@ -89,7 +92,9 @@ export function OrderBook({ symbol, depth = 10, onPriceClick }: OrderBookProps) 
         <div className="order-book-header">
           <h3>Order Book</h3>
         </div>
-        <div className="order-book-loading">Loading order book...</div>
+        <div className="order-book-loading">
+          <SwordLoader size="small" showParticles={false} />
+        </div>
       </div>
     );
   }
